@@ -56,14 +56,45 @@ else
   git clone --depth 1 --branch main "$REPO_URL" "$INSTALL_DIR"
 fi
 
-echo -e "${BLUE}==> Initializing git submodules (pipecat)${NC}"
-git -C "$INSTALL_DIR" submodule sync --recursive
-git -C "$INSTALL_DIR" submodule update --init --recursive --depth 1
+# pipecat is a git submodule; Docker build bind-mounts it. Ensure sources exist.
+ensure_pipecat() {
+  local root="$1"
+  if [[ -f "$root/pipecat/pyproject.toml" ]]; then
+    echo -e "${GREEN}✓ pipecat sources present${NC}"
+    return 0
+  fi
 
-if [[ ! -f "$INSTALL_DIR/pipecat/pyproject.toml" ]]; then
-  echo -e "${RED}pipecat submodule missing pyproject.toml — clone failed${NC}"
-  exit 1
-fi
+  echo -e "${BLUE}==> Initializing git submodules (pipecat)${NC}"
+  git -C "$root" submodule sync --recursive || true
+  git -C "$root" submodule update --init --recursive || true
+
+  if [[ -f "$root/pipecat/pyproject.toml" ]]; then
+    echo -e "${GREEN}✓ pipecat submodule checked out${NC}"
+    return 0
+  fi
+
+  # Fallback: some hosts fail shallow/submodule fetch. Clone pinned SHA directly.
+  local sha
+  sha="$(git -C "$root" ls-tree HEAD pipecat | awk '{print $3}')"
+  if [[ -z "$sha" ]]; then
+    echo -e "${RED}Could not resolve pipecat submodule SHA from git tree${NC}"
+    return 1
+  fi
+
+  echo -e "${BLUE}==> Fallback: cloning dograh-hq/pipecat @ ${sha}${NC}"
+  rm -rf "$root/pipecat"
+  git clone https://github.com/dograh-hq/pipecat.git "$root/pipecat"
+  git -C "$root/pipecat" fetch --depth 1 origin "$sha"
+  git -C "$root/pipecat" checkout --force "$sha"
+
+  if [[ ! -f "$root/pipecat/pyproject.toml" ]]; then
+    echo -e "${RED}pipecat/pyproject.toml still missing after fallback clone${NC}"
+    return 1
+  fi
+  echo -e "${GREEN}✓ pipecat cloned via fallback${NC}"
+}
+
+ensure_pipecat "$INSTALL_DIR"
 
 chmod +x "$INSTALL_DIR/scripts/install_elphie_remote.sh"
 SERVER_IP="$SERVER_IP" bash "$INSTALL_DIR/scripts/install_elphie_remote.sh"
