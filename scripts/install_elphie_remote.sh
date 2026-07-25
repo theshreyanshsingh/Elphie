@@ -113,7 +113,7 @@ services:
     pull_policy: never
 EOF
 
-# 4) Swap if needed (helps small EC2s during docker build)
+# 4) Swap if needed (helps small VMs during docker build)
 if ! swapon --show 2>/dev/null | grep -q .; then
   echo -e "${BLUE}==> Adding 4G swap${NC}"
   if [[ ! -f /swapfile ]]; then
@@ -124,9 +124,32 @@ if ! swapon --show 2>/dev/null | grep -q .; then
   swapon /swapfile || true
 fi
 
+# 4b) Disk check + Docker prune (API image + BuildKit cache needs ~15–25GB free)
+AVAIL_KB="$(df -Pk / | awk 'NR==2{print $4}')"
+AVAIL_GB=$(( AVAIL_KB / 1024 / 1024 ))
+echo -e "${BLUE}==> Free disk on /: ~${AVAIL_GB}G${NC}"
+if (( AVAIL_GB < 12 )); then
+  echo -e "${BLUE}==> Low disk — pruning Docker build cache / unused images${NC}"
+  docker builder prune -af || true
+  docker system prune -af || true
+  AVAIL_KB="$(df -Pk / | awk 'NR==2{print $4}')"
+  AVAIL_GB=$(( AVAIL_KB / 1024 / 1024 ))
+  echo -e "${BLUE}==> Free disk after prune: ~${AVAIL_GB}G${NC}"
+fi
+if (( AVAIL_GB < 8 )); then
+  echo -e "${RED}Not enough disk (~${AVAIL_GB}G free). Need ~12G+ to build elphie-api.${NC}"
+  echo -e "${RED}Resize the Azure disk, or free space, then re-run.${NC}"
+  df -h /
+  docker system df || true
+  exit 1
+fi
+
 # 5) Build one service at a time (more reliable on small instances)
 echo -e "${BLUE}==> Building API image (this can take a while)${NC}"
 docker compose --profile remote build api
+
+# Drop intermediate BuildKit layers before UI build (keeps disk pressure down)
+docker builder prune -af || true
 
 echo -e "${BLUE}==> Building UI image (this can take a while)${NC}"
 docker compose --profile remote build ui
