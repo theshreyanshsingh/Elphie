@@ -56,6 +56,15 @@ else
   git clone --depth 1 --branch main "$REPO_URL" "$INSTALL_DIR"
 fi
 
+echo -e "${BLUE}==> Initializing git submodules (pipecat)${NC}"
+git -C "$INSTALL_DIR" submodule sync --recursive
+git -C "$INSTALL_DIR" submodule update --init --recursive --depth 1
+
+if [[ ! -f "$INSTALL_DIR/pipecat/pyproject.toml" ]]; then
+  echo -e "${RED}pipecat submodule missing pyproject.toml — clone failed${NC}"
+  exit 1
+fi
+
 chmod +x "$INSTALL_DIR/scripts/install_elphie_remote.sh"
 SERVER_IP="$SERVER_IP" bash "$INSTALL_DIR/scripts/install_elphie_remote.sh"
 

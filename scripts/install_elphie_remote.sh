@@ -35,6 +35,17 @@ fi
 
 echo -e "${BLUE}==> Installing Elphie on ${SERVER_IP}${NC}"
 
+# 0) Ensure pipecat submodule is present (required for API Docker build)
+if [[ ! -f "$ROOT_DIR/pipecat/pyproject.toml" ]]; then
+  echo -e "${BLUE}==> Initializing git submodules (pipecat)${NC}"
+  git -C "$ROOT_DIR" submodule sync --recursive
+  git -C "$ROOT_DIR" submodule update --init --recursive --depth 1
+fi
+if [[ ! -f "$ROOT_DIR/pipecat/pyproject.toml" ]]; then
+  echo -e "${RED}pipecat/pyproject.toml missing. Run: git submodule update --init --recursive${NC}"
+  exit 1
+fi
+
 # 1) .env
 if [[ ! -f .env ]]; then
   echo -e "${BLUE}==> Creating .env${NC}"
