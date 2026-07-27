@@ -7,11 +7,11 @@ from pipecat.frames.frames import TranscriptionFrame
 from pipecat.processors.aggregators.llm_context import LLMContext
 from pipecat.processors.frame_processor import FrameDirection
 
-from api.services.pipecat.realtime.gemini_live import DograhGeminiLiveLLMService
+from api.services.pipecat.realtime.gemini_live import ElphieGeminiLiveLLMService
 
 
-class _TestDograhGeminiLiveLLMService(DograhGeminiLiveLLMService):
-    """Dograh Gemini service with client creation stubbed for unit tests."""
+class _TestElphieGeminiLiveLLMService(ElphieGeminiLiveLLMService):
+    """Elphie Gemini service with client creation stubbed for unit tests."""
 
     def create_client(self):
         self._client = SimpleNamespace(
@@ -26,8 +26,8 @@ class _FakeSession:
         self.close = AsyncMock()
 
 
-def _make_service() -> _TestDograhGeminiLiveLLMService:
-    service = _TestDograhGeminiLiveLLMService(api_key="test-key")
+def _make_service() -> _TestElphieGeminiLiveLLMService:
+    service = _TestElphieGeminiLiveLLMService(api_key="test-key")
     service.stop_all_metrics = AsyncMock()
     service.start_ttfb_metrics = AsyncMock()
     service.cancel_task = AsyncMock()

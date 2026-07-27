@@ -80,7 +80,7 @@ const ttsProviders = new Set([
   "deepgram",
   "sarvam",
   "cartesia",
-  "dograh",
+  "elphie",
   "rime"
 ]);
 

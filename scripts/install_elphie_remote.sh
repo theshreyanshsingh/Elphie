@@ -43,9 +43,9 @@ if [[ ! -f "$ROOT_DIR/pipecat/pyproject.toml" ]]; then
 fi
 if [[ ! -f "$ROOT_DIR/pipecat/pyproject.toml" ]]; then
   PIPECAT_SHA="$(git -C "$ROOT_DIR" ls-tree HEAD pipecat | awk '{print $3}')"
-  echo -e "${BLUE}==> Fallback: cloning dograh-hq/pipecat @ ${PIPECAT_SHA:-latest}${NC}"
+  echo -e "${BLUE}==> Fallback: cloning elphie-hq/pipecat @ ${PIPECAT_SHA:-latest}${NC}"
   rm -rf "$ROOT_DIR/pipecat"
-  git clone https://github.com/dograh-hq/pipecat.git "$ROOT_DIR/pipecat"
+  git clone https://github.com/elphie-hq/pipecat.git "$ROOT_DIR/pipecat"
   if [[ -n "${PIPECAT_SHA:-}" ]]; then
     git -C "$ROOT_DIR/pipecat" fetch --depth 1 origin "$PIPECAT_SHA"
     git -C "$ROOT_DIR/pipecat" checkout --force "$PIPECAT_SHA"
@@ -54,7 +54,7 @@ fi
 if [[ ! -f "$ROOT_DIR/pipecat/pyproject.toml" ]]; then
   echo -e "${RED}pipecat/pyproject.toml missing — cannot build API image${NC}"
   echo -e "${RED}Manual fix:${NC}"
-  echo "  cd $ROOT_DIR && rm -rf pipecat && git clone https://github.com/dograh-hq/pipecat.git pipecat"
+  echo "  cd $ROOT_DIR && rm -rf pipecat && git clone https://github.com/elphie-hq/pipecat.git pipecat"
   exit 1
 fi
 echo -e "${GREEN}✓ pipecat ready ($(git -C "$ROOT_DIR/pipecat" rev-parse --short HEAD 2>/dev/null || echo ok))${NC}"

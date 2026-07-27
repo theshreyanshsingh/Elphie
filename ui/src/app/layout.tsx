@@ -29,7 +29,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Elfie",
+  title: "Elphie",
   description: "Voice Assistant Workflow Builder",
 };
 

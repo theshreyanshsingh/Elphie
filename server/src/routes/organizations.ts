@@ -216,7 +216,7 @@ const warnings: RequestHandler = async (req, res, next) => {
 const modelDefaults: RequestHandler = (_req, res) => {
   const schemas = defaultConfigurationSchemas();
   res.json({
-    dograh: {
+    elphie: {
       voices: ["default"],
       allow_custom_input: true,
       speeds: [0.8, 0.9, 1, 1.1, 1.2],
@@ -679,7 +679,7 @@ const currentUsage: RequestHandler = async (req, res, next) => {
     res.json({
       period_start: start.toISOString(),
       period_end: end.toISOString(),
-      used_dograh_tokens: row.tokens,
+      used_elphie_tokens: row.tokens,
       total_duration_seconds: row.duration,
       used_amount_usd:
         organization?.price_per_second_usd != null
@@ -728,7 +728,7 @@ const usageAggregate = async (
     .selectFrom("workflow_runs as wr")
     .innerJoin("workflows as w", "wr.workflow_id", "w.id")
     .select([
-      sql<number>`COALESCE(sum((wr.usage_info->>'dograh_token_usage')::float), 0)`.as("tokens"),
+      sql<number>`COALESCE(sum((wr.usage_info->>'elphie_token_usage')::float), 0)`.as("tokens"),
       sql<number>`COALESCE(sum((wr.usage_info->>'call_duration_seconds')::int), 0)`.as("duration"),
       sql<number>`count(wr.id)`.as("count")
     ])
@@ -791,7 +791,7 @@ const usageRunResponse = (run: Record<string, unknown>) => {
     workflow_name: run.workflow_name ?? null,
     name: run.name,
     created_at: run.created_at,
-    dograh_token_usage: Number(usage.dograh_token_usage ?? usage.total_dograh_tokens ?? 0),
+    elphie_token_usage: Number(usage.elphie_token_usage ?? usage.total_elphie_tokens ?? 0),
     call_duration_seconds: Number(usage.call_duration_seconds ?? 0),
     recording_url: run.recording_url ?? null,
     transcript_url: run.transcript_url ?? null,
@@ -822,7 +822,7 @@ const usageRuns: RequestHandler = async (req, res, next) => {
     const aggregate = await usageAggregate(organizationId, null, null);
     res.json({
       runs: result.rows.map((row) => usageRunResponse(row as Record<string, unknown>)),
-      total_dograh_tokens: aggregate.tokens,
+      total_elphie_tokens: aggregate.tokens,
       total_duration_seconds: aggregate.duration,
       total_count: result.total,
       page: query.page,
@@ -854,7 +854,7 @@ const dailyBreakdown: RequestHandler = async (req, res, next) => {
       .select([
         sql<string>`to_char(wr.created_at, 'YYYY-MM-DD')`.as("date"),
         sql<number>`COALESCE(sum((wr.usage_info->>'call_duration_seconds')::float), 0)`.as("seconds"),
-        sql<number>`COALESCE(sum((wr.usage_info->>'dograh_token_usage')::float), 0)`.as("tokens"),
+        sql<number>`COALESCE(sum((wr.usage_info->>'elphie_token_usage')::float), 0)`.as("tokens"),
         sql<number>`count(wr.id)`.as("count")
       ])
       .where("w.organization_id", "=", organizationId)
@@ -865,14 +865,14 @@ const dailyBreakdown: RequestHandler = async (req, res, next) => {
       date: row.date,
       minutes: Number(row.seconds) / 60,
       cost_usd: null,
-      dograh_tokens: Number(row.tokens),
+      elphie_tokens: Number(row.tokens),
       call_count: Number(row.count)
     }));
     res.json({
       breakdown,
       total_minutes: breakdown.reduce((sum, item) => sum + item.minutes, 0),
       total_cost_usd: null,
-      total_dograh_tokens: breakdown.reduce((sum, item) => sum + item.dograh_tokens, 0),
+      total_elphie_tokens: breakdown.reduce((sum, item) => sum + item.elphie_tokens, 0),
       currency: null
     });
   } catch (err) {

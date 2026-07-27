@@ -441,7 +441,7 @@ export default function APIKeysPage() {
                         </CardContent>
                     </Card>
 
-                    {/* Dograh Service Keys Section */}
+                    {/* Elphie Service Keys Section */}
                     <Card className="mb-6">
                         <CardHeader>
                             <div className="flex justify-between items-center">

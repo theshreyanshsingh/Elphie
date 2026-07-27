@@ -46,7 +46,7 @@ type McpTool = {
 const tools: McpTool[] = [
   {
     name: "create_workflow",
-    description: "Create a Dograh workflow from a JSON workflow definition string.",
+    description: "Create a Elphie workflow from a JSON workflow definition string.",
     inputSchema: {
       type: "object",
       properties: { code: { type: "string" }, name: { type: "string" } },
@@ -55,7 +55,7 @@ const tools: McpTool[] = [
   },
   {
     name: "create_tool",
-    description: "Create a Dograh custom tool in the authenticated organization.",
+    description: "Create a Elphie custom tool in the authenticated organization.",
     inputSchema: {
       type: "object",
       properties: {
@@ -69,7 +69,7 @@ const tools: McpTool[] = [
   },
   {
     name: "get_node_type",
-    description: "Read one Dograh workflow node type specification.",
+    description: "Read one Elphie workflow node type specification.",
     inputSchema: {
       type: "object",
       properties: { name: { type: "string" } },
@@ -113,7 +113,7 @@ const tools: McpTool[] = [
   },
   {
     name: "list_node_types",
-    description: "List Dograh workflow node type specifications.",
+    description: "List Elphie workflow node type specifications.",
     inputSchema: { type: "object", properties: {} }
   },
   {
@@ -154,7 +154,7 @@ const tools: McpTool[] = [
   },
   {
     name: "get_voice_prompting_guide",
-    description: "Return concise guidance for authoring Dograh voice prompts.",
+    description: "Return concise guidance for authoring Elphie voice prompts.",
     inputSchema: { type: "object", properties: {} }
   },
   {
@@ -176,7 +176,7 @@ const tools: McpTool[] = [
   },
   {
     name: "search_docs",
-    description: "Search local Dograh documentation.",
+    description: "Search local Elphie documentation.",
     inputSchema: {
       type: "object",
       properties: { query: { type: "string" }, limit: { type: "number" } },
@@ -185,12 +185,12 @@ const tools: McpTool[] = [
   },
   {
     name: "list_api_paths",
-    description: "List documented Dograh API paths from the OpenAPI snapshot.",
+    description: "List documented Elphie API paths from the OpenAPI snapshot.",
     inputSchema: { type: "object", properties: {} }
   },
   {
     name: "read_api_path",
-    description: "Read one documented Dograh API path from the OpenAPI snapshot.",
+    description: "Read one documented Elphie API path from the OpenAPI snapshot.",
     inputSchema: {
       type: "object",
       properties: { path: { type: "string" } },
@@ -484,7 +484,7 @@ const handleJsonRpc: RequestHandler = async (req, res, next) => {
       res.json(
         jsonRpcResponse(request, {
           protocolVersion: "2024-11-05",
-          serverInfo: { name: "dograh", version: "1.37.0" },
+          serverInfo: { name: "elphie", version: "1.37.0" },
           capabilities: { tools: {} }
         })
       );
@@ -529,7 +529,7 @@ export const registerMcpRouter = (apiRouter: Router): void => {
   router.use(requireMcpApiKey);
   router.get("/", (_req, res) => {
     res.json({
-      name: "dograh",
+      name: "elphie",
       transport: "streamable_http",
       auth: "x-api-key",
       tools: tools.map((tool) => tool.name)

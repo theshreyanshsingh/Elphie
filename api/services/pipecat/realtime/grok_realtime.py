@@ -1,6 +1,6 @@
-"""Dograh subclass of pipecat's Grok Realtime LLM service.
+"""Elphie subclass of pipecat's Grok Realtime LLM service.
 
-Layers Dograh engine integration quirks onto upstream-pristine
+Layers Elphie engine integration quirks onto upstream-pristine
 :class:`GrokRealtimeLLMService`. Grok already supports runtime session updates,
 so this wrapper stays close to the OpenAI realtime shim.
 
@@ -10,10 +10,10 @@ Adds:
 - **TTSSpeakFrame as initial-response trigger** so the engine's greeting
   flow kicks off the bot's first response.
 - **One-off LLMMessagesAppendFrame handling** for ephemeral realtime prompts
-  like user-idle checks, without mutating Dograh's local ``LLMContext``.
+  like user-idle checks, without mutating Elphie's local ``LLMContext``.
 - **Function-call deferral** until the bot finishes speaking, to avoid racing
   tool execution with the active audio turn.
-- **finalized=True on TranscriptionFrame** for parity with Dograh's other
+- **finalized=True on TranscriptionFrame** for parity with Elphie's other
   realtime providers.
 """
 
@@ -41,8 +41,8 @@ from pipecat.services.xai.realtime.llm import GrokRealtimeLLMService
 from pipecat.utils.time import time_now_iso8601
 
 
-class DograhGrokRealtimeLLMService(GrokRealtimeLLMService):
-    """Grok Realtime with Dograh engine integration quirks."""
+class ElphieGrokRealtimeLLMService(GrokRealtimeLLMService):
+    """Grok Realtime with Elphie engine integration quirks."""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

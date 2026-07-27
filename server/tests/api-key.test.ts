@@ -10,7 +10,7 @@ test("API key hashing matches Python sha256 behavior", () => {
   assert.equal(hashApiKey(raw), expected);
 });
 
-test("generated API keys preserve Dograh prefix contract", () => {
+test("generated API keys preserve Elphie prefix contract", () => {
   const generated = generateApiKey();
   assert.match(generated.rawApiKey, /^dgr_/);
   assert.equal(generated.keyPrefix, generated.rawApiKey.slice(0, 8));

@@ -16,8 +16,8 @@ const headersForScope = (scope: MpsScope = {}): Record<string, string> => {
       headers["X-Created-By"] = scope.createdBy;
     }
   } else {
-    if (env.dograhMpsSecretKey) {
-      headers["X-Secret-Key"] = env.dograhMpsSecretKey;
+    if (env.elphieMpsSecretKey) {
+      headers["X-Secret-Key"] = env.elphieMpsSecretKey;
     }
     if (scope.organizationId) {
       headers["X-Organization-Id"] = String(scope.organizationId);

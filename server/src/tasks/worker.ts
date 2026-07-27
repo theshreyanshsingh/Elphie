@@ -5,11 +5,11 @@ import { taskHandlers } from "./handlers.js";
 import type { FunctionName } from "./functionNames.js";
 
 const worker = new Worker(
-  "dograh",
+  "elphie",
   async (job) => {
     const handler = taskHandlers[job.name as FunctionName];
     if (!handler) {
-      throw new Error(`Unknown Dograh task: ${job.name}`);
+      throw new Error(`Unknown Elphie task: ${job.name}`);
     }
     const args = Array.isArray(job.data?.args) ? job.data.args : [];
     return handler(...args);

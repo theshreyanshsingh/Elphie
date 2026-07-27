@@ -171,7 +171,7 @@ export const useWebSocketRTC = ({ workflowId, workflowRunId, accessToken, initia
                         const localhostApiReachable = await probeLocalhostApi();
                         if (!localhostApiReachable) {
                             throw new Error(
-                                'Elfie API is not reachable at http://localhost:8000. Ensure the backend is running on port 8000.',
+                                'Elphie API is not reachable at http://localhost:8000. Ensure the backend is running on port 8000.',
                             );
                         }
                         baseUrl = LOCALHOST_API_BASE_URL;
@@ -179,7 +179,7 @@ export const useWebSocketRTC = ({ workflowId, workflowRunId, accessToken, initia
                         baseUrl = configuredBackendUrl;
                     }
                 } catch (error) {
-                    if (error instanceof Error && error.message.includes('Elfie API')) {
+                    if (error instanceof Error && error.message.includes('Elphie API')) {
                         throw error;
                     }
                     baseUrl = configuredBackendUrl;
@@ -200,7 +200,7 @@ export const useWebSocketRTC = ({ workflowId, workflowRunId, accessToken, initia
             const localhostApiReachable = await probeLocalhostApi();
 
             if (!localhostApiReachable) {
-                throw new Error('Elfie API is not reachable at http://localhost:8000. Ensure the api container is running and port 8000 is published.');
+                throw new Error('Elphie API is not reachable at http://localhost:8000. Ensure the api container is running and port 8000 is published.');
             }
 
             baseUrl = LOCALHOST_API_BASE_URL;

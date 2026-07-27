@@ -1,14 +1,14 @@
 ---
 title: Fork Workflow
-description: Keep your Dograh fork connected to upstream.
+description: Keep your Elphie fork connected to upstream.
 ---
 
 The contributor bootstrap script configures two remotes:
 
 - `origin`: your fork, where you push
-- `upstream`: `dograh-hq/dograh`, where new commits land
+- `upstream`: `elphie-hq/elphie`, where new commits land
 
-If you cloned `dograh-hq/dograh` directly instead of your fork, run this once inside the devcontainer after it boots:
+If you cloned `elphie-hq/elphie` directly instead of your fork, run this once inside the devcontainer after it boots:
 
 ```bash
 bash scripts/setup_fork.sh
@@ -32,10 +32,10 @@ git remote -v
 You should see:
 
 ```bash
-origin    https://github.com/<YOUR_HANDLE>/dograh.git (fetch/push)
-upstream  https://github.com/dograh-hq/dograh.git    (fetch/push)
+origin    https://github.com/<YOUR_HANDLE>/elphie.git (fetch/push)
+upstream  https://github.com/elphie-hq/elphie.git    (fetch/push)
 ```
 
 <Note>
-Always push feature branches to **`origin`** (your fork), then open a pull request against `dograh-hq/dograh:main`. Never push directly to `upstream`.
+Always push feature branches to **`origin`** (your fork), then open a pull request against `elphie-hq/elphie:main`. Never push directly to `upstream`.
 </Note>

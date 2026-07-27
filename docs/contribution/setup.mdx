@@ -1,26 +1,26 @@
 ---
 title: Setup
-description: Set up the Dograh contributor environment with the devcontainer-first workflow.
+description: Set up the Elphie contributor environment with the devcontainer-first workflow.
 ---
 <Note>
-If the steps below do not work for you, please open an issue on [GitHub](https://github.com/dograh-hq/dograh/issues).
+If the steps below do not work for you, please open an issue on [GitHub](https://github.com/elphie-hq/elphie/issues).
 </Note>
 
 <Tip>
-**Using Claude Code or Codex?** Install the official Dograh setup skill and let your agent walk you through the contributor setup — it covers both the devcontainer and host-managed paths, runs Dograh's own scripts, and verifies the stack is healthy.
+**Using Claude Code or Codex?** Install the official Elphie setup skill and let your agent walk you through the contributor setup — it covers both the devcontainer and host-managed paths, runs Elphie's own scripts, and verifies the stack is healthy.
 
 <CodeGroup>
 ```text Claude Code
-/plugin marketplace add dograh-hq/dograh-plugins
-/plugin install dograh@dograh
+/plugin marketplace add elphie-hq/elphie-plugins
+/plugin install elphie@elphie
 ```
 ```text Codex
-codex plugin marketplace add dograh-hq/dograh-plugins
-codex plugin add dograh@dograh
+codex plugin marketplace add elphie-hq/elphie-plugins
+codex plugin add elphie@elphie
 ```
 </CodeGroup>
 
-Start a new session, then ask it to *"set up Dograh for development"* (or run `/dograh-setup develop` in Claude Code). More at [dograh-hq/dograh-plugins](https://github.com/dograh-hq/dograh-plugins).
+Start a new session, then ask it to *"set up Elphie for development"* (or run `/elphie-setup develop` in Claude Code). More at [elphie-hq/elphie-plugins](https://github.com/elphie-hq/elphie-plugins).
 </Tip>
 
 ### Recommended: Devcontainer Setup
@@ -31,11 +31,11 @@ Start a new session, then ask it to *"set up Dograh for development"* (or run `/
 - For the IDE path: VS Code with the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 - For the terminal-only path: Node.js on your host so you can install the Dev Container CLI
 
-1. Fork the Dograh repository at https://github.com/dograh-hq/dograh
+1. Fork the Elphie repository at https://github.com/elphie-hq/elphie
 2. Clone **your fork**:
 ```bash
-git clone https://github.com/<GITHUB_HANDLE>/dograh
-cd dograh
+git clone https://github.com/<GITHUB_HANDLE>/elphie
+cd elphie
 ```
 3. Start the devcontainer.
 
@@ -76,5 +76,5 @@ curl -X GET localhost:8000/api/v1/health
 ### More Setup Options
 
 - For what the devcontainer bootstrap does, rebuild guidance, logs, and personal install hooks, see [Devcontainer Workflow](/contribution/devcontainer).
-- If you cloned `dograh-hq/dograh` directly instead of your fork, see [Fork Workflow](/contribution/fork-workflow) to reset `origin` and `upstream`.
+- If you cloned `elphie-hq/elphie` directly instead of your fork, see [Fork Workflow](/contribution/fork-workflow) to reset `origin` and `upstream`.
 - If you do not want to use the devcontainer, see [Host-managed Setup](/contribution/host-managed-setup).

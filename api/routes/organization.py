@@ -15,12 +15,12 @@ from api.db.models import UserModel
 from api.db.telephony_configuration_client import TelephonyConfigurationInUseError
 from api.enums import OrganizationConfigurationKey, PostHogEvent
 from api.schemas.ai_model_configuration import (
-    DOGRAH_DEFAULT_LANGUAGE,
-    DOGRAH_DEFAULT_VOICE,
-    DOGRAH_SPEED_MAX,
-    DOGRAH_SPEED_MIN,
-    DOGRAH_SPEED_OPTIONS,
-    DOGRAH_SPEED_STEP,
+    ELPHIE_DEFAULT_LANGUAGE,
+    ELPHIE_DEFAULT_VOICE,
+    ELPHIE_SPEED_MAX,
+    ELPHIE_SPEED_MIN,
+    ELPHIE_SPEED_OPTIONS,
+    ELPHIE_SPEED_STEP,
     OrganizationAIModelConfigurationResponse,
     OrganizationAIModelConfigurationV2,
 )
@@ -61,9 +61,9 @@ from api.services.configuration.check_validity import UserConfigurationValidator
 from api.services.configuration.defaults import DEFAULT_SERVICE_PROVIDERS
 from api.services.configuration.masking import is_mask_of, mask_key, mask_user_config
 from api.services.configuration.registry import (
-    DOGRAH_STT_LANGUAGES,
+    ELPHIE_STT_LANGUAGES,
     REGISTRY,
-    DograhTTSService,
+    ElphieTTSService,
     ServiceProviders,
     ServiceType,
 )
@@ -148,7 +148,7 @@ class TelephonyConfigWarningsResponse(BaseModel):
 
 @router.get("/context", response_model=OrganizationContextResponse)
 async def get_current_organization_context(user: UserModel = Depends(get_user)):
-    """Return organization-scoped configuration signals owned by Dograh."""
+    """Return organization-scoped configuration signals owned by Elphie."""
     return await get_organization_context(user)
 
 
@@ -218,8 +218,8 @@ async def get_telephony_config_warnings(user: UserModel = Depends(get_user)):
 # ---------------------------------------------------------------------------
 
 
-def _dograh_allows_custom_voice() -> bool:
-    extra = DograhTTSService.model_fields["voice"].json_schema_extra
+def _elphie_allows_custom_voice() -> bool:
+    extra = ElphieTTSService.model_fields["voice"].json_schema_extra
     if isinstance(extra, dict):
         return bool(extra.get("allow_custom_input", False))
     return False
@@ -229,7 +229,7 @@ def _byok_provider_schemas(service_type: ServiceType) -> dict[str, dict]:
     return {
         provider: model_cls.model_json_schema()
         for provider, model_cls in REGISTRY[service_type].items()
-        if provider != ServiceProviders.DOGRAH.value
+        if provider != ServiceProviders.ELPHIE.value
     }
 
 
@@ -261,23 +261,23 @@ async def get_model_configuration_v2_defaults(
     byok_default_providers = {
         service: provider
         for service, provider in DEFAULT_SERVICE_PROVIDERS.items()
-        if provider != ServiceProviders.DOGRAH.value
+        if provider != ServiceProviders.ELPHIE.value
     }
     return {
-        "dograh": {
-            "voices": [DOGRAH_DEFAULT_VOICE],
-            "allow_custom_input": _dograh_allows_custom_voice(),
-            "speeds": list(DOGRAH_SPEED_OPTIONS),
+        "elphie": {
+            "voices": [ELPHIE_DEFAULT_VOICE],
+            "allow_custom_input": _elphie_allows_custom_voice(),
+            "speeds": list(ELPHIE_SPEED_OPTIONS),
             "speed_range": {
-                "min": DOGRAH_SPEED_MIN,
-                "max": DOGRAH_SPEED_MAX,
-                "step": DOGRAH_SPEED_STEP,
+                "min": ELPHIE_SPEED_MIN,
+                "max": ELPHIE_SPEED_MAX,
+                "step": ELPHIE_SPEED_STEP,
             },
-            "languages": DOGRAH_STT_LANGUAGES,
+            "languages": ELPHIE_STT_LANGUAGES,
             "defaults": {
-                "voice": DOGRAH_DEFAULT_VOICE,
+                "voice": ELPHIE_DEFAULT_VOICE,
                 "speed": 1.0,
-                "language": DOGRAH_DEFAULT_LANGUAGE,
+                "language": ELPHIE_DEFAULT_LANGUAGE,
             },
         },
         "byok": {

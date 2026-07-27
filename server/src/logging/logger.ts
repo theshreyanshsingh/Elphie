@@ -4,7 +4,7 @@ import { env } from "../config/env.js";
 export const logger = pino({
   level: env.logLevel.toLowerCase(),
   base: {
-    service: "dograh-server",
+    service: "elphie-server",
     environment: env.environment
   }
 });

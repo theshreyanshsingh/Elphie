@@ -26,7 +26,7 @@ export interface OrganizationTable {
   provider_id: string;
   created_at: Timestamp;
   quota_type: string;
-  quota_dograh_tokens: number;
+  quota_elphie_tokens: number;
   quota_reset_day: number;
   quota_start_date: Timestamp | null;
   quota_enabled: boolean;

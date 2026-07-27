@@ -1,4 +1,4 @@
-# Dograh Express Backend Migration
+# Elphie Express Backend Migration
 
 This folder is the TypeScript/Express migration target for the existing
 FastAPI backend in `api/`.

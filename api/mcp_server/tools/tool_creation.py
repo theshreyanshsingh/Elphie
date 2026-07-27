@@ -1,4 +1,4 @@
-"""MCP tool for creating reusable Dograh tools."""
+"""MCP tool for creating reusable Elphie tools."""
 
 from __future__ import annotations
 

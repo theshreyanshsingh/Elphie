@@ -22,7 +22,7 @@ CREATE TABLE organizations (
 	provider_id VARCHAR NOT NULL, 
 	created_at TIMESTAMP WITH TIME ZONE, 
 	quota_type quota_type DEFAULT 'monthly'::quota_type NOT NULL, 
-	quota_dograh_tokens INTEGER DEFAULT 0 NOT NULL, 
+	quota_elphie_tokens INTEGER DEFAULT 0 NOT NULL,
 	quota_reset_day INTEGER DEFAULT 1 NOT NULL, 
 	quota_start_date TIMESTAMP WITH TIME ZONE, 
 	quota_enabled BOOLEAN DEFAULT false NOT NULL, 
@@ -70,8 +70,8 @@ CREATE TABLE organization_usage_cycles (
 	organization_id INTEGER NOT NULL, 
 	period_start TIMESTAMP WITH TIME ZONE NOT NULL, 
 	period_end TIMESTAMP WITH TIME ZONE NOT NULL, 
-	quota_dograh_tokens INTEGER NOT NULL, 
-	used_dograh_tokens FLOAT NOT NULL, 
+	quota_elphie_tokens INTEGER NOT NULL,
+	used_elphie_tokens FLOAT NOT NULL,
 	total_duration_seconds INTEGER DEFAULT 0 NOT NULL, 
 	used_amount_usd FLOAT, 
 	quota_amount_usd FLOAT, 
@@ -559,7 +559,7 @@ CREATE TABLE IF NOT EXISTS alembic_version (
   version_num VARCHAR(32) NOT NULL PRIMARY KEY
 );
 
-INSERT INTO alembic_version (version_num) VALUES ('91cc6ba3e1c7')
+INSERT INTO alembic_version (version_num) VALUES ('d4f5a6b7c8e9')
 ON CONFLICT (version_num) DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS node_schema_migrations (
@@ -569,5 +569,5 @@ CREATE TABLE IF NOT EXISTS node_schema_migrations (
 );
 
 INSERT INTO node_schema_migrations (id, alembic_revision)
-VALUES ('0000_alembic_head_schema', '91cc6ba3e1c7')
+VALUES ('0000_alembic_head_schema', 'd4f5a6b7c8e9')
 ON CONFLICT (id) DO NOTHING;

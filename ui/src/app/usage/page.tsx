@@ -541,7 +541,7 @@ export default function UsagePage() {
                                     <div className="mt-4 p-3 bg-muted rounded-md">
                                         <p className="text-sm text-muted-foreground">
                                             Total for filtered period: <span className="font-semibold text-foreground">
-                                                {usageHistory.total_dograh_tokens.toLocaleString()} Elfie Tokens
+                                                {usageHistory.total_elphie_tokens.toLocaleString()} Elphie Tokens
                                             </span>
                                             {' • '}
                                             <span className="font-semibold text-foreground">

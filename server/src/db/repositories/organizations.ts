@@ -4,7 +4,7 @@ export type OrganizationRecord = {
   id: number;
   provider_id: string;
   quota_type: string;
-  quota_dograh_tokens: number;
+  quota_elphie_tokens: number;
   quota_reset_day: number;
   quota_start_date: Date | string | null;
   quota_enabled: boolean;
@@ -47,7 +47,7 @@ export const getOrCreateOrganizationByProviderId = async (
     .values({
       provider_id: providerId,
       quota_type: "monthly",
-      quota_dograh_tokens: 0,
+      quota_elphie_tokens: 0,
       quota_reset_day: 1,
       quota_enabled: false
     })

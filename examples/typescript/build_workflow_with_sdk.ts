@@ -1,29 +1,29 @@
 // Build a multi-node voice agent using the Workflow SDK and save it as a draft.
 //
 // Requirements:
-//   npm install @dograh/sdk
+//   npm install @elphie/sdk
 //
 // Environment variables:
-//   DOGRAH_API_ENDPOINT  - Dograh API base URL (e.g. http://localhost:8000)
-//   DOGRAH_API_TOKEN     - API token sent as X-API-Key
+//   ELPHIE_API_ENDPOINT  - Elphie API base URL (e.g. http://localhost:8000)
+//   ELPHIE_API_TOKEN     - API token sent as X-API-Key
 //
 // Run:
 //   npx tsx build_workflow_with_sdk.ts
 
-import { DograhClient, Workflow } from "@dograh/sdk";
+import { ElphieClient, Workflow } from "@elphie/sdk";
 
-// Replace with the numeric ID of an existing agent in your Dograh account.
+// Replace with the numeric ID of an existing agent in your Elphie account.
 // Create one via the UI or with create_workflow.ts if you don't have one yet.
 const WORKFLOW_ID = 0;
 
 async function main(): Promise<void> {
-    const apiEndpoint = process.env.DOGRAH_API_ENDPOINT ?? "http://localhost:8000";
-    const apiToken = process.env.DOGRAH_API_TOKEN;
+    const apiEndpoint = process.env.ELPHIE_API_ENDPOINT ?? "http://localhost:8000";
+    const apiToken = process.env.ELPHIE_API_TOKEN;
 
-    if (!apiToken) throw new Error("DOGRAH_API_TOKEN is required");
+    if (!apiToken) throw new Error("ELPHIE_API_TOKEN is required");
     if (WORKFLOW_ID === 0) throw new Error("Set WORKFLOW_ID at the top of this file to an existing workflow ID");
 
-    const client = new DograhClient({
+    const client = new ElphieClient({
         baseUrl: apiEndpoint,
         apiKey: apiToken,
     });

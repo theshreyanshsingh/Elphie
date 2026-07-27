@@ -1,13 +1,11 @@
 // Thin client for the SEPARATE user_onboarding service (its own base URL).
-// Not part of the generated Dograh SDK — a different host. All endpoints are PUBLIC
+// Not part of the generated Elphie SDK — a different host. All endpoints are PUBLIC
 // (no auth token); identity is the email carried in the body. Every call is
 // BEST-EFFORT: failures are swallowed so a down/erroring service never blocks the user.
 
-// Base URL of the user_onboarding service. Unset (the default for self-hosted OSS —
-// .env.example ships this commented out) → fall back to our cloud leads backend so we
-// still receive OSS form submissions. Override the env var to point elsewhere (or to a
-// local backend) to stop sending leads to us.
-const BASE_URL = process.env.NEXT_PUBLIC_ONBOARDING_API_URL || "https://api-leads.dograh.com";
+// Self-hosted installs leave this unset. Managed deployments opt in by providing the
+// service URL at build time.
+const BASE_URL = process.env.NEXT_PUBLIC_ONBOARDING_API_URL?.replace(/\/$/, "");
 
 // Bound every call so a slow/hung service can never freeze the UI. Best-effort:
 // failures are surfaced via console.error (Sentry breadcrumbs) but never thrown.
@@ -15,6 +13,9 @@ const TIMEOUT_MS = 6000;
 
 // POST a JSON body to the onboarding service (public — no auth header).
 async function post(path: string, body: unknown): Promise<void> {
+  if (!BASE_URL) {
+    return;
+  }
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {

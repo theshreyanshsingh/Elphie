@@ -1,20 +1,20 @@
-"""Dograh subclass of pipecat's Ultravox realtime LLM service.
+"""Elphie subclass of pipecat's Ultravox realtime LLM service.
 
 Ultravox is audio-native and realtime, but prompt and tool configuration is
-bound to call creation. Dograh therefore cannot lean on in-session updates or
+bound to call creation. Elphie therefore cannot lean on in-session updates or
 Gemini-style session resumption handles. This wrapper adapts Ultravox to the
-Dograh engine contract by:
+Elphie engine contract by:
 
 - deferring the first call creation until the engine queues the initial node
   opening via ``TTSSpeakFrame`` or ``LLMContextFrame``
 - marking the call for recreation when ``system_instruction`` changes across
   node transitions, then rebuilding it on the follow-up ``LLMContextFrame``
   so the transition tool result is present in ``initialMessages``
-- reconstructing Ultravox ``initialMessages`` from Dograh context when the
+- reconstructing Ultravox ``initialMessages`` from Elphie context when the
   call must be recreated after a node transition
 - appending a transient resumptive user nudge to recreated ``initialMessages``
-  after tool-result transitions, without mutating Dograh's stored context
-- handling Dograh-only frames such as user mute and idle append prompts
+  after tool-result transitions, without mutating Elphie's stored context
+- handling Elphie-only frames such as user mute and idle append prompts
 - tagging user transcripts with ``finalized=True`` for downstream parity
 """
 
@@ -51,8 +51,8 @@ from pipecat.services.ultravox.llm import (
 from pipecat.utils.time import time_now_iso8601
 
 
-class DograhUltravoxOneShotInputParams(OneShotInputParams):
-    """Dograh-friendly OneShot params with string voice support."""
+class ElphieUltravoxOneShotInputParams(OneShotInputParams):
+    """Elphie-friendly OneShot params with string voice support."""
 
     voice: str | None = Field(default=None)
 
@@ -64,8 +64,8 @@ _RESUMPTION_USER_MESSAGE = (
 )
 
 
-class DograhUltravoxRealtimeLLMService(UltravoxRealtimeLLMService):
-    """Ultravox realtime with Dograh engine integration quirks."""
+class ElphieUltravoxRealtimeLLMService(UltravoxRealtimeLLMService):
+    """Ultravox realtime with Elphie engine integration quirks."""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -81,7 +81,7 @@ class DograhUltravoxRealtimeLLMService(UltravoxRealtimeLLMService):
         self._pending_user_text_messages: list[str] = []
 
     async def start(self, frame):
-        # Dograh defers call creation until the engine queues the node opening.
+        # Elphie defers call creation until the engine queues the node opening.
         await LLMService.start(self, frame)
 
     async def process_frame(self, frame: Frame, direction: FrameDirection):
@@ -393,7 +393,7 @@ class DograhUltravoxRealtimeLLMService(UltravoxRealtimeLLMService):
         greeting_text: str | None,
         initial_messages: list[dict[str, Any]] | None,
         agent_speaks_first: bool,
-    ) -> DograhUltravoxOneShotInputParams:
+    ) -> ElphieUltravoxOneShotInputParams:
         current_params = self._params
         extra = {
             key: value
@@ -415,7 +415,7 @@ class DograhUltravoxRealtimeLLMService(UltravoxRealtimeLLMService):
         if isinstance(output_medium, _NotGiven):
             output_medium = current_params.output_medium
 
-        return DograhUltravoxOneShotInputParams(
+        return ElphieUltravoxOneShotInputParams(
             api_key=current_params.api_key,
             system_prompt=self._current_system_instruction(),
             temperature=current_params.temperature,

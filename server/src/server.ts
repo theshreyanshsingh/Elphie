@@ -12,7 +12,7 @@ const server = http.createServer(app);
 registerWebSockets(server);
 
 server.listen(port, host, () => {
-  logger.info({ host, port }, "Dograh Express server listening");
+  logger.info({ host, port }, "Elphie Express server listening");
 });
 
 const shutdown = (signal: NodeJS.Signals): void => {

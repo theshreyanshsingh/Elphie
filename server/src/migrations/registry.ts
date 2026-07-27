@@ -56,7 +56,7 @@ export const createNodeMigrations = (
       alembicRevision: head.revision,
       downRevisions: head.downRevisions,
       description:
-        "Create the current Dograh PostgreSQL schema and stamp Alembic head.",
+        "Create the current Elphie PostgreSQL schema and stamp Alembic head.",
       up: async ({ client }) => {
         await client.query(await fs.readFile(bootstrapSchemaPath, "utf8"));
       },

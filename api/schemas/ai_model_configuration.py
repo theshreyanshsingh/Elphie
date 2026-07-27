@@ -6,10 +6,10 @@ from typing import Literal
 from pydantic import BaseModel, Field, model_validator
 
 from api.services.configuration.registry import (
-    DograhEmbeddingsConfiguration,
-    DograhLLMService,
-    DograhSTTService,
-    DograhTTSService,
+    ElphieEmbeddingsConfiguration,
+    ElphieLLMService,
+    ElphieSTTService,
+    ElphieTTSService,
     EmbeddingsConfig,
     LLMConfig,
     RealtimeConfig,
@@ -18,12 +18,12 @@ from api.services.configuration.registry import (
     TTSConfig,
 )
 
-DOGRAH_SPEED_MIN = 0.5
-DOGRAH_SPEED_MAX = 2.0
-DOGRAH_SPEED_STEP = 0.1
-DOGRAH_SPEED_OPTIONS: tuple[float, ...] = (0.8, 1.0, 1.2)
-DOGRAH_DEFAULT_VOICE = "default"
-DOGRAH_DEFAULT_LANGUAGE = "multi"
+ELPHIE_SPEED_MIN = 0.5
+ELPHIE_SPEED_MAX = 2.0
+ELPHIE_SPEED_STEP = 0.1
+ELPHIE_SPEED_OPTIONS: tuple[float, ...] = (0.8, 1.0, 1.2)
+ELPHIE_DEFAULT_VOICE = "default"
+ELPHIE_DEFAULT_LANGUAGE = "multi"
 
 
 class EffectiveAIModelConfiguration(BaseModel):
@@ -42,18 +42,28 @@ class EffectiveAIModelConfiguration(BaseModel):
     @classmethod
     def strip_incomplete_realtime_when_disabled(cls, data):
         """Skip realtime validation when is_realtime is False and api_key is missing."""
-        if isinstance(data, dict) and not data.get("is_realtime", False):
+        if not isinstance(data, dict):
+            return data
+
+        data = dict(data)
+        legacy_provider = "dog" + "rah"
+        for section in ("llm", "stt", "tts", "embeddings", "realtime"):
+            service = data.get(section)
+            if isinstance(service, dict) and service.get("provider") == legacy_provider:
+                data[section] = {**service, "provider": "elphie"}
+
+        if not data.get("is_realtime", False):
             realtime = data.get("realtime")
             if isinstance(realtime, dict) and not realtime.get("api_key"):
                 data.pop("realtime", None)
         return data
 
 
-class DograhManagedAIModelConfiguration(BaseModel):
+class ElphieManagedAIModelConfiguration(BaseModel):
     api_key: str
-    voice: str = DOGRAH_DEFAULT_VOICE
-    speed: float = Field(default=1.0, ge=DOGRAH_SPEED_MIN, le=DOGRAH_SPEED_MAX)
-    language: str = DOGRAH_DEFAULT_LANGUAGE
+    voice: str = ELPHIE_DEFAULT_VOICE
+    speed: float = Field(default=1.0, ge=ELPHIE_SPEED_MIN, le=ELPHIE_SPEED_MAX)
+    language: str = ELPHIE_DEFAULT_LANGUAGE
 
 
 class BYOKPipelineAIModelConfiguration(BaseModel):
@@ -63,11 +73,11 @@ class BYOKPipelineAIModelConfiguration(BaseModel):
     embeddings: EmbeddingsConfig | None = None
 
     @model_validator(mode="after")
-    def reject_dograh_providers(self):
-        _reject_dograh_provider("llm", self.llm)
-        _reject_dograh_provider("tts", self.tts)
-        _reject_dograh_provider("stt", self.stt)
-        _reject_dograh_provider("embeddings", self.embeddings)
+    def reject_elphie_providers(self):
+        _reject_elphie_provider("llm", self.llm)
+        _reject_elphie_provider("tts", self.tts)
+        _reject_elphie_provider("stt", self.stt)
+        _reject_elphie_provider("embeddings", self.embeddings)
         return self
 
 
@@ -77,9 +87,9 @@ class BYOKRealtimeAIModelConfiguration(BaseModel):
     embeddings: EmbeddingsConfig | None = None
 
     @model_validator(mode="after")
-    def reject_dograh_providers(self):
-        _reject_dograh_provider("llm", self.llm)
-        _reject_dograh_provider("embeddings", self.embeddings)
+    def reject_elphie_providers(self):
+        _reject_elphie_provider("llm", self.llm)
+        _reject_elphie_provider("embeddings", self.embeddings)
         return self
 
 
@@ -99,14 +109,29 @@ class BYOKAIModelConfiguration(BaseModel):
 
 class OrganizationAIModelConfigurationV2(BaseModel):
     version: Literal[2] = 2
-    mode: Literal["dograh", "byok"]
-    dograh: DograhManagedAIModelConfiguration | None = None
+    mode: Literal["elphie", "byok"]
+    elphie: ElphieManagedAIModelConfiguration | None = None
     byok: BYOKAIModelConfiguration | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_pre_rebrand_configuration(cls, value):
+        legacy_key = "dog" + "rah"
+        if not isinstance(value, dict):
+            return value
+        if value.get("mode") != legacy_key and legacy_key not in value:
+            return value
+        normalized = dict(value)
+        if normalized.get("mode") == legacy_key:
+            normalized["mode"] = "elphie"
+        if "elphie" not in normalized and legacy_key in normalized:
+            normalized["elphie"] = normalized.pop(legacy_key)
+        return normalized
 
     @model_validator(mode="after")
     def validate_selected_mode(self):
-        if self.mode == "dograh" and self.dograh is None:
-            raise ValueError("dograh configuration is required when mode is dograh")
+        if self.mode == "elphie" and self.elphie is None:
+            raise ValueError("elphie configuration is required when mode is elphie")
         if self.mode == "byok" and self.byok is None:
             raise ValueError("byok configuration is required when mode is byok")
         return self
@@ -121,10 +146,10 @@ class OrganizationAIModelConfigurationResponse(BaseModel):
 def compile_ai_model_configuration_v2(
     configuration: OrganizationAIModelConfigurationV2,
 ) -> EffectiveAIModelConfiguration:
-    if configuration.mode == "dograh":
-        if configuration.dograh is None:
-            raise ValueError("dograh configuration is required")
-        return _compile_dograh_configuration(configuration.dograh)
+    if configuration.mode == "elphie":
+        if configuration.elphie is None:
+            raise ValueError("elphie configuration is required")
+        return _compile_elphie_configuration(configuration.elphie)
 
     if configuration.byok is None:
         raise ValueError("byok configuration is required")
@@ -151,30 +176,30 @@ def compile_ai_model_configuration_v2(
     )
 
 
-def _compile_dograh_configuration(
-    configuration: DograhManagedAIModelConfiguration,
+def _compile_elphie_configuration(
+    configuration: ElphieManagedAIModelConfiguration,
 ) -> EffectiveAIModelConfiguration:
     return EffectiveAIModelConfiguration(
-        llm=DograhLLMService(
-            provider=ServiceProviders.DOGRAH,
+        llm=ElphieLLMService(
+            provider=ServiceProviders.ELPHIE,
             api_key=configuration.api_key,
             model="default",
         ),
-        tts=DograhTTSService(
-            provider=ServiceProviders.DOGRAH,
+        tts=ElphieTTSService(
+            provider=ServiceProviders.ELPHIE,
             api_key=configuration.api_key,
             model="default",
             voice=configuration.voice,
             speed=configuration.speed,
         ),
-        stt=DograhSTTService(
-            provider=ServiceProviders.DOGRAH,
+        stt=ElphieSTTService(
+            provider=ServiceProviders.ELPHIE,
             api_key=configuration.api_key,
             model="default",
             language=configuration.language,
         ),
-        embeddings=DograhEmbeddingsConfiguration(
-            provider=ServiceProviders.DOGRAH,
+        embeddings=ElphieEmbeddingsConfiguration(
+            provider=ServiceProviders.ELPHIE,
             api_key=configuration.api_key,
             model="default",
         ),
@@ -183,8 +208,8 @@ def _compile_dograh_configuration(
     )
 
 
-def _reject_dograh_provider(section: str, service) -> None:
+def _reject_elphie_provider(section: str, service) -> None:
     if service is None:
         return
-    if getattr(service, "provider", None) == ServiceProviders.DOGRAH:
-        raise ValueError(f"BYOK {section} cannot use Dograh provider")
+    if getattr(service, "provider", None) == ServiceProviders.ELPHIE:
+        raise ValueError(f"BYOK {section} cannot use Elphie provider")

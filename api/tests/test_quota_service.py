@@ -9,14 +9,14 @@ from api.services.configuration.registry import ServiceProviders
 from api.services.managed_model_services import MPS_CORRELATION_ID_CONTEXT_KEY
 
 
-def _dograh_config(
+def _elphie_config(
     api_key: str = "mps_sk_12345678",
     *,
     managed_service_version: int = 1,
 ):
     return SimpleNamespace(
         managed_service_version=managed_service_version,
-        llm=SimpleNamespace(provider=ServiceProviders.DOGRAH, api_key=api_key),
+        llm=SimpleNamespace(provider=ServiceProviders.ELPHIE, api_key=api_key),
         stt=None,
         tts=None,
         embeddings=None,
@@ -74,7 +74,7 @@ def _patch_workflow_context(monkeypatch, *, workflow=None, owner=None):
 async def test_authorize_workflow_run_uses_workflow_org_for_hosted_v2(
     monkeypatch,
 ):
-    get_config = AsyncMock(return_value=_dograh_config())
+    get_config = AsyncMock(return_value=_elphie_config())
     authorize = AsyncMock(
         return_value={
             "allowed": True,
@@ -115,9 +115,9 @@ async def test_authorize_workflow_run_uses_workflow_org_for_hosted_v2(
         workflow_run_id=None,
         service_key=None,
         require_correlation_id=False,
-        minimum_credits=quota_service.MINIMUM_DOGRAH_CREDITS_FOR_CALL,
+        minimum_credits=quota_service.MINIMUM_ELPHIE_CREDITS_FOR_CALL,
         created_by="provider-123",
-        metadata={"dograh_user_id": "123", "workflow_id": 7},
+        metadata={"elphie_user_id": "123", "workflow_id": 7},
     )
     check_usage.assert_not_awaited()
 
@@ -160,7 +160,7 @@ async def test_authorize_workflow_run_v2_insufficient_credits_prompts_billing(
     assert result.has_quota is False
     assert result.error_code == "insufficient_credits"
     assert "/billing" in result.error_message
-    assert "founders@dograh.com" not in result.error_message
+    assert "contact support" not in result.error_message
     authorize.assert_awaited_once()
     check_usage.assert_not_awaited()
 
@@ -170,7 +170,7 @@ async def test_authorize_workflow_run_v1_uses_legacy_key_usage(
     monkeypatch,
 ):
     api_key = "mps_sk_12345678"
-    get_config = AsyncMock(return_value=_dograh_config(api_key))
+    get_config = AsyncMock(return_value=_elphie_config(api_key))
     authorize = AsyncMock(
         return_value={
             "allowed": True,
@@ -204,7 +204,7 @@ async def test_authorize_workflow_run_v1_uses_legacy_key_usage(
 
     assert result.has_quota is False
     assert result.error_code == "quota_exceeded"
-    assert "founders@dograh.com" in result.error_message
+    assert "contact support" in result.error_message
     assert "/billing" not in result.error_message
     authorize.assert_awaited_once()
     check_usage.assert_awaited_once_with(
@@ -221,7 +221,7 @@ async def test_authorize_workflow_run_managed_v2_stores_hosted_correlation(
     api_key = "mps_sk_12345678"
     workflow_run = SimpleNamespace(initial_context={"existing": "value"})
     get_config = AsyncMock(
-        return_value=_dograh_config(api_key, managed_service_version=2)
+        return_value=_elphie_config(api_key, managed_service_version=2)
     )
     authorize = AsyncMock(
         return_value={
@@ -272,9 +272,9 @@ async def test_authorize_workflow_run_managed_v2_stores_hosted_correlation(
         workflow_run_id=88,
         service_key=api_key,
         require_correlation_id=True,
-        minimum_credits=quota_service.MINIMUM_DOGRAH_CREDITS_FOR_CALL,
+        minimum_credits=quota_service.MINIMUM_ELPHIE_CREDITS_FOR_CALL,
         created_by="provider-123",
-        metadata={"dograh_user_id": "123", "workflow_id": 7},
+        metadata={"elphie_user_id": "123", "workflow_id": 7},
     )
     update_workflow_run.assert_awaited_once_with(
         88,
@@ -291,7 +291,7 @@ async def test_authorize_workflow_run_service_token_from_wrong_org_prompts_new_t
 ):
     api_key = "mps_sk_12345678"
     get_config = AsyncMock(
-        return_value=_dograh_config(api_key, managed_service_version=2)
+        return_value=_elphie_config(api_key, managed_service_version=2)
     )
     request = httpx.Request(
         "POST",
@@ -342,9 +342,9 @@ async def test_authorize_workflow_run_service_token_from_wrong_org_prompts_new_t
         workflow_run_id=88,
         service_key=api_key,
         require_correlation_id=True,
-        minimum_credits=quota_service.MINIMUM_DOGRAH_CREDITS_FOR_CALL,
+        minimum_credits=quota_service.MINIMUM_ELPHIE_CREDITS_FOR_CALL,
         created_by="provider-123",
-        metadata={"dograh_user_id": "123", "workflow_id": 7},
+        metadata={"elphie_user_id": "123", "workflow_id": 7},
     )
 
 
@@ -355,7 +355,7 @@ async def test_authorize_workflow_run_oss_uses_key_paths_not_workflow_org(
     api_key = "mps_sk_12345678"
     workflow_run = SimpleNamespace(initial_context={})
     get_config = AsyncMock(
-        return_value=_dograh_config(api_key, managed_service_version=2)
+        return_value=_elphie_config(api_key, managed_service_version=2)
     )
     hosted_authorize = AsyncMock()
     check_usage = AsyncMock(

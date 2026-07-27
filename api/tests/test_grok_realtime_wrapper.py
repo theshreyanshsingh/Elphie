@@ -10,13 +10,13 @@ from pipecat.services.xai.realtime import events
 from api.schemas.ai_model_configuration import EffectiveAIModelConfiguration
 from api.services.configuration.registry import GrokRealtimeLLMConfiguration
 from api.services.pipecat.realtime.grok_realtime import (
-    DograhGrokRealtimeLLMService,
+    ElphieGrokRealtimeLLMService,
 )
 from api.services.pipecat.service_factory import create_realtime_llm_service
 
 
-def _make_service() -> DograhGrokRealtimeLLMService:
-    service = DograhGrokRealtimeLLMService(api_key="test-key")
+def _make_service() -> ElphieGrokRealtimeLLMService:
+    service = ElphieGrokRealtimeLLMService(api_key="test-key")
     service._create_response = AsyncMock()
     service._process_completed_function_calls = AsyncMock()
     return service
@@ -119,7 +119,7 @@ async def test_completed_input_transcription_is_broadcast_as_finalized():
     assert service.broadcast_frame.await_args.kwargs["finalized"] is True
 
 
-def test_factory_creates_dograh_grok_realtime_service():
+def test_factory_creates_elphie_grok_realtime_service():
     effective_config = EffectiveAIModelConfiguration(
         is_realtime=True,
         realtime=GrokRealtimeLLMConfiguration(
@@ -135,4 +135,4 @@ def test_factory_creates_dograh_grok_realtime_service():
         audio_config=SimpleNamespace(),
     )
 
-    assert isinstance(service, DograhGrokRealtimeLLMService)
+    assert isinstance(service, ElphieGrokRealtimeLLMService)

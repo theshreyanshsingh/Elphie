@@ -858,7 +858,7 @@ const rewindTextSession: RequestHandler = async (req, res, next) => {
 };
 
 const embedScript = (token: EmbedTokenRecord): string =>
-  `<!-- Dograh Voice Widget -->\n<script src="${env.uiAppUrl.replace(/\/+$/, "")}/embed/dograh-widget.js?token=${token.token}&environment=${env.environment}&apiEndpoint=${env.backendApiEndpoint}" async></script>`;
+  `<!-- Elphie Voice Widget -->\n<script src="${env.uiAppUrl.replace(/\/+$/, "")}/embed/elphie-widget.js?token=${token.token}&environment=${env.environment}&apiEndpoint=${env.backendApiEndpoint}" async></script>`;
 
 const embedResponse = (token: EmbedTokenRecord) => ({
   id: token.id,

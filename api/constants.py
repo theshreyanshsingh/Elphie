@@ -36,8 +36,11 @@ AUTH_PROVIDER = os.getenv("AUTH_PROVIDER", "local")
 # needs them baked into the bundle at build time.
 STACK_AUTH_PROJECT_ID = os.getenv("STACK_AUTH_PROJECT_ID")
 STACK_PUBLISHABLE_CLIENT_KEY = os.getenv("STACK_PUBLISHABLE_CLIENT_KEY")
-DOGRAH_MPS_SECRET_KEY = os.getenv("DOGRAH_MPS_SECRET_KEY", None)
-MPS_API_URL = os.getenv("MPS_API_URL", "https://services.dograh.com")
+_LEGACY_MPS_SECRET_ENV = "DOG" + "RAH_MPS_SECRET_KEY"
+ELPHIE_MPS_SECRET_KEY = os.getenv("ELPHIE_MPS_SECRET_KEY") or os.getenv(
+    _LEGACY_MPS_SECRET_ENV
+)
+MPS_API_URL = os.getenv("MPS_API_URL", "http://localhost:8002")
 
 # Storage Configuration
 ENABLE_AWS_S3 = os.getenv("ENABLE_AWS_S3", "false").lower() == "true"

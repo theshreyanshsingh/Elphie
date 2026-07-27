@@ -1,9 +1,9 @@
 {
-  "name": "dograh-server",
+  "name": "elphie-server",
   "version": "1.37.0",
   "private": true,
   "type": "module",
-  "description": "Express/Node backend migration target for Dograh",
+  "description": "Express/Node backend for Elphie",
   "engines": {
     "node": ">=20"
   },

@@ -1,8 +1,8 @@
-"""Dograh subclass of pipecat's Azure OpenAI Realtime LLM service.
+"""Elphie subclass of pipecat's Azure OpenAI Realtime LLM service.
 
-Layers Dograh engine integration quirks (mute gating, TTSSpeakFrame greeting
+Layers Elphie engine integration quirks (mute gating, TTSSpeakFrame greeting
 trigger, LLMMessagesAppendFrame handling, deferred tool calls) onto pipecat's
-AzureRealtimeLLMService, mirroring what DograhOpenAIRealtimeLLMService does
+AzureRealtimeLLMService, mirroring what ElphieOpenAIRealtimeLLMService does
 for the standard OpenAI Realtime endpoint.
 """
 
@@ -31,11 +31,11 @@ from pipecat.transcriptions.language import Language
 from pipecat.utils.time import time_now_iso8601
 
 
-class DograhAzureRealtimeLLMService(AzureRealtimeLLMService):
-    """Azure OpenAI Realtime with Dograh engine integration quirks.
+class ElphieAzureRealtimeLLMService(AzureRealtimeLLMService):
+    """Azure OpenAI Realtime with Elphie engine integration quirks.
 
-    Extends AzureRealtimeLLMService with the same Dograh-specific behaviours
-    added to DograhOpenAIRealtimeLLMService:
+    Extends AzureRealtimeLLMService with the same Elphie-specific behaviours
+    added to ElphieOpenAIRealtimeLLMService:
     - User-mute audio gating
     - TTSSpeakFrame as initial-response trigger
     - One-off LLMMessagesAppendFrame handling

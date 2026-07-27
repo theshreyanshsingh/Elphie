@@ -25,14 +25,14 @@ services:
     networks:
       - app-network
     volumes:
-      - .:/workspaces/dograh:cached
-      - dograh-venv:/workspaces/dograh/venv
-      - dograh-ui-node_modules:/workspaces/dograh/ui/node_modules
-      - dograh-ts-validator-node_modules:/workspaces/dograh/api/mcp_server/ts_validator/node_modules
+      - .:/workspaces/elphie:cached
+      - elphie-venv:/workspaces/elphie/venv
+      - elphie-ui-node_modules:/workspaces/elphie/ui/node_modules
+      - elphie-ts-validator-node_modules:/workspaces/elphie/api/mcp_server/ts_validator/node_modules
     ports:
       - "127.0.0.1:3000:3000"
       - "127.0.0.1:8000:8000"
 volumes:
-  dograh-venv:
-  dograh-ui-node_modules:
-  dograh-ts-validator-node_modules:
+  elphie-venv:
+  elphie-ui-node_modules:
+  elphie-ts-validator-node_modules:

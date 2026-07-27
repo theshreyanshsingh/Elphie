@@ -1,4 +1,4 @@
-# Local dev infra only: Dograh Postgres (pgvector) + MinIO.
+# Local dev infra only: Elphie Postgres (pgvector) + MinIO.
 # Redis is reused from the nearzero stack on localhost:6379 (no password).
 services:
   postgres:

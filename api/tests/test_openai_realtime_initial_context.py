@@ -7,12 +7,12 @@ from pipecat.processors.aggregators.llm_context import LLMContext
 from pipecat.processors.frame_processor import FrameDirection
 
 from api.services.pipecat.realtime.openai_realtime import (
-    DograhOpenAIRealtimeLLMService,
+    ElphieOpenAIRealtimeLLMService,
 )
 
 
-def _make_service() -> DograhOpenAIRealtimeLLMService:
-    service = DograhOpenAIRealtimeLLMService(api_key="test-key")
+def _make_service() -> ElphieOpenAIRealtimeLLMService:
+    service = ElphieOpenAIRealtimeLLMService(api_key="test-key")
     service._create_response = AsyncMock()
     service._process_completed_function_calls = AsyncMock()
     return service

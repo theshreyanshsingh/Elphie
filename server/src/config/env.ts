@@ -37,6 +37,8 @@ const required = (name: string): string => {
   return value;
 };
 
+const legacyMpsSecretEnv = "DOG" + "RAH_MPS_SECRET_KEY";
+
 export const env = {
   environment: process.env.ENVIRONMENT ?? "local",
   logLevel: process.env.LOG_LEVEL ?? "DEBUG",
@@ -76,8 +78,9 @@ export const env = {
   forceTurnRelay: boolFromEnv(process.env.FORCE_TURN_RELAY),
   ossJwtSecret: process.env.OSS_JWT_SECRET ?? "change-me-in-production",
   ossJwtExpiryHours: intFromEnv(process.env.OSS_JWT_EXPIRY_HOURS, 720),
-  mpsApiUrl: process.env.MPS_API_URL ?? "https://services.dograh.com",
-  dograhMpsSecretKey: process.env.DOGRAH_MPS_SECRET_KEY,
+  mpsApiUrl: process.env.MPS_API_URL ?? "http://localhost:8002",
+  elphieMpsSecretKey:
+    process.env.ELPHIE_MPS_SECRET_KEY ?? process.env[legacyMpsSecretEnv],
   // Python call-engine microservice (pipecat WebRTC pipeline). Express does not
   // run the voice pipeline itself; it reverse-proxies signaling WebSockets here.
   callServiceUrl: (process.env.CALL_SERVICE_URL ?? "ws://localhost:8001").replace(

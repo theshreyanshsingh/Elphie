@@ -1,21 +1,21 @@
 // Create a new workflow using the TypeScript SDK.
 //
 // Requirements:
-//   npm install @dograh/sdk
+//   npm install @elphie/sdk
 //
 // Environment variables:
-//   DOGRAH_API_ENDPOINT  - Dograh API base URL (e.g. http://localhost:8000)
-//   DOGRAH_API_TOKEN     - API token sent as X-API-Key
+//   ELPHIE_API_ENDPOINT  - Elphie API base URL (e.g. http://localhost:8000)
+//   ELPHIE_API_TOKEN     - API token sent as X-API-Key
 //
 // Run:
 //   npx tsx create_workflow.ts
 
-import { DograhClient } from "@dograh/sdk";
+import { ElphieClient } from "@elphie/sdk";
 
 const WORKFLOW_NAME = "My SDK-created agent";
 
 // A minimal starter agent with a single `startCall` node that greets the user.
-// Open the new agent in the Dograh UI to extend it, or edit this object and
+// Open the new agent in the Elphie UI to extend it, or edit this object and
 // re-run to tweak the starting definition.
 const WORKFLOW_DEFINITION = {
     nodes: [
@@ -56,12 +56,12 @@ const WORKFLOW_DEFINITION = {
 };
 
 async function main(): Promise<void> {
-    const apiEndpoint = process.env.DOGRAH_API_ENDPOINT ?? "http://localhost:8000";
-    const apiToken = process.env.DOGRAH_API_TOKEN;
+    const apiEndpoint = process.env.ELPHIE_API_ENDPOINT ?? "http://localhost:8000";
+    const apiToken = process.env.ELPHIE_API_TOKEN;
 
-    if (!apiToken) throw new Error("DOGRAH_API_TOKEN is required");
+    if (!apiToken) throw new Error("ELPHIE_API_TOKEN is required");
 
-    const client = new DograhClient({
+    const client = new ElphieClient({
         baseUrl: apiEndpoint,
         apiKey: apiToken,
     });

@@ -63,9 +63,9 @@ services:
     networks:
       - app-network
 
-  dograh-init:
+  elphie-init:
     image: bash:5.2
-    container_name: dograh_init
+    container_name: elphie_init
     profiles: ["remote", "local-turn"]
     environment:
       ENVIRONMENT: "${ENVIRONMENT:-local}"
@@ -84,14 +84,14 @@ services:
       - nginx-generated:/generated/nginx
       - coturn-generated:/generated/coturn
     command:
-      - /workspace/scripts/run_dograh_init.sh
+      - /workspace/scripts/run_elphie_init.sh
 
   nginx:
     image: nginx:alpine
     container_name: nginx_https
     profiles: ["remote"]
     depends_on:
-      dograh-init:
+      elphie-init:
         condition: service_completed_successfully
       ui:
         condition: service_started
@@ -110,7 +110,7 @@ services:
     restart: unless-stopped
     profiles: ["remote", "local-turn"]
     depends_on:
-      dograh-init:
+      elphie-init:
         condition: service_completed_successfully
     ports:
       - "3478:3478/udp"
@@ -127,7 +127,7 @@ services:
       - app-network
 
   api:
-    image: ${REGISTRY:-ghcr.io/theshreyanshsingh}/elphie-api:${IMAGE_TAG:-latest}
+    image: ${REGISTRY:-elphie-local}/elphie-api:${IMAGE_TAG:-latest}
     volumes:
       - shared-tmp:/tmp
     environment:
@@ -160,7 +160,7 @@ services:
       MINIO_SECURE: "false"
 
       # Number of uvicorn worker processes (each is its own process bound to a
-      # distinct port starting at 8000). dograh-init renders nginx upstreams
+      # distinct port starting at 8000). elphie-init renders nginx upstreams
       # from this value and nginx load-balances across them with least_conn.
       FASTAPI_WORKERS: "${FASTAPI_WORKERS:-1}"
 
@@ -220,7 +220,7 @@ services:
       - app-network
 
   ui:
-    image: ${REGISTRY:-ghcr.io/theshreyanshsingh}/elphie-ui:${IMAGE_TAG:-latest}
+    image: ${REGISTRY:-elphie-local}/elphie-ui:${IMAGE_TAG:-latest}
     environment:
       # Bind the Next.js standalone server to all interfaces
       HOSTNAME: "0.0.0.0"

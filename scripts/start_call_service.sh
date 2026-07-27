@@ -18,7 +18,7 @@ set -e
 BASE_DIR="$(cd "$(dirname "$(dirname "${BASH_SOURCE[0]}")")" && pwd)"
 cd "$BASE_DIR"
 
-ENV_FILE="${DOGRAH_ENV_FILE:-$BASE_DIR/api/.env}"
+ENV_FILE="${ELPHIE_ENV_FILE:-$BASE_DIR/api/.env}"
 VENV_PATH="$BASE_DIR/venv"
 PORT="${CALL_SERVICE_PORT:-8001}"
 

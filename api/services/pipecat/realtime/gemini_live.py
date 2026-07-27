@@ -1,6 +1,6 @@
-"""Dograh subclass of pipecat's Gemini Live LLM service.
+"""Elphie subclass of pipecat's Gemini Live LLM service.
 
-Layers Dograh engine integration quirks onto upstream-pristine
+Layers Elphie engine integration quirks onto upstream-pristine
 :class:`GeminiLiveLLMService`:
 
 - **Deferred connect.** Connection is held back until ``system_instruction``
@@ -36,8 +36,8 @@ from pipecat.services.llm_service import FunctionCallFromLLM
 from pipecat.utils.tracing.service_decorators import traced_gemini_live
 
 
-class DograhGeminiLiveLLMService(GeminiLiveLLMService):
-    """Gemini Live with Dograh engine integration quirks. See module docstring."""
+class ElphieGeminiLiveLLMService(GeminiLiveLLMService):
+    """Gemini Live with Elphie engine integration quirks. See module docstring."""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -157,10 +157,10 @@ class DograhGeminiLiveLLMService(GeminiLiveLLMService):
         await super()._send_user_audio(frame)
 
     # ------------------------------------------------------------------
-    # Context lifecycle: Dograh pre-populates self._context via the engine,
+    # Context lifecycle: Elphie pre-populates self._context via the engine,
     # so upstream's "first arrival === self._context is None" check doesn't
     # work. We gate on _handled_initial_context instead and skip the
-    # init-instruction reconciliation (Dograh updates system_instruction at
+    # init-instruction reconciliation (Elphie updates system_instruction at
     # runtime via _update_settings, not via init).
     # ------------------------------------------------------------------
 
@@ -177,7 +177,7 @@ class DograhGeminiLiveLLMService(GeminiLiveLLMService):
     # Session lifecycle: drop upstream's automatic reconnect-seed and
     # initial-context-seed paths. The TTSSpeakFrame trigger and the
     # function-call-result LLMContextFrame are the only paths that should
-    # kick off bot turns in the Dograh flow.
+    # kick off bot turns in the Elphie flow.
     # ------------------------------------------------------------------
 
     @traced_gemini_live(operation="llm_setup")

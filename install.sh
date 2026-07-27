@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 # Elphie one-command remote install.
 #
-#   curl -fsSL https://raw.githubusercontent.com/theshreyanshsingh/Elphie/main/install.sh | bash -s -- YOUR.PUBLIC.IP
+#   ELPHIE_REPO_URL=https://github.com/your-organization/elphie.git \
+#     bash install.sh YOUR.PUBLIC.IP
 #
 # Or:
-#   SERVER_IP=YOUR.PUBLIC.IP bash <(curl -fsSL https://raw.githubusercontent.com/theshreyanshsingh/Elphie/main/install.sh)
+#   ELPHIE_REPO_URL=https://github.com/your-organization/elphie.git \
+#     SERVER_IP=YOUR.PUBLIC.IP bash install.sh
 
 set -euo pipefail
 
@@ -13,13 +15,18 @@ GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-REPO_URL="${ELPHIE_REPO_URL:-https://github.com/theshreyanshsingh/Elphie.git}"
+REPO_URL="${ELPHIE_REPO_URL:-}"
 INSTALL_DIR="${ELPHIE_INSTALL_DIR:-$HOME/elphie}"
 SERVER_IP="${SERVER_IP:-${1:-}}"
 
 if [[ -z "$SERVER_IP" ]]; then
   echo -e "${RED}Usage:${NC}"
-  echo "  curl -fsSL https://raw.githubusercontent.com/theshreyanshsingh/Elphie/main/install.sh | bash -s -- YOUR.PUBLIC.IP"
+  echo "  ELPHIE_REPO_URL=https://github.com/your-organization/elphie.git bash install.sh YOUR.PUBLIC.IP"
+  exit 1
+fi
+
+if [[ -z "$REPO_URL" && ! -d "$INSTALL_DIR/.git" ]]; then
+  echo -e "${RED}ELPHIE_REPO_URL is required for a new installation.${NC}"
   exit 1
 fi
 
@@ -81,9 +88,16 @@ ensure_pipecat() {
     return 1
   fi
 
-  echo -e "${BLUE}==> Fallback: cloning dograh-hq/pipecat @ ${sha}${NC}"
+  local pipecat_url
+  pipecat_url="${ELPHIE_PIPECAT_REPO_URL:-$(git -C "$root" config -f .gitmodules --get submodule.pipecat.url || true)}"
+  if [[ -z "$pipecat_url" ]]; then
+    echo -e "${RED}Could not resolve the pipecat repository URL${NC}"
+    return 1
+  fi
+
+  echo -e "${BLUE}==> Fallback: cloning pipecat @ ${sha}${NC}"
   rm -rf "$root/pipecat"
-  git clone https://github.com/dograh-hq/pipecat.git "$root/pipecat"
+  git clone "$pipecat_url" "$root/pipecat"
   git -C "$root/pipecat" fetch --depth 1 origin "$sha"
   git -C "$root/pipecat" checkout --force "$sha"
 

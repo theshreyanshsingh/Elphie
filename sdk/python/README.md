@@ -1,13 +1,13 @@
-# dograh-sdk
+# elphie-sdk
 
-Typed builder for Dograh voice-AI workflows. Fetches the node-spec catalog from
-the Dograh backend at session start, validates every call against it at the
+Typed builder for Elphie voice-AI workflows. Fetches the node-spec catalog from
+the Elphie backend at session start, validates every call against it at the
 call site, and produces `ReactFlowDTO`-compatible JSON.
 
 ## Install
 
 ```bash
-pip install dograh-sdk
+pip install elphie-sdk
 ```
 
 For local development against a checked-out monorepo:
@@ -19,9 +19,9 @@ pip install -e sdk/python/
 ## Usage
 
 ```python
-from dograh_sdk import DograhClient, Workflow
+from elphie_sdk import ElphieClient, Workflow
 
-with DograhClient(base_url="http://localhost:8000", api_key="...") as client:
+with ElphieClient(base_url="http://localhost:8000", api_key="...") as client:
     wf = Workflow(client=client, name="loan_qualification")
 
     start = wf.add(
@@ -68,8 +68,8 @@ through (compound invariants, cross-field rules).
 ## Environment
 
 ```bash
-DOGRAH_API_URL=http://localhost:8000   # default
-DOGRAH_API_KEY=sk-...                  # sent as X-API-Key
+ELPHIE_API_URL=http://localhost:8000   # default
+ELPHIE_API_KEY=sk-...                  # sent as X-API-Key
 ```
 
 ## License

@@ -39,7 +39,7 @@ export const defaultConfigurationSchemas = () => ({
     openai: serviceSchema("openai", {
       model: { type: "string", default: "gpt-4o-mini", title: "Model" }
     }),
-    dograh: serviceSchema("dograh", {
+    elphie: serviceSchema("elphie", {
       model: { type: "string", default: "default", title: "Model" }
     })
   },
@@ -60,7 +60,7 @@ export const defaultConfigurationSchemas = () => ({
       model: { type: "string", default: "sonic-2", title: "Model" },
       voice: { type: "string", title: "Voice" }
     }),
-    dograh: serviceSchema("dograh", {
+    elphie: serviceSchema("elphie", {
       model: { type: "string", default: "default", title: "Model" },
       voice: { type: "string", default: "default", title: "Voice" },
       speed: { type: "number", default: 1, title: "Speed" }
@@ -75,7 +75,7 @@ export const defaultConfigurationSchemas = () => ({
       model: { type: "string", default: "nova-3", title: "Model" },
       language: { type: "string", title: "Language" }
     }),
-    dograh: serviceSchema("dograh", {
+    elphie: serviceSchema("elphie", {
       model: { type: "string", default: "default", title: "Model" },
       language: { type: "string", default: "multi", title: "Language" }
     })
@@ -84,7 +84,7 @@ export const defaultConfigurationSchemas = () => ({
     openai: serviceSchema("openai", {
       model: { type: "string", default: "text-embedding-3-small", title: "Model" }
     }),
-    dograh: serviceSchema("dograh", {
+    elphie: serviceSchema("elphie", {
       model: { type: "string", default: "default", title: "Model" }
     })
   },

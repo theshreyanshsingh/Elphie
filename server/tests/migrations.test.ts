@@ -11,9 +11,9 @@ const migrationSqlPath = repoPath(
 
 test("Alembic migration manifest preserves the Python revision graph", () => {
   const revisions = discoverAlembicRevisions();
-  assert.equal(revisions.length, 90);
+  assert.equal(revisions.length, 91);
   assert.equal(revisions[0]?.revision, "93a1ddbb6ffd");
-  assert.equal(revisions.at(-1)?.revision, "91cc6ba3e1c7");
+  assert.equal(revisions.at(-1)?.revision, "d4f5a6b7c8e9");
   assert.ok(
     revisions.some(
       (revision) =>
@@ -29,7 +29,7 @@ test("Node bootstrap schema is stamped to Alembic head", () => {
   assert.match(sql, /CREATE EXTENSION IF NOT EXISTS vector;/);
   assert.match(sql, /CREATE TABLE IF NOT EXISTS alembic_version/);
   assert.match(sql, /CREATE TABLE IF NOT EXISTS node_schema_migrations/);
-  assert.match(sql, /91cc6ba3e1c7/);
+  assert.match(sql, /d4f5a6b7c8e9/);
 
   for (const table of [
     "organizations",

@@ -1,4 +1,4 @@
-"""Quota checking service for Dograh credits.
+"""Quota checking service for Elphie credits.
 
 This module provides reusable quota checking functionality that can be used
 across different endpoints (WebRTC signaling, telephony, public API triggers).
@@ -18,27 +18,27 @@ from api.services.configuration.ai_model_configuration import (
 from api.services.configuration.registry import ServiceProviders
 from api.services.managed_model_services import (
     MPS_CORRELATION_ID_CONTEXT_KEY,
-    get_dograh_service_api_key,
+    get_elphie_service_api_key,
     uses_managed_model_services_v2,
 )
 from api.services.mps_service_key_client import mps_service_key_client
 
-MINIMUM_DOGRAH_CREDITS_FOR_CALL = 0.10
+MINIMUM_ELPHIE_CREDITS_FOR_CALL = 0.10
 
 LEGACY_QUOTA_EXCEEDED_MESSAGE = (
     "You have exhausted your trial credits. "
-    "Please email founders@dograh.com for additional Dograh credits "
+    "Please contact support for additional Elphie credits "
     "or change providers in Models configurations."
 )
 
 BILLING_V2_QUOTA_EXCEEDED_MESSAGE = (
-    "You have exhausted your Dograh credits. "
+    "You have exhausted your Elphie credits. "
     "Please purchase more credits from /billing "
     "or change providers in Models configurations."
 )
 
 SERVICE_TOKEN_ORG_MISMATCH_MESSAGE = (
-    "The Dograh service token being used is created from another account. "
+    "The Elphie service token being used is created from another account. "
     "Please create a new service token from the Developers tab and use it in "
     "your model configuration."
 )
@@ -76,18 +76,18 @@ def _insufficient_legacy_quota_result() -> QuotaCheckResult:
     )
 
 
-def _service_uses_dograh(service: Any) -> bool:
+def _service_uses_elphie(service: Any) -> bool:
     provider = getattr(service, "provider", None)
     return (
-        provider == ServiceProviders.DOGRAH or provider == ServiceProviders.DOGRAH.value
+        provider == ServiceProviders.ELPHIE or provider == ServiceProviders.ELPHIE.value
     )
 
 
-def _dograh_api_keys(user_config: Any) -> set[str]:
+def _elphie_api_keys(user_config: Any) -> set[str]:
     api_keys: set[str] = set()
     for section_name in ("llm", "stt", "tts", "embeddings"):
         service = getattr(user_config, section_name, None)
-        if not _service_uses_dograh(service):
+        if not _service_uses_elphie(service):
             continue
         if hasattr(service, "get_all_api_keys"):
             all_api_keys = [
@@ -166,7 +166,7 @@ async def _authorize_hosted_workflow_run_start(
         workflow_run_id and uses_managed_model_services_v2(user_config)
     )
     service_key = (
-        get_dograh_service_api_key(user_config) if requires_correlation else None
+        get_elphie_service_api_key(user_config) if requires_correlation else None
     )
     if requires_correlation and not service_key:
         return (
@@ -187,14 +187,14 @@ async def _authorize_hosted_workflow_run_start(
             workflow_run_id=workflow_run_id,
             service_key=service_key,
             require_correlation_id=requires_correlation,
-            minimum_credits=MINIMUM_DOGRAH_CREDITS_FOR_CALL,
+            minimum_credits=MINIMUM_ELPHIE_CREDITS_FOR_CALL,
             created_by=(
                 str(workflow_owner.provider_id)
                 if workflow_owner.provider_id is not None
                 else None
             ),
             metadata={
-                "dograh_user_id": str(workflow_owner.id),
+                "elphie_user_id": str(workflow_owner.id),
                 "workflow_id": workflow_id,
             },
         )
@@ -217,7 +217,7 @@ async def _authorize_hosted_workflow_run_start(
             QuotaCheckResult(
                 has_quota=False,
                 error_code="quota_check_failed",
-                error_message="Could not verify Dograh credits. Please try again.",
+                error_message="Could not verify Elphie credits. Please try again.",
             ),
             True,
         )
@@ -229,10 +229,10 @@ async def _authorize_hosted_workflow_run_start(
     remaining = _safe_float(authorization.get("remaining_credits"))
     if (
         not authorization.get("allowed", False)
-        or remaining < MINIMUM_DOGRAH_CREDITS_FOR_CALL
+        or remaining < MINIMUM_ELPHIE_CREDITS_FOR_CALL
     ):
         logger.warning(
-            "Insufficient Dograh billing v2 credits for org {}: {:.2f} credits remaining",
+            "Insufficient Elphie billing v2 credits for org {}: {:.2f} credits remaining",
             organization_id,
             remaining,
         )
@@ -253,25 +253,25 @@ async def _authorize_hosted_workflow_run_start(
             QuotaCheckResult(
                 has_quota=False,
                 error_code="quota_check_failed",
-                error_message="Could not verify Dograh credits. Please try again.",
+                error_message="Could not verify Elphie credits. Please try again.",
             ),
             True,
         )
     logger.info(
-        "Dograh billing v2 run authorization passed for org {}: {:.2f} credits remaining",
+        "Elphie billing v2 run authorization passed for org {}: {:.2f} credits remaining",
         organization_id,
         remaining,
     )
     return QuotaCheckResult(has_quota=True), True
 
 
-async def _authorize_legacy_dograh_keys(
+async def _authorize_legacy_elphie_keys(
     *,
-    dograh_api_keys: set[str],
+    elphie_api_keys: set[str],
     organization_id: int | None,
     workflow_owner: UserModel,
 ) -> QuotaCheckResult:
-    for api_key in dograh_api_keys:
+    for api_key in elphie_api_keys:
         try:
             usage = await mps_service_key_client.check_service_key_usage(
                 api_key,
@@ -281,19 +281,19 @@ async def _authorize_legacy_dograh_keys(
             remaining = usage.get("remaining_credits", 0.0)
 
             # Require at least $0.10 for a short call
-            if remaining < MINIMUM_DOGRAH_CREDITS_FOR_CALL:
+            if remaining < MINIMUM_ELPHIE_CREDITS_FOR_CALL:
                 logger.warning(
-                    f"Insufficient Dograh credits for key ...{api_key[-8:]}: "
+                    f"Insufficient Elphie credits for key ...{api_key[-8:]}: "
                     f"${remaining:.2f} remaining"
                 )
                 return _insufficient_legacy_quota_result()
 
             logger.info(
-                f"Dograh quota check passed for key ...{api_key[-8:]}: "
+                f"Elphie quota check passed for key ...{api_key[-8:]}: "
                 f"{remaining:.2f} credits remaining"
             )
         except Exception as e:
-            logger.error(f"Failed to check quota for Dograh key: {str(e)}")
+            logger.error(f"Failed to check quota for Elphie key: {str(e)}")
             error_str = str(e)
             if "404" in error_str or "not found" in error_str.lower():
                 return QuotaCheckResult(
@@ -304,7 +304,7 @@ async def _authorize_legacy_dograh_keys(
             return QuotaCheckResult(
                 has_quota=False,
                 error_code="quota_check_failed",
-                error_message="Could not verify Dograh credits. Please try again.",
+                error_message="Could not verify Elphie credits. Please try again.",
             )
 
     return QuotaCheckResult(has_quota=True)
@@ -319,7 +319,7 @@ async def _authorize_oss_managed_v2_correlation(
     if not workflow_run_id or not uses_managed_model_services_v2(user_config):
         return QuotaCheckResult(has_quota=True)
 
-    service_key = get_dograh_service_api_key(user_config)
+    service_key = get_elphie_service_api_key(user_config)
     if not service_key:
         return QuotaCheckResult(
             has_quota=False,
@@ -349,7 +349,7 @@ async def _authorize_oss_managed_v2_correlation(
         return QuotaCheckResult(
             has_quota=False,
             error_code="quota_check_failed",
-            error_message="Could not verify Dograh credits. Please try again.",
+            error_message="Could not verify Elphie credits. Please try again.",
         )
 
     return QuotaCheckResult(has_quota=True)
@@ -415,12 +415,12 @@ async def authorize_workflow_run_start(
             if hosted_enforced or not hosted_result.has_quota:
                 return hosted_result
 
-        dograh_api_keys = _dograh_api_keys(user_config)
-        if not dograh_api_keys:
+        elphie_api_keys = _elphie_api_keys(user_config)
+        if not elphie_api_keys:
             return QuotaCheckResult(has_quota=True)
 
-        legacy_result = await _authorize_legacy_dograh_keys(
-            dograh_api_keys=dograh_api_keys,
+        legacy_result = await _authorize_legacy_elphie_keys(
+            elphie_api_keys=elphie_api_keys,
             organization_id=(
                 None if DEPLOYMENT_MODE == "oss" else workflow.organization_id
             ),

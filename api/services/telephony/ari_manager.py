@@ -451,7 +451,7 @@ class ARIConnection:
         the POST and avoid racing against the StasisStart event.
         """
         # v() appends URI query params to the websocket_client.conf URL
-        # e.g. wss://api.dograh.com/ws/ari?workflow_id=1&user_id=2&workflow_run_id=3
+        # e.g. wss://elphie.nearzero.dev/ws/ari?workflow_id=1&user_id=2&workflow_run_id=3
         transport_data = (
             f"v(workflow_id={workflow_id},"
             f"user_id={user_id},"
@@ -640,7 +640,7 @@ class ARIConnection:
         created in :meth:`_complete_bridge_after_ext_ready` once the external
         media channel has entered Stasis (its own StasisStart event).
         """
-        ext_channel_id = f"dograh-ext-{uuid.uuid4()}"
+        ext_channel_id = f"elphie-ext-{uuid.uuid4()}"
         try:
             logger.info(
                 f"[ARI org={self.organization_id}] Setting up external media for "

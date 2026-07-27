@@ -1,4 +1,4 @@
-"""Tests for CAMB AI TTS integration into Dograh.
+"""Tests for CAMB AI TTS integration into Elphie.
 
 Covers:
 - CambTTSConfiguration model (defaults, custom values, JSON schema)
@@ -70,16 +70,10 @@ class TestServiceFactoryCamb:
     def test_create_tts_service_camb(self):
         import sys
 
-        # Mock missing modules (custom pipecat fork, not in public pipecat-ai)
-        dograh_modules = [
-            "pipecat.services.dograh",
-            "pipecat.services.dograh.llm",
-            "pipecat.services.dograh.stt",
-            "pipecat.services.dograh.tts",
-            "pipecat.utils.text.xml_function_tag_filter",
-        ]
+        # Mock optional modules that may be absent from a public Pipecat install.
+        elphie_modules = ["pipecat.utils.text.xml_function_tag_filter"]
         mocks = {}
-        for mod in dograh_modules:
+        for mod in elphie_modules:
             if mod not in sys.modules:
                 mocks[mod] = MagicMock()
 

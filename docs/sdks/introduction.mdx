@@ -1,12 +1,12 @@
 ---
 title: "Introduction"
-description: "Build and operate Dograh voice AI agents programmatically from Python or TypeScript"
+description: "Build and operate Elphie voice AI agents programmatically from Python or TypeScript"
 ---
 
-Dograh ships official SDKs for **Python** and **TypeScript** that wrap the Dograh REST API and the workflow builder. Use them to create or edit agents, place outbound calls, and inspect runs from your own code.
+Elphie ships official SDKs for **Python** and **TypeScript** that wrap the Elphie REST API and the workflow builder. Use them to create or edit agents, place outbound calls, and inspect runs from your own code.
 
-- **Python** — [`dograh-sdk`](https://pypi.org/project/dograh-sdk/) on PyPI
-- **TypeScript** — [`@dograh/sdk`](https://www.npmjs.com/package/@dograh/sdk) on npm
+- **Python** — [`elphie-sdk`](https://pypi.org/project/elphie-sdk/) on PyPI
+- **TypeScript** — [`@elphie/sdk`](https://www.npmjs.com/package/@elphie/sdk) on npm
 
 Both packages are generated from the same backend OpenAPI spec, so the method surface is equivalent — only the naming convention differs (`snake_case` in Python, `camelCase` in TypeScript).
 
@@ -14,33 +14,33 @@ Both packages are generated from the same backend OpenAPI spec, so the method su
 
 <CodeGroup>
 ```bash Python
-pip install dograh-sdk
+pip install elphie-sdk
 ```
 ```bash TypeScript
-npm install @dograh/sdk
+npm install @elphie/sdk
 ```
 </CodeGroup>
 
 ## Authenticate
 
-Generate an API key at [`/api-keys`](https://app.dograh.com/api-keys) (or `http://localhost:3010/api-keys` for self-hosted). See [API Keys](/configurations/api-keys) for details.
+Generate an API key at [`/api-keys`](https://elphie.nearzero.dev/api-keys) (or `http://localhost:3010/api-keys` for self-hosted). See [API Keys](/configurations/api-keys) for details.
 
-Both SDKs read the API key from the `DOGRAH_API_KEY` environment variable by default, and the base URL from `DOGRAH_API_URL` (defaults to `http://localhost:8000`). You can also pass them explicitly.
+Both SDKs read the API key from the `ELPHIE_API_KEY` environment variable by default, and the base URL from `ELPHIE_API_URL` (defaults to `http://localhost:8000`). You can also pass them explicitly.
 
 <CodeGroup>
 ```python Python
-from dograh_sdk import DograhClient
+from elphie_sdk import ElphieClient
 
-client = DograhClient(
-    base_url="https://app.dograh.com",
+client = ElphieClient(
+    base_url="https://elphie.nearzero.dev",
     api_key="YOUR_API_KEY",
 )
 ```
 ```typescript TypeScript
-import { DograhClient } from "@dograh/sdk";
+import { ElphieClient } from "@elphie/sdk";
 
-const client = new DograhClient({
-    baseUrl: "https://app.dograh.com",
+const client = new ElphieClient({
+    baseUrl: "https://elphie.nearzero.dev",
     apiKey: "YOUR_API_KEY",
 });
 ```

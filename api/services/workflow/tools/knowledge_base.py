@@ -280,11 +280,11 @@ async def _perform_retrieval(
             else:
                 default_headers = None
                 if (
-                    embeddings_provider == ServiceProviders.DOGRAH.value
+                    embeddings_provider == ServiceProviders.ELPHIE.value
                     and correlation_id
                 ):
                     default_headers = {
-                        "X-Dograh-Correlation-Id": correlation_id,
+                        "X-Elphie-Correlation-Id": correlation_id,
                     }
                 embedding_service = OpenAIEmbeddingService(
                     db_client=db_client,

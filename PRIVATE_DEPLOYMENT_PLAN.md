@@ -1,6 +1,6 @@
 # Voice AI on GCP — Private VPC Deployment Playbook
 
-A step-by-step guide to deploying a voice AI stack (Dograh + Claude/Gemini + STT/TTS) entirely within a customer's GCP project, with no data leaving their VPC.
+A step-by-step guide to deploying a voice AI stack (Elphie + Claude/Gemini + STT/TTS) entirely within a customer's GCP project, with no data leaving their VPC.
 
 ---
 
@@ -8,18 +8,18 @@ A step-by-step guide to deploying a voice AI stack (Dograh + Claude/Gemini + STT
 
 One VPC in the customer's GCP project. Inside it:
 
-- A **GKE cluster** running Dograh (orchestration + Pipecat pipeline).
+- A **GKE cluster** running Elphie (orchestration + Pipecat pipeline).
 - A single **Private Service Connect (PSC) endpoint** to the `all-apis` bundle. This gives private access to *every* `*.googleapis.com` service in one shot — Vertex AI (Claude + Gemini), Cloud Speech-to-Text, Cloud Text-to-Speech, Cloud Storage, KMS, everything.
 - Third-party TTS/STT (ElevenLabs or Deepgram) either as a Vertex Model Garden partner endpoint or as a Helm chart on the same GKE cluster.
 - A **VPC Service Controls perimeter** around the project so leaked credentials can't exfiltrate data outside the perimeter.
 
 ```
 ┌─────────────────────────── Customer GCP Project ───────────────────────────┐
-│  ┌─────────────────────── VPC: dograh-vpc ─────────────────────────────┐   │
+│  ┌─────────────────────── VPC: elphie-vpc ─────────────────────────────┐   │
 │  │                                                                     │   │
 │  │   ┌──────────────────┐         ┌──────────────────────────┐         │   │
 │  │   │  GKE Cluster     │  ────▶  │  PSC Endpoint            │ ──▶ Vertex AI
-│  │   │  (Dograh pods)   │         │  192.168.255.230         │ ──▶ Cloud STT
+│  │   │  (Elphie pods)   │         │  192.168.255.230         │ ──▶ Cloud STT
 │  │   │  + optional      │         │  target: all-apis bundle │ ──▶ Cloud TTS
 │  │   │  Deepgram pods   │         └──────────────────────────┘         │   │
 │  │   └──────────────────┘                                              │   │
@@ -36,13 +36,13 @@ Traffic from GKE pods to Vertex AI, STT, and TTS resolves via private DNS to the
 
 ## Phase 1 — VPC and PSC endpoint to Google APIs
 
-This is the single piece of plumbing that gives Dograh private access to Vertex AI (Claude/Gemini), Cloud STT, and Cloud TTS.
+This is the single piece of plumbing that gives Elphie private access to Vertex AI (Claude/Gemini), Cloud STT, and Cloud TTS.
 
 ### 1.1 Set variables and enable APIs
 
 ```bash
 export PROJECT_ID=$(gcloud config get-value project)
-export NETWORK=dograh-vpc
+export NETWORK=elphie-vpc
 export REGION=us-east1
 export PSC_IP=192.168.255.230   # any unused internal IP
 
@@ -64,7 +64,7 @@ gcloud compute networks create $NETWORK \
   --bgp-routing-mode=global \
   --mtu=1460
 
-gcloud compute networks subnets create dograh-subnet \
+gcloud compute networks subnets create elphie-subnet \
   --network=$NETWORK \
   --range=10.0.0.0/20 \
   --region=$REGION \
@@ -76,16 +76,16 @@ The `--enable-private-ip-google-access` flag is required for VMs without externa
 ### 1.3 Reserve internal IP and create the PSC forwarding rule
 
 ```bash
-gcloud compute addresses create dograh-psc-ip \
+gcloud compute addresses create elphie-psc-ip \
   --global \
   --purpose=PRIVATE_SERVICE_CONNECT \
   --addresses=$PSC_IP \
   --network=$NETWORK
 
-gcloud compute forwarding-rules create dograh-psc-googleapis \
+gcloud compute forwarding-rules create elphie-psc-googleapis \
   --global \
   --network=$NETWORK \
-  --address=dograh-psc-ip \
+  --address=elphie-psc-ip \
   --target-google-apis-bundle=all-apis
 ```
 
@@ -150,15 +150,15 @@ gemini = genai.Client(vertexai=True, location="us-east1", project=PROJECT_ID)
 
 ---
 
-## Phase 3 — Deploy Dograh on GKE in the same VPC
+## Phase 3 — Deploy Elphie on GKE in the same VPC
 
 ### 3.1 Create a private GKE cluster
 
 ```bash
-gcloud container clusters create dograh-cluster \
+gcloud container clusters create elphie-cluster \
   --region=$REGION \
   --network=$NETWORK \
-  --subnetwork=dograh-subnet \
+  --subnetwork=elphie-subnet \
   --enable-private-nodes \
   --enable-private-endpoint \
   --master-ipv4-cidr=172.16.0.0/28 \
@@ -166,16 +166,16 @@ gcloud container clusters create dograh-cluster \
   --num-nodes=3 \
   --workload-pool=$PROJECT_ID.svc.id.goog
 
-gcloud container clusters get-credentials dograh-cluster --region=$REGION
+gcloud container clusters get-credentials elphie-cluster --region=$REGION
 ```
 
-### 3.2 Install Dograh via Helm
+### 3.2 Install Elphie via Helm
 
 ```bash
-helm install dograh ./charts/dograh -n dograh --create-namespace
+helm install elphie ./charts/elphie -n elphie --create-namespace
 ```
 
-Dograh pods inherit the VPC's DNS, so any call to `aiplatform.googleapis.com`, `speech.googleapis.com`, or `texttospeech.googleapis.com` automatically routes through the PSC endpoint.
+Elphie pods inherit the VPC's DNS, so any call to `aiplatform.googleapis.com`, `speech.googleapis.com`, or `texttospeech.googleapis.com` automatically routes through the PSC endpoint.
 
 ### 3.3 Configure Workload Identity
 
@@ -183,25 +183,25 @@ This lets pods authenticate to Vertex AI without static service account keys.
 
 ```bash
 # Kubernetes service account
-kubectl create serviceaccount dograh-ksa -n dograh
+kubectl create serviceaccount elphie-ksa -n elphie
 
 # GCP service account
-gcloud iam service-accounts create dograh-gsa
+gcloud iam service-accounts create elphie-gsa
 
 # Grant Vertex AI access
 gcloud projects add-iam-policy-binding $PROJECT_ID \
-  --member="serviceAccount:dograh-gsa@$PROJECT_ID.iam.gserviceaccount.com" \
+  --member="serviceAccount:elphie-gsa@$PROJECT_ID.iam.gserviceaccount.com" \
   --role="roles/aiplatform.user"
 
 # Bind KSA to GSA
 gcloud iam service-accounts add-iam-policy-binding \
-  dograh-gsa@$PROJECT_ID.iam.gserviceaccount.com \
-  --member="serviceAccount:$PROJECT_ID.svc.id.goog[dograh/dograh-ksa]" \
+  elphie-gsa@$PROJECT_ID.iam.gserviceaccount.com \
+  --member="serviceAccount:$PROJECT_ID.svc.id.goog[elphie/elphie-ksa]" \
   --role="roles/iam.workloadIdentityUser"
 
 # Annotate KSA
-kubectl annotate serviceaccount dograh-ksa -n dograh \
-  iam.gke.io/gcp-service-account=dograh-gsa@$PROJECT_ID.iam.gserviceaccount.com
+kubectl annotate serviceaccount elphie-ksa -n elphie \
+  iam.gke.io/gcp-service-account=elphie-gsa@$PROJECT_ID.iam.gserviceaccount.com
 ```
 
 ---
@@ -221,7 +221,7 @@ Runs entirely in the customer's VPC, no egress to Deepgram cloud after licensing
 ```bash
 # GPU node pool (L4s are the sweet spot for Deepgram)
 gcloud container node-pools create gpu-pool \
-  --cluster=dograh-cluster \
+  --cluster=elphie-cluster \
   --region=$REGION \
   --machine-type=g2-standard-12 \
   --accelerator=type=nvidia-l4,count=1 \
@@ -261,8 +261,8 @@ This is the lock that turns "data flows over private network" into "data *cannot
 gcloud access-context-manager policies list --organization=YOUR_ORG_ID
 
 # Create the perimeter
-gcloud access-context-manager perimeters create dograh-perimeter \
-  --title="Dograh VPC-SC Perimeter" \
+gcloud access-context-manager perimeters create elphie-perimeter \
+  --title="Elphie VPC-SC Perimeter" \
   --resources=projects/$(gcloud projects describe $PROJECT_ID --format='value(projectNumber)') \
   --restricted-services=aiplatform.googleapis.com,speech.googleapis.com,texttospeech.googleapis.com,storage.googleapis.com,cloudkms.googleapis.com \
   --policy=YOUR_POLICY_ID
@@ -276,9 +276,9 @@ Enable Customer-Managed Encryption Keys on the project for at-rest encryption wi
 
 ```bash
 # Create a key ring and key
-gcloud kms keyrings create dograh-keyring --location=$REGION
-gcloud kms keys create dograh-key \
-  --keyring=dograh-keyring \
+gcloud kms keyrings create elphie-keyring --location=$REGION
+gcloud kms keys create elphie-key \
+  --keyring=elphie-keyring \
   --location=$REGION \
   --purpose=encryption
 ```
@@ -289,7 +289,7 @@ Then attach the key to resources as needed (Vertex AI, Cloud Storage, GKE etcd, 
 
 ## Phase 6 — Verification checklist
 
-Run these from a Dograh pod inside the cluster:
+Run these from a Elphie pod inside the cluster:
 
 ```bash
 # DNS resolves to PSC IP, not public Google IPs
@@ -331,7 +331,7 @@ Claude and other partner models require a one-time terms acceptance in the Cloud
 ```bash
 # 1. Variables
 export PROJECT_ID=$(gcloud config get-value project)
-export NETWORK=dograh-vpc
+export NETWORK=elphie-vpc
 export REGION=us-east1
 export PSC_IP=192.168.255.230
 
@@ -342,14 +342,14 @@ gcloud services enable compute.googleapis.com aiplatform.googleapis.com \
 
 # 3. VPC
 gcloud compute networks create $NETWORK --subnet-mode=custom --bgp-routing-mode=global
-gcloud compute networks subnets create dograh-subnet --network=$NETWORK \
+gcloud compute networks subnets create elphie-subnet --network=$NETWORK \
   --range=10.0.0.0/20 --region=$REGION --enable-private-ip-google-access
 
 # 4. PSC endpoint
-gcloud compute addresses create dograh-psc-ip --global \
+gcloud compute addresses create elphie-psc-ip --global \
   --purpose=PRIVATE_SERVICE_CONNECT --addresses=$PSC_IP --network=$NETWORK
-gcloud compute forwarding-rules create dograh-psc-googleapis --global \
-  --network=$NETWORK --address=dograh-psc-ip --target-google-apis-bundle=all-apis
+gcloud compute forwarding-rules create elphie-psc-googleapis --global \
+  --network=$NETWORK --address=elphie-psc-ip --target-google-apis-bundle=all-apis
 
 # 5. Private DNS
 gcloud dns managed-zones create googleapis-private --dns-name="googleapis.com." \
@@ -360,8 +360,8 @@ gcloud dns record-sets create "*.googleapis.com." --zone=googleapis-private \
   --type=CNAME --ttl=300 --rrdatas="googleapis.com."
 
 # 6. GKE
-gcloud container clusters create dograh-cluster --region=$REGION \
-  --network=$NETWORK --subnetwork=dograh-subnet \
+gcloud container clusters create elphie-cluster --region=$REGION \
+  --network=$NETWORK --subnetwork=elphie-subnet \
   --enable-private-nodes --enable-private-endpoint \
   --master-ipv4-cidr=172.16.0.0/28 --enable-ip-alias --num-nodes=3 \
   --workload-pool=$PROJECT_ID.svc.id.goog
@@ -369,8 +369,8 @@ gcloud container clusters create dograh-cluster --region=$REGION \
 # 7. Manual step: enable Claude + Gemini in Model Garden via console
 
 # 8. VPC-SC perimeter (after getting org policy ID)
-gcloud access-context-manager perimeters create dograh-perimeter \
-  --title="Dograh VPC-SC Perimeter" \
+gcloud access-context-manager perimeters create elphie-perimeter \
+  --title="Elphie VPC-SC Perimeter" \
   --resources=projects/$(gcloud projects describe $PROJECT_ID --format='value(projectNumber)') \
   --restricted-services=aiplatform.googleapis.com,speech.googleapis.com,texttospeech.googleapis.com,storage.googleapis.com,cloudkms.googleapis.com \
   --policy=YOUR_POLICY_ID

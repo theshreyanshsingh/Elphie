@@ -1,24 +1,24 @@
-# Contributing to Dograh AI
+# Contributing to Elphie AI
 
-Welcome to Dograh AI! ❤️ Thank you for your interest in contributing to the future of open-source voice AI. ❤️
+Welcome to Elphie AI! ❤️ Thank you for your interest in contributing to the future of open-source voice AI. ❤️
 
-Dograh AI is a comprehensive voice agent platform that helps developers build, test, and deploy conversational AI systems with minimal setup. This guide will help you understand the project structure, set up your development environment, and start contributing effectively.
+Elphie AI is a comprehensive voice agent platform that helps developers build, test, and deploy conversational AI systems with minimal setup. This guide will help you understand the project structure, set up your development environment, and start contributing effectively.
 
-👉 Join our community → [Dograh Community Slack](https://join.slack.com/t/dograh-community/shared_invite/zt-3zjb5vwvl-j7hRz3_F1SOn5cH~jm5f5g)
+👉 Join our community → [Elphie Discussions](https://github.com/elphie-hq/elphie/discussions)
 
 ## 🏗️ Project Overview
 
-### What is Dograh AI?
+### What is Elphie AI?
 
-Dograh AI is a full-stack platform for building voice agents with a drag-and-drop workflow builder. It combines multiple technologies to provide a seamless experience from development to production deployment.
+Elphie AI is a full-stack platform for building voice agents with a drag-and-drop workflow builder. It combines multiple technologies to provide a seamless experience from development to production deployment.
 
 ## 🙌 How You Can Contribute
 
-- 🐛 **Report bugs** via [GitHub Issues](https://github.com/dograh-hq/dograh/issues)
-- 💡 **Suggest features** via [Ideas](https://github.com/orgs/dograh-hq/discussions/categories/ideas)
+- 🐛 **Report bugs** via [GitHub Issues](https://github.com/elphie-hq/elphie/issues)
+- 💡 **Suggest features** via [Ideas](https://github.com/orgs/elphie-hq/discussions/categories/ideas)
 - 🔧 **Submit pull requests**
 - 📖 **Improve documentation** The documentation is hosted via mintlify and the code is in `docs/` folder
-- 💬 **Join the Slack community**
+- 💬 **Join the community discussions**
 
 👉 A great place to start is with issues tagged **`good first issue`**.
 
@@ -27,37 +27,37 @@ Dograh AI is a full-stack platform for building voice agents with a drag-and-dro
 > - Star the project;
 > - Tweet about it;
 > - Refer to this project in your project's readme;
-> - Submit and vote on [Ideas](https://github.com/orgs/dograh-hq/discussions/categories/ideas);
-> - Create and comment on [Issues](https://github.com/dograh-hq/dograh/issues);
+> - Submit and vote on [Ideas](https://github.com/orgs/elphie-hq/discussions/categories/ideas);
+> - Create and comment on [Issues](https://github.com/elphie-hq/elphie/issues);
 > - Mention the project at local meetups and tell your friends/colleagues.
 
 ## 🚀 Development Setup
 
-Please refer to our [Development Setup documentation](https://docs.dograh.com/contribution/setup).
+Please refer to our [Development Setup documentation](https://elphie.nearzero.dev/contribution/setup).
 
 ### Getting Help
 
 **Before You Start**
 
 - Check existing [GitHub Issues](../../issues) for similar work
-- Join our [Slack community](https://join.slack.com/t/dograh-community/shared_invite/zt-3zjb5vwvl-j7hRz3_F1SOn5cH~jm5f5g) to discuss your plans
+- Join our [GitHub Discussions](https://github.com/elphie-hq/elphie/discussions) to discuss your plans
 - Look for issues tagged `good first issue` for beginner-friendly tasks
 
 **During Development**
 
-- Ask questions in our Slack community
+- Ask questions in our community discussions
 - Reference related issues and PRs in your discussions
 - Share early drafts for feedback on complex features
 
 ## 💬 Community & Support
 
-Our Slack community is the heart of Dograh AI development:
+Our community discussions are the heart of Elphie AI development:
 
 - **Get Help**: Setup assistance and debugging support
 - **Collaborate**: Discuss features and architectural decisions
 - **Connect**: Meet other contributors and maintainers
 - **Stay Updated**: Learn about contribution opportunities and releases
 
-👉 **Join us**: [Dograh Community Slack](https://join.slack.com/t/dograh-community/shared_invite/zt-3zjb5vwvl-j7hRz3_F1SOn5cH~jm5f5g)
+👉 **Join us**: [Elphie Discussions](https://github.com/elphie-hq/elphie/discussions)
 
 Thank you for helping us keep voice AI open and accessible! 🎉

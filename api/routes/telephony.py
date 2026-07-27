@@ -178,7 +178,7 @@ async def initiate_call(
             )
         workflow_run_name = workflow_run.name
 
-    # Check Dograh quota after the run exists so hosted v2 can mint and store
+    # Check Elphie quota after the run exists so hosted v2 can mint and store
     # the MPS correlation id before initiating the call.
     quota_result = await authorize_workflow_run_start(
         workflow_id=workflow.id,
