@@ -4,6 +4,7 @@ import { ExternalLink, Upload } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { AppPageContent } from "@/components/layout/AppPageContent";
+import { PageHeading } from "@/components/PageHeading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -51,7 +52,7 @@ export default function FilesPage() {
     return (
         <AppPageContent>
             <div className="mb-8">
-                <h1 className="text-3xl font-bold mb-2">Knowledge Base Files</h1>
+                <PageHeading className="mb-2">Knowledge Base Files</PageHeading>
                 <p className="text-muted-foreground">
                     Upload and manage documents for your voice agents to reference.{" "}
                     <a href={KNOWLEDGE_BASE_DOC_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5 underline">

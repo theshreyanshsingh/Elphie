@@ -14,6 +14,7 @@ import type {
     OrganizationAiModelConfigurationV2,
 } from "@/client/types.gen";
 import { AIModelConfigurationV2Editor, type ModelConfigurationDefaultsV2 } from "@/components/AIModelConfigurationV2Editor";
+import { PageHeading } from "@/components/PageHeading";
 import { ServiceConfigurationForm } from "@/components/ServiceConfigurationForm";
 import {
     AlertDialog,
@@ -179,7 +180,7 @@ export default function ModelConfigurationV2({
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                         <div className="flex items-center gap-2">
-                            <h1 className="text-3xl font-bold">AI Models Configuration</h1>
+                            <PageHeading>AI Models Configuration</PageHeading>
                             <Badge variant="outline">
                                 {source === "legacy_user_v1" ? "legacy" : "v1"}
                             </Badge>
@@ -237,7 +238,7 @@ export default function ModelConfigurationV2({
         <div className="w-full max-w-4xl mx-auto space-y-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold">AI Models Configuration</h1>
+                    <PageHeading>AI Models Configuration</PageHeading>
                     <p className="mt-2 text-sm text-muted-foreground">
                         Organization-scoped model settings.{" "}
                         {docsUrl && (

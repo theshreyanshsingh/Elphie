@@ -13,6 +13,7 @@ import {
 import type { CreateToolRequest, ToolResponse } from "@/client/types.gen";
 import { CredentialSelector } from "@/components/http";
 import { AppPageContent } from "@/components/layout/AppPageContent";
+import { PageHeading } from "@/components/PageHeading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -297,7 +298,7 @@ export default function ToolsPage() {
     return (
         <AppPageContent width="6xl">
                     <div className="mb-8">
-                        <h1 className="text-3xl font-bold mb-2">Tools</h1>
+                        <PageHeading className="mb-2">Tools</PageHeading>
                         <p className="text-muted-foreground">
                             Manage reusable tools that can be used across your workflows.{" "}
                             <a href={TOOLS_INTRODUCTION_DOC_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5 underline">

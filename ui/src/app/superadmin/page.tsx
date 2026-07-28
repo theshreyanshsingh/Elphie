@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { AppPageContent } from "@/components/layout/AppPageContent";
+import { PageHeading } from "@/components/PageHeading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -52,7 +53,7 @@ export default function SuperadminPage() {
         <>
             <AppPageContent width="4xl" className="space-y-6">
                 <div className="text-center">
-                    <h1 className="text-3xl font-bold mb-2">Superadmin Dashboard</h1>
+                    <PageHeading className="mx-auto mb-2">Superadmin Dashboard</PageHeading>
                     <p className="text-sm text-muted-foreground">Manage users and view system-wide data</p>
                 </div>
 

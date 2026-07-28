@@ -5,6 +5,7 @@ import { ExternalLink } from "lucide-react";
 import { AppPageContent } from "@/components/layout/AppPageContent";
 import { MCPSection } from "@/components/MCPSection";
 import { OrganizationPreferencesSection } from "@/components/OrganizationPreferencesSection";
+import { PageHeading } from "@/components/PageHeading";
 import { TelemetrySection } from "@/components/TelemetrySection";
 import {
   Card,
@@ -19,7 +20,7 @@ export default function SettingsPage() {
   return (
     <AppPageContent width="2xl" className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold">Platform Settings</h1>
+          <PageHeading className="text-2xl">Platform Settings</PageHeading>
           <p className="text-muted-foreground">
             Manage your platform configuration and integrations.
           </p>

@@ -2,6 +2,7 @@
 
 import { ExternalLink } from "lucide-react";
 
+import { PageHeading } from "@/components/PageHeading";
 import { ServiceConfigurationForm } from "@/components/ServiceConfigurationForm";
 import { useUserConfig } from "@/context/UserConfigContext";
 
@@ -15,7 +16,7 @@ export default function ServiceConfiguration({ docsUrl }: ServiceConfigurationPr
     return (
         <div className="w-full max-w-2xl mx-auto">
             <div className="mb-6">
-                <h1 className="text-3xl font-bold mb-2">AI Models Configuration</h1>
+                <PageHeading className="mb-2">AI Models Configuration</PageHeading>
                 <p className="text-muted-foreground">
                     Configure your AI model, voice, and transcription services.{" "}
                     {docsUrl && (

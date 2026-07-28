@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { createMpsCreditPurchaseUrlApiV1OrganizationsUsageMpsCreditsPurchaseUrlPost, getBillingCreditsApiV1OrganizationsBillingCreditsGet } from "@/client/sdk.gen";
 import type { MpsBillingCreditsResponse, MpsCreditLedgerEntryResponse } from "@/client/types.gen";
 import { AppPageContent } from "@/components/layout/AppPageContent";
+import { PageHeading } from "@/components/PageHeading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -250,7 +251,7 @@ export default function BillingPage() {
         <AppPageContent className="space-y-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold mb-2">Billing</h1>
+                    <PageHeading className="mb-2">Billing</PageHeading>
                     <p className="text-muted-foreground">
                         Credits, balance, and account usage for your organization.
                     </p>

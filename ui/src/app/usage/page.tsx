@@ -13,6 +13,7 @@ import { DailyUsageTable } from '@/components/DailyUsageTable';
 import { FilterBuilder } from '@/components/filters/FilterBuilder';
 import { AppPageContent } from '@/components/layout/AppPageContent';
 import { MediaPreviewButton, MediaPreviewDialog } from '@/components/MediaPreviewDialog';
+import { PageHeading } from '@/components/PageHeading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -329,7 +330,7 @@ export default function UsagePage() {
             <div>
                 <div className="flex justify-between items-start">
                     <div>
-                        <h1 className="text-3xl font-bold mb-2">Agent Runs</h1>
+                        <PageHeading className="mb-2">Agent Runs</PageHeading>
                         <p className="text-muted-foreground">See all your Agent Runs across all Voice Agents. You can use filters to filter out required Agent Runs.</p>
                     </div>
                         <div className="flex items-center gap-2">

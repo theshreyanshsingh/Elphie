@@ -12,6 +12,7 @@ import {
 } from '@/client/sdk.gen';
 import type { WorkflowRunDetail } from '@/client/types.gen';
 import { AppPageContent } from '@/components/layout/AppPageContent';
+import { PageHeading } from '@/components/PageHeading';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarPicker } from '@/components/ui/calendar';
 import { Card } from '@/components/ui/card';
@@ -203,7 +204,7 @@ export default function ReportsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold">Daily Reports</h1>
+          <PageHeading>Daily Reports</PageHeading>
         </div>
 
         {/* Date Navigation & Workflow Selector */}

@@ -25,6 +25,7 @@ import type {
   TelephonyConfigurationListItem,
 } from "@/client/types.gen";
 import { AppPageContent } from "@/components/layout/AppPageContent";
+import { PageHeading } from "@/components/PageHeading";
 import { ConfigFormDialog } from "@/components/telephony/ConfigFormDialog";
 import {
   AlertDialog,
@@ -153,7 +154,7 @@ export default function TelephonyConfigurationsPage() {
     <AppPageContent>
         <div className="flex items-start justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Telephony configurations</h1>
+            <PageHeading className="mb-2">Telephony configurations</PageHeading>
             <p className="text-muted-foreground">
               Connect one or more telephony provider accounts. Each campaign uses one
               configuration; inbound calls are routed to the right one by account ID.{" "}

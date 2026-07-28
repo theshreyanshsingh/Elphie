@@ -15,6 +15,7 @@ import {
 } from '@/client/sdk.gen';
 import type { TelephonyConfigurationListItem, WorkflowSummaryResponse } from '@/client/types.gen';
 import { AppPageContent } from '@/components/layout/AppPageContent';
+import { PageHeading } from '@/components/PageHeading';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -358,7 +359,7 @@ export default function NewCampaignPage() {
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     Back to Campaigns
                 </Button>
-                <h1 className="text-3xl font-bold mb-2">Create New Campaign</h1>
+                <PageHeading className="mb-2">Create New Campaign</PageHeading>
                 <p className="text-muted-foreground">Set up a new campaign to execute workflows at scale</p>
             </div>
 

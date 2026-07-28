@@ -7,6 +7,7 @@ import { WorkflowRunResponseSchema } from "@/client/types.gen";
 import { CallTypeCell } from "@/components/CallTypeCell";
 import { FilterBuilder } from "@/components/filters/FilterBuilder";
 import { MediaPreviewButton, MediaPreviewDialog } from "@/components/MediaPreviewDialog";
+import { PageHeading } from "@/components/PageHeading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -100,7 +101,7 @@ export function WorkflowRunsTable({
             {/* Title and Filters */}
             {showFilters && (
                 <div className="mb-6">
-                    <h1 className="text-2xl font-bold mb-4">{title}</h1>
+                    <PageHeading className="mb-4 text-2xl">{title}</PageHeading>
                     <FilterBuilder
                         availableAttributes={availableAttributes}
                         activeFilters={activeFilters}

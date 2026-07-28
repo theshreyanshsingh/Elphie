@@ -14,6 +14,7 @@ import {
 } from '@/client/sdk.gen';
 import type { ApiKeyResponse, CreateApiKeyResponse, CreateServiceKeyResponse,ServiceKeyResponse } from '@/client/types.gen';
 import { AppPageContent } from '@/components/layout/AppPageContent';
+import { PageHeading } from '@/components/PageHeading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -323,7 +324,7 @@ export default function APIKeysPage() {
     return (
         <AppPageContent width="6xl">
                     <div className="mb-8">
-                        <h1 className="text-3xl font-bold mb-2">Developer Portal</h1>
+                        <PageHeading className="mb-2">Developer Portal</PageHeading>
                         <p className="text-muted-foreground">Manage your API keys to access {APP_NAME} services programmatically</p>
                     </div>
 

@@ -4,6 +4,7 @@ import { ExternalLink, Upload } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { AppPageContent } from "@/components/layout/AppPageContent";
+import { PageHeading } from "@/components/PageHeading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -38,7 +39,7 @@ export default function RecordingsPage() {
     return (
         <AppPageContent>
             <div className="mb-8">
-                <h1 className="text-3xl font-bold mb-2">Recordings</h1>
+                <PageHeading className="mb-2">Recordings</PageHeading>
                 <p className="text-muted-foreground">
                     Manage audio recordings for your organization. Use{" "}
                     <code className="rounded bg-muted px-1 text-xs">@</code> in prompt fields to insert them,

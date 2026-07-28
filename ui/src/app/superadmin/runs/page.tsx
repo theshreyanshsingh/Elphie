@@ -9,6 +9,7 @@ import { getWorkflowRunsApiV1SuperuserWorkflowRunsGet } from '@/client/sdk.gen';
 import { FilterBuilder } from "@/components/filters/FilterBuilder";
 import { AppPageContent } from '@/components/layout/AppPageContent';
 import { MediaPreviewButton, MediaPreviewDialog } from '@/components/MediaPreviewDialog';
+import { PageHeading } from '@/components/PageHeading';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -296,7 +297,7 @@ export default function RunsPage() {
     return (
         <AppPageContent className="space-y-6">
             <div>
-                <h1 className="text-3xl font-bold mb-2">Workflow Runs</h1>
+                <PageHeading className="mb-2">Workflow Runs</PageHeading>
                 <p className="text-muted-foreground">View and manage all workflow runs across organizations</p>
             </div>
 

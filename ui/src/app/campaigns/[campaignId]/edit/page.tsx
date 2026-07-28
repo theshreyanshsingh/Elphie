@@ -13,6 +13,7 @@ import {
 } from '@/client/sdk.gen';
 import type { CampaignResponse } from '@/client/types.gen';
 import { AppPageContent } from '@/components/layout/AppPageContent';
+import { PageHeading } from '@/components/PageHeading';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -304,7 +305,7 @@ export default function EditCampaignPage() {
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     Back to Campaign
                 </Button>
-                <h1 className="text-3xl font-bold mb-2">Edit Campaign</h1>
+                <PageHeading className="mb-2">Edit Campaign</PageHeading>
                 <p className="text-muted-foreground">Modify campaign settings</p>
             </div>
 
