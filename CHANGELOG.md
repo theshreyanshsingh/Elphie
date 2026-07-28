@@ -371,7 +371,6 @@
 ### Bug Fixes
 
 * add disposition codes in workflows (9bc2ffc)
-* resize chatwoot icon for workflow run page (#217) (bb263a4)
 * skip updating gathered_context when the extracted variables is not a dict (#219) (e0c3d6c)
 
 ## 1.19.2 (2026-03-26)
@@ -760,7 +759,6 @@
 
 ### Features
 
-* add chatwoot integration (#39) (5c1fe2c)
 * add csv upload functionality (3babb5c)
 * add csv upload functionality for OSS (#29) (3babb5c)
 * add gmail integration for searching and reply to emails (#34) (6503d80)
