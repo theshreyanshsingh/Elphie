@@ -6,6 +6,8 @@ import { useEffect, useRef } from "react";
 
 import { Button } from "@/components/ui/button";
 import { RealtimeFeedback } from "@/components/workflow/conversation";
+import { useAppConfig } from "@/context/AppConfigContext";
+import { isBillingAvailable } from "@/lib/deploymentFeatures";
 
 import { ApiKeyErrorDialog, ConnectionStatus, WorkflowConfigErrorDialog } from "../../run/[runId]/components";
 import { useWebSocketRTC } from "../../run/[runId]/hooks";
@@ -29,6 +31,8 @@ export function EmbeddedVoiceTester({
     onNodeTransition,
 }: EmbeddedVoiceTesterProps) {
     const router = useRouter();
+    const { config } = useAppConfig();
+    const billingAvailable = isBillingAvailable(config?.deploymentMode);
     const {
         audioRef,
         connectionActive,
@@ -147,6 +151,7 @@ export function EmbeddedVoiceTester({
                 onOpenChange={setApiKeyModalOpen}
                 error={apiKeyError}
                 errorCode={apiKeyErrorCode}
+                billingAvailable={billingAvailable}
                 onNavigateToBilling={() => router.push("/billing")}
                 onNavigateToDevelopers={() => router.push("/api-keys")}
                 onNavigateToModelConfig={() => router.push("/model-configurations")}

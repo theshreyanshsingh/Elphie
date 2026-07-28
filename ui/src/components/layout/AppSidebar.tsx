@@ -58,6 +58,7 @@ import { useAppConfig } from "@/context/AppConfigContext";
 import { useTelephonyConfigWarnings } from "@/context/TelephonyConfigWarningsContext";
 import type { LocalUser } from "@/lib/auth";
 import { useAuth } from "@/lib/auth";
+import { isBillingAvailable } from "@/lib/deploymentFeatures";
 import { cn } from "@/lib/utils";
 
 type SidebarNavItem = {
@@ -192,6 +193,7 @@ export function AppSidebar() {
   const { provider, getSelectedTeam, logout, user } = useAuth();
   const { config } = useAppConfig();
   const { telnyxMissingWebhookPublicKeyCount } = useTelephonyConfigWarnings();
+  const billingAvailable = isBillingAvailable(config?.deploymentMode);
   const hasTelephonyWarning = telnyxMissingWebhookPublicKeyCount > 0;
   const isCollapsed = !isMobile && state === "collapsed";
 
@@ -423,11 +425,13 @@ export function AppSidebar() {
               </SidebarGroupLabel>
             )}
             <SidebarMenu>
-              {section.items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarLink item={item} />
-                </SidebarMenuItem>
-              ))}
+              {section.items
+                .filter((item) => item.url !== "/billing" || billingAvailable)
+                .map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarLink item={item} />
+                  </SidebarMenuItem>
+                ))}
             </SidebarMenu>
           </SidebarGroup>
         ))}

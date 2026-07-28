@@ -11,6 +11,7 @@ interface ApiKeyErrorDialogProps {
     onOpenChange: (open: boolean) => void;
     error: string | null;
     errorCode: string | null;
+    billingAvailable: boolean;
     onNavigateToBilling: () => void;
     onNavigateToDevelopers: () => void;
     onNavigateToModelConfig: () => void;
@@ -21,11 +22,13 @@ export const ApiKeyErrorDialog = ({
     onOpenChange,
     error,
     errorCode,
+    billingAvailable,
     onNavigateToBilling,
     onNavigateToDevelopers,
     onNavigateToModelConfig,
 }: ApiKeyErrorDialogProps) => {
     const isBillingCreditsError = errorCode === 'insufficient_credits';
+    const showBillingAction = isBillingCreditsError && billingAvailable;
     const isServiceKeyOrgMismatch = errorCode === 'service_key_org_mismatch';
     const isQuotaError = isBillingCreditsError || errorCode === 'quota_exceeded';
 
@@ -35,12 +38,12 @@ export const ApiKeyErrorDialog = ({
             ? "Service Token Account Mismatch"
             : "API Configuration Error";
     const icon = isQuotaError ? <CreditCard className="h-5 w-5 text-orange-500" /> : <Key className="h-5 w-5 text-red-500" />;
-    const buttonText = isBillingCreditsError
+    const buttonText = showBillingAction
         ? "Go to Billing"
         : isServiceKeyOrgMismatch
             ? "Go to Developers"
             : "Go to Model Configurations";
-    const onNavigate = isBillingCreditsError
+    const onNavigate = showBillingAction
         ? onNavigateToBilling
         : isServiceKeyOrgMismatch
             ? onNavigateToDevelopers
@@ -59,9 +62,14 @@ export const ApiKeyErrorDialog = ({
                             <AlertCircle className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                             <div className="text-sm space-y-1">
                                 <p className="font-medium text-foreground">{error}</p>
-                                {isBillingCreditsError && (
+                                {showBillingAction && (
                                     <p className="text-muted-foreground">
                                         Purchase credits from Billing to continue using Elphie-managed models.
+                                    </p>
+                                )}
+                                {isBillingCreditsError && !billingAvailable && (
+                                    <p className="text-muted-foreground">
+                                        Configure a provider or service key in Model Configurations to continue.
                                     </p>
                                 )}
                                 {isServiceKeyOrgMismatch && (

@@ -5,7 +5,6 @@ import {
     ChevronRight,
     CircleDollarSign,
     CreditCard,
-    Info,
     RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
@@ -30,9 +29,9 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { APP_DOMAIN } from "@/constants/branding";
 import { useAppConfig } from "@/context/AppConfigContext";
 import { useAuth } from "@/lib/auth";
+import { isBillingAvailable } from "@/lib/deploymentFeatures";
 
 const LEDGER_PAGE_SIZE = 50;
 
@@ -118,7 +117,7 @@ export default function BillingPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const auth = useAuth();
-    const { config } = useAppConfig();
+    const { config, loading: configLoading } = useAppConfig();
     const [credits, setCredits] = useState<MpsBillingCreditsResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -128,8 +127,8 @@ export default function BillingPage() {
     );
 
     const isBillingV2 = credits?.billing_version === "v2";
-    const isOssMode = config?.deploymentMode === "oss";
-    const canPurchaseCredits = isBillingV2 && !isOssMode;
+    const billingAvailable = isBillingAvailable(config?.deploymentMode);
+    const canPurchaseCredits = isBillingV2 && billingAvailable;
     const totalQuota = credits?.total_quota ?? 0;
     const remainingCredits = credits?.remaining_credits ?? 0;
     const usedCredits = credits?.total_credits_used ?? 0;
@@ -144,7 +143,7 @@ export default function BillingPage() {
         page: number,
         { silent = false }: { silent?: boolean } = {},
     ) => {
-        if (auth.loading) {
+        if (auth.loading || configLoading || !billingAvailable) {
             return;
         }
 
@@ -176,7 +175,13 @@ export default function BillingPage() {
             setLoading(false);
             setRefreshing(false);
         }
-    }, [auth.isAuthenticated, auth.loading]);
+    }, [auth.isAuthenticated, auth.loading, billingAvailable, configLoading]);
+
+    useEffect(() => {
+        if (!configLoading && config && !billingAvailable) {
+            router.replace("/usage");
+        }
+    }, [billingAvailable, config, configLoading, router]);
 
     useEffect(() => {
         const nextPage = getPageFromSearchParams(searchParams);
@@ -231,6 +236,10 @@ export default function BillingPage() {
         }
     };
 
+    if (configLoading || !config || !billingAvailable) {
+        return null;
+    }
+
     if (loading) {
         return (
             <AppPageContent className="space-y-6">
@@ -269,26 +278,6 @@ export default function BillingPage() {
                     )}
                 </div>
             </div>
-
-            {isOssMode && (
-                <div className="flex gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/50 dark:bg-amber-950/30">
-                    <Info className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400" />
-                    <div className="text-sm text-amber-900 dark:text-amber-200">
-                        <p className="font-medium">Credit purchases are unavailable in OSS mode</p>
-                        <p className="mt-1">
-                            You can&apos;t purchase credits from this self-hosted app. Configure a
-                            service key in{" "}
-                            <Link
-                                href="/model-configurations"
-                                className="font-medium underline underline-offset-2"
-                            >
-                                Model Configurations
-                            </Link>
-                            {" "}to use {APP_DOMAIN} managed models.
-                        </p>
-                    </div>
-                </div>
-            )}
 
             <div className="grid gap-4 md:grid-cols-2">
                 <Card>
