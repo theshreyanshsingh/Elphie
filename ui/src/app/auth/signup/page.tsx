@@ -9,6 +9,7 @@ import { AuthShell } from "@/components/auth/AuthShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { detailFromError } from "@/lib/apiError";
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
@@ -37,8 +38,7 @@ export default function SignupPage() {
       });
 
       if (res.error || !res.data) {
-        const detail = (res.error as { detail?: string })?.detail;
-        toast.error(detail || "Signup failed");
+        toast.error(detailFromError(res.error, "Signup failed"));
         return;
       }
 
