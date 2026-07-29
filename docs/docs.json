@@ -272,8 +272,8 @@
     ]
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg",
+    "light": "/logo/elphie.png",
+    "dark": "/logo/elphie.png",
     "href": "https://elphie.nearzero.dev"
   },
   "navbar": {

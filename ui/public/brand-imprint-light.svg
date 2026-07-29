@@ -1,7 +1,3 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="282" viewBox="0 0 1000 282">
-  <g fill="#111827" fill-opacity="0.012">
-    <rect x="24" y="41" width="200" height="200" rx="40"/>
-    <path d="M82 91h98v28h-66v28h58v28h-58v28h66v28H82z" fill="#ffffff"/>
-    <text x="270" y="194" font-family="Inter, Arial, sans-serif" font-size="150" font-weight="700" letter-spacing="0">Elphie</text>
-  </g>
+  <image href="/elphie.png" x="359" width="282" height="282" opacity="0.012"/>
 </svg>
