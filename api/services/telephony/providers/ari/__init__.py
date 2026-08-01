@@ -29,7 +29,7 @@ def _config_loader(value: Dict[str, Any]) -> Dict[str, Any]:
 
 _UI_METADATA = ProviderUIMetadata(
     display_name="Asterisk ARI",
-    docs_url="https://docs.dograh.com/integrations/telephony/asterisk-ari",
+    docs_url="https://elphie.willowave.in/integrations/telephony/asterisk-ari",
     fields=[
         ProviderUIField(
             name="ari_endpoint",
@@ -67,7 +67,7 @@ _UI_METADATA = ProviderUIMetadata(
             type="select",
             required=False,
             description=(
-                "Enable PBX-specific call control for calls patched into Dograh "
+                "Enable PBX-specific call control for calls patched into Elphie "
                 "through this Asterisk configuration."
             ),
             options=[ProviderUIOption(value="vicidial", label="VICIdial")],

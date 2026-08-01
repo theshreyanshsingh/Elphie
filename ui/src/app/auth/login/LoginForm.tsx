@@ -5,11 +5,11 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { loginApiV1AuthLoginPost } from "@/client/sdk.gen";
-import { AuthEnterpriseCTA } from "@/components/auth/AuthEnterpriseCTA";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { detailFromError } from "@/lib/apiError";
 
 export function LoginForm({ signupEnabled }: { signupEnabled: boolean }) {
   const [email, setEmail] = useState("");
@@ -26,8 +26,7 @@ export function LoginForm({ signupEnabled }: { signupEnabled: boolean }) {
       });
 
       if (res.error || !res.data) {
-        const detail = (res.error as { detail?: string })?.detail;
-        toast.error(detail || "Login failed");
+        toast.error(detailFromError(res.error, "Login failed"));
         return;
       }
 
@@ -47,7 +46,7 @@ export function LoginForm({ signupEnabled }: { signupEnabled: boolean }) {
   };
 
   return (
-    <AuthShell enterpriseSlot={<AuthEnterpriseCTA />}>
+    <AuthShell>
       <div className="space-y-1.5 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
         <p className="text-sm text-muted-foreground">

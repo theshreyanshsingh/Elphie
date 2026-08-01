@@ -7,7 +7,9 @@ import { useCallback, useEffect, useState } from "react";
 
 import { getWorkflowRunsApiV1SuperuserWorkflowRunsGet } from '@/client/sdk.gen';
 import { FilterBuilder } from "@/components/filters/FilterBuilder";
+import { AppPageContent } from "@/components/layout/AppPageContent";
 import { MediaPreviewButton, MediaPreviewDialog } from '@/components/MediaPreviewDialog';
+import { PageHeading } from "@/components/PageHeading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -282,19 +284,19 @@ export default function RunsPage() {
 
     if (isLoading && runs.length === 0) {
         return (
-            <div className="container mx-auto p-6 flex items-center justify-center min-h-[400px]">
+            <AppPageContent className="flex min-h-[400px] items-center justify-center">
                 <div className="flex items-center space-x-2">
                     <Loader2 className="h-6 w-6 animate-spin" />
                     <span>Loading workflow runs...</span>
                 </div>
-            </div>
+            </AppPageContent>
         );
     }
 
     return (
-        <div className="container mx-auto p-6 space-y-6 max-w-full">
+        <AppPageContent className="space-y-6">
             <div>
-                <h1 className="text-3xl font-bold mb-2">Workflow Runs</h1>
+                <PageHeading className="text-3xl mb-2">Workflow Runs</PageHeading>
                 <p className="text-muted-foreground">View and manage all workflow runs across organizations</p>
             </div>
 
@@ -500,7 +502,7 @@ export default function RunsPage() {
                                                                         }),
                                                                     );
                                                                     window.open(
-                                                                        `https://app.axiom.co/dograh-of6c/stream/${process.env.NEXT_PUBLIC_AXIOM_LOG_DATASET}?q=${query}`,
+                                                                        `https://app.axiom.co/elphie-of6c/stream/${process.env.NEXT_PUBLIC_AXIOM_LOG_DATASET}?q=${query}`,
                                                                         '_blank',
                                                                     );
                                                                 }}
@@ -643,6 +645,6 @@ export default function RunsPage() {
                 {/* Media Preview Dialog */}
                 {mediaPreview.dialog}
 
-        </div>
+        </AppPageContent>
     );
 }

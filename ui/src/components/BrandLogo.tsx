@@ -1,11 +1,8 @@
+import Image from "next/image";
+
+import { APP_NAME } from "@/constants/branding";
 import { cn } from "@/lib/utils";
 
-// Reusable Dograh wordmark. Theme-aware by default: the dark logo shows on light
-// surfaces and the light/cream logo shows on dark. Pass `inverse` to force the
-// light logo on an always-dark surface (e.g. the auth brand panel). Pass `mark`
-// to render the square logo mark instead of the full wordmark (e.g. the app
-// sidebar header). Height is controlled by the caller via className (e.g.
-// "h-7"); width stays auto so each lockup keeps its aspect ratio.
 export function BrandLogo({
   className,
   inverse = false,
@@ -15,24 +12,24 @@ export function BrandLogo({
   inverse?: boolean;
   mark?: boolean;
 }) {
-  if (mark) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img src="/dograh-mark.png" alt="Dograh" className={cn("w-auto select-none", className)} />
-    );
-  }
-  if (inverse) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img src="/dograh-logo-inverse.png" alt="Dograh" className={cn("w-auto select-none", className)} />
-    );
-  }
   return (
-    <>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/dograh-logo.png" alt="Dograh" className={cn("block w-auto select-none dark:hidden", className)} />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/dograh-logo-inverse.png" alt="Dograh" className={cn("hidden w-auto select-none dark:block", className)} />
-    </>
+    <span
+      className={cn(
+        "inline-flex select-none items-center font-semibold tracking-tight",
+        mark ? "justify-center text-sm" : "gap-2 text-base",
+        inverse ? "text-white" : "text-foreground",
+        className,
+      )}
+      aria-label={APP_NAME}
+    >
+      <Image
+        src="/elphie.png"
+        alt=""
+        width={512}
+        height={512}
+        className={cn("shrink-0 object-contain", mark ? "size-6" : "size-10")}
+      />
+      {!mark && <span>{APP_NAME}</span>}
+    </span>
   );
 }

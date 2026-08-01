@@ -2,6 +2,8 @@ import { Suspense } from 'react';
 
 import { getWorkflowsApiV1WorkflowFetchGet, listFoldersApiV1FolderGet } from '@/client/sdk.gen';
 import type { FolderResponse, WorkflowListResponse } from '@/client/types.gen';
+import { AppPageContent } from "@/components/layout/AppPageContent";
+import { PageHeading } from "@/components/PageHeading";
 import { Card, CardContent } from '@/components/ui/card';
 import { CreateWorkflowButton } from "@/components/workflow/CreateWorkflowButton";
 import { AgentFolderView } from '@/components/workflow/folders/AgentFolderView';
@@ -110,11 +112,11 @@ async function PageContent() {
     const workflowList = await WorkflowList();
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <AppPageContent>
             {/* Your Workflows Section */}
             <div className="mb-6">
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold">Your Agents</h1>
+                    <PageHeading className="text-2xl">Your Agents</PageHeading>
                     <div className="flex gap-2">
                         <UploadWorkflowButton />
                         <CreateFolderButton />
@@ -123,13 +125,13 @@ async function PageContent() {
                 </div>
                 {workflowList}
             </div>
-        </div>
+        </AppPageContent>
     );
 }
 
 function WorkflowsLoading() {
     return (
-        <div className="container mx-auto px-4 py-8">
+        <AppPageContent>
             {/* Get Started Section Loading */}
             <div className="mb-12">
                 <div className="h-8 w-48 bg-muted rounded mb-6"></div>
@@ -156,7 +158,7 @@ function WorkflowsLoading() {
                     </CardContent>
                 </Card>
             </div>
-        </div>
+        </AppPageContent>
     );
 }
 
@@ -167,6 +169,5 @@ export default function WorkflowPage() {
                 <PageContent />
             </Suspense>
         </WorkflowLayout>
-
     );
 }

@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { createWorkflowFromTemplateApiV1WorkflowCreateTemplatePost } from '@/client/sdk.gen';
+import { AppPageContent } from '@/components/layout/AppPageContent';
+import { PageHeading } from '@/components/PageHeading';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -80,10 +82,9 @@ export default function CreateWorkflowPage() {
     };
 
     return (
-        <div className="min-h-screen">
-            <div className="container mx-auto px-4 py-8 max-w-2xl">
+        <AppPageContent width="2xl">
                 <div className="mb-6">
-                    <h1 className="text-3xl font-bold mb-2">Create Voice Agent</h1>
+                    <PageHeading className="mb-2">Create Voice Agent</PageHeading>
                     <p className="text-muted-foreground">
                         Tell us about your use case and we&apos;ll create a customized voice agent for you
                     </p>
@@ -159,7 +160,6 @@ export default function CreateWorkflowPage() {
                         </div>
                     </CardContent>
                 </Card>
-            </div>
 
             {/* Loading Overlay */}
             {isLoading && (
@@ -219,6 +219,6 @@ export default function CreateWorkflowPage() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-        </div>
+        </AppPageContent>
     );
 }

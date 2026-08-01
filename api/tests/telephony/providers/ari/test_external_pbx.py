@@ -21,13 +21,13 @@ def _vicidial_config() -> dict:
             "url": "https://vici.example.com/agc/api.php",
             "username": "agent-api-user",
             "password": "secret",
-            "source": "dograh",
+            "source": "elphie",
         },
         "non_agent_api": {
             "url": "https://vici.example.com/vicidial/non_agent_api.php",
             "username": "lead-api-user",
             "password": "secret",
-            "source": "dograh",
+            "source": "elphie",
         },
     }
 

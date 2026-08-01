@@ -1,6 +1,6 @@
 # Telephony Provider Implementation
 
-This module implements the telephony provider abstraction for Dograh AI. For user-facing documentation, see the [Mintlify docs](https://docs.dograh.com/integrations/telephony/overview).
+This module implements the telephony provider abstraction for Elphie AI. For user-facing documentation, see the [Mintlify docs](https://elphie.willowave.in/integrations/telephony/overview).
 
 ## Architecture
 
@@ -49,7 +49,7 @@ telephony/
 
 ## Implementing a New Provider
 
-See the [Custom Provider Guide](https://docs.dograh.com/integrations/telephony/custom) in the documentation for detailed implementation instructions.
+See the [Custom Provider Guide](https://elphie.willowave.in/integrations/telephony/custom) in the documentation for detailed implementation instructions.
 
 Quick checklist:
 1. Create `providers/your_provider.py` implementing `TelephonyProvider`
@@ -170,7 +170,7 @@ await provider.initiate_call(...)
 
 ## Related Documentation
 
-- [User Documentation](https://docs.dograh.com/integrations/telephony/overview)
-- [Twilio Integration](https://docs.dograh.com/integrations/telephony/twilio)
-- [Custom Providers](https://docs.dograh.com/integrations/telephony/custom)
-- [Webhooks Guide](https://docs.dograh.com/integrations/telephony/webhooks)
+- [User Documentation](https://elphie.willowave.in/integrations/telephony/overview)
+- [Twilio Integration](https://elphie.willowave.in/integrations/telephony/twilio)
+- [Custom Providers](https://elphie.willowave.in/integrations/telephony/custom)
+- [Webhooks Guide](https://elphie.willowave.in/integrations/telephony/webhooks)

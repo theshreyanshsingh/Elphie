@@ -3,6 +3,8 @@
 import { ExternalLink, Upload } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { AppPageContent } from "@/components/layout/AppPageContent";
+import { PageHeading } from "@/components/PageHeading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -13,6 +15,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { KNOWLEDGE_BASE_DOC_URL } from "@/constants/documentation";
 import { useAuth } from "@/lib/auth";
 
 import DocumentList from "./DocumentList";
@@ -37,22 +40,22 @@ export default function FilesPage() {
 
     if (loading || !user) {
         return (
-            <div className="container mx-auto px-4 py-8">
+            <AppPageContent>
                 <div className="space-y-4">
                     <Skeleton className="h-12 w-64" />
                     <Skeleton className="h-64 w-full" />
                 </div>
-            </div>
+            </AppPageContent>
         );
     }
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <AppPageContent>
             <div className="mb-8">
-                <h1 className="text-3xl font-bold mb-2">Knowledge Base Files</h1>
+                <PageHeading className="mb-2">Knowledge Base Files</PageHeading>
                 <p className="text-muted-foreground">
                     Upload and manage documents for your voice agents to reference.{" "}
-                    <a href="https://docs.dograh.com/voice-agent/knowledge-base" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5 underline">
+                    <a href={KNOWLEDGE_BASE_DOC_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5 underline">
                         Learn more <ExternalLink className="h-3 w-3" />
                     </a>
                 </p>
@@ -89,6 +92,6 @@ export default function FilesPage() {
                     <DocumentUpload onUploadSuccess={handleUploadSuccess} />
                 </DialogContent>
             </Dialog>
-        </div>
+        </AppPageContent>
     );
 }

@@ -2,7 +2,7 @@
 set -e
 
 ENV_FILE=".env"
-REGISTRY="${REGISTRY:-ghcr.io/dograh-hq}"
+REGISTRY="${REGISTRY:-ghcr.io/elphie-hq}"
 ENABLE_TELEMETRY="${ENABLE_TELEMETRY:-true}"
 
 fail() {
@@ -27,7 +27,7 @@ generate_secret() {
 }
 
 generate_minio_root_user() {
-    printf 'dograh%s\n' "$(generate_secret | cut -c1-12)"
+    printf 'elphie%s\n' "$(generate_secret | cut -c1-12)"
 }
 
 dotenv_value() {
@@ -126,12 +126,12 @@ sync_postgres_password() {
         fail "Postgres did not become ready while syncing POSTGRES_PASSWORD."
     fi
 
-    printf '%s\n' "ALTER USER postgres WITH PASSWORD :'dograh_password';" \
+    printf '%s\n' "ALTER USER postgres WITH PASSWORD :'elphie_password';" \
         | docker compose exec -T postgres psql \
         -U postgres \
         -d postgres \
         -v ON_ERROR_STOP=1 \
-        -v "dograh_password=$postgres_password" >/dev/null
+        -v "elphie_password=$postgres_password" >/dev/null
     echo "Postgres password synced."
 }
 
@@ -200,20 +200,21 @@ fi
 
 echo ""
 echo "Docker registry: $REGISTRY"
+echo "Telemetry enabled: $ENABLE_TELEMETRY"
 echo ""
 echo "This will run:"
-echo "  REGISTRY=$REGISTRY ENABLE_TELEMETRY=$ENABLE_TELEMETRY docker compose --profile tunnel up --pull always"
+echo "  REGISTRY=$REGISTRY ENABLE_TELEMETRY=$ENABLE_TELEMETRY docker compose up --pull always"
 echo ""
 
 if [[ ! -t 0 ]]; then
-    echo "Run the command above from an interactive shell to start Dograh."
+    echo "Run the command above from an interactive shell to start Elphie."
     exit 0
 fi
 
-read -r -p "Start Dograh now? [Y/n]: " answer
+read -r -p "Start Elphie now? [Y/n]: " answer
 case "$answer" in
     [Nn]*)
-        echo "Dograh was not started."
+        echo "Elphie was not started."
         exit 0
         ;;
 esac
@@ -221,4 +222,4 @@ esac
 postgres_password="$(dotenv_value POSTGRES_PASSWORD || true)"
 sync_postgres_password "$postgres_password"
 
-REGISTRY="$REGISTRY" ENABLE_TELEMETRY="$ENABLE_TELEMETRY" docker compose --profile tunnel up --pull always
+REGISTRY="$REGISTRY" ENABLE_TELEMETRY="$ENABLE_TELEMETRY" docker compose up --pull always

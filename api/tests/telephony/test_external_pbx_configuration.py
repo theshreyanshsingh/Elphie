@@ -9,7 +9,7 @@ from api.services import tool_management
 def _credentials(password: str = "agent-secret") -> dict:
     return {
         "ari_endpoint": "https://asterisk.example.com",
-        "app_name": "dograh",
+        "app_name": "elphie",
         "app_password": "ari-secret",
         "external_pbx": {
             "type": "vicidial",

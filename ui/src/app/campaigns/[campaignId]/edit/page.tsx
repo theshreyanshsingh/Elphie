@@ -12,6 +12,8 @@ import {
     updateCampaignApiV1CampaignCampaignIdPatch
 } from '@/client/sdk.gen';
 import type { CampaignResponse } from '@/client/types.gen';
+import { AppPageContent } from '@/components/layout/AppPageContent';
+import { PageHeading } from '@/components/PageHeading';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -275,25 +277,25 @@ export default function EditCampaignPage() {
 
     if (isLoading) {
         return (
-            <div className="container mx-auto p-6 space-y-6 max-w-2xl">
+            <AppPageContent width="2xl" className="space-y-6">
                 <div className="animate-pulse">
                     <div className="h-8 bg-muted rounded w-1/4 mb-4"></div>
                     <div className="h-64 bg-muted rounded"></div>
                 </div>
-            </div>
+            </AppPageContent>
         );
     }
 
     if (!campaign) {
         return (
-            <div className="container mx-auto p-6 space-y-6 max-w-2xl">
+            <AppPageContent width="2xl" className="space-y-6">
                 <p className="text-center text-muted-foreground">Campaign not found</p>
-            </div>
+            </AppPageContent>
         );
     }
 
     return (
-        <div className="container mx-auto p-6 pb-12 space-y-6 max-w-2xl">
+        <AppPageContent width="2xl" className="space-y-6 pb-12">
             <div>
                 <Button
                     variant="ghost"
@@ -303,7 +305,7 @@ export default function EditCampaignPage() {
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     Back to Campaign
                 </Button>
-                <h1 className="text-3xl font-bold mb-2">Edit Campaign</h1>
+                <PageHeading className="mb-2">Edit Campaign</PageHeading>
                 <p className="text-muted-foreground">Modify campaign settings</p>
             </div>
 
@@ -390,6 +392,6 @@ export default function EditCampaignPage() {
                     </form>
                 </CardContent>
             </Card>
-        </div>
+        </AppPageContent>
     );
 }

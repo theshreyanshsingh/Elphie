@@ -1,0 +1,8 @@
+# Local dev infra only: Elphie Postgres (pgvector) + MinIO.
+# Redis is reused from the willowave stack on localhost:6379 (no password).
+services:
+  postgres:
+    ports: !override
+      - "5433:5432"
+  redis:
+    profiles: ["unused"]

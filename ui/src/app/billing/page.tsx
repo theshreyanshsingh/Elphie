@@ -16,6 +16,8 @@ import { toast } from "sonner";
 
 import { createMpsCreditPurchaseUrlApiV1OrganizationsUsageMpsCreditsPurchaseUrlPost, getBillingCreditsApiV1OrganizationsBillingCreditsGet } from "@/client/sdk.gen";
 import type { MpsBillingCreditsResponse, MpsCreditLedgerEntryResponse } from "@/client/types.gen";
+import { AppPageContent } from "@/components/layout/AppPageContent";
+import { PageHeading } from "@/components/PageHeading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,6 +35,7 @@ import { useAppConfig } from "@/context/AppConfigContext";
 import { useOrganizationTimezone } from "@/hooks/useOrganizationTimezone";
 import { useAuth } from "@/lib/auth";
 import { formatDateTime } from "@/lib/dateTime";
+import { isBillingAvailable } from "@/lib/deploymentFeatures";
 
 const LEDGER_PAGE_SIZE = 50;
 
@@ -224,7 +227,7 @@ export default function BillingPage() {
 
     if (loading || configLoading) {
         return (
-            <div className="container mx-auto p-6 space-y-6">
+            <AppPageContent width="full" className="space-y-6">
                 <div className="space-y-2">
                     <Skeleton className="h-9 w-40" />
                     <Skeleton className="h-5 w-96 max-w-full" />
@@ -234,15 +237,20 @@ export default function BillingPage() {
                     <Skeleton className="h-36 rounded-lg" />
                 </div>
                 <Skeleton className="h-80 rounded-lg" />
-            </div>
+            </AppPageContent>
         );
     }
 
+    if (!isBillingAvailable(config?.deploymentMode)) {
+        router.replace("/usage");
+        return null;
+    }
+
     return (
-        <div className="container mx-auto p-6 space-y-6">
+        <AppPageContent width="full" className="space-y-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold mb-2">Billing</h1>
+                    <PageHeading className="text-3xl mb-2">Billing</PageHeading>
                     <p className="text-muted-foreground">
                         Credits, balance, and account usage for your organization.
                     </p>
@@ -270,12 +278,12 @@ export default function BillingPage() {
                             You can&apos;t purchase credits from this self-hosted app. Sign up and
                             purchase credits at{" "}
                             <a
-                                href="https://app.dograh.com"
+                                href="https://elphie.willowave.in"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center gap-1 font-medium underline underline-offset-2"
                             >
-                                app.dograh.com
+                                elphie.willowave.in
                                 <ExternalLink className="h-3 w-3" />
                             </a>
                             . Then add the generated service key in{" "}
@@ -285,7 +293,7 @@ export default function BillingPage() {
                             >
                                 Model Configurations
                             </Link>
-                            . Usage for that service key is visible in app.dograh.com.
+                            . Usage for that service key is visible in elphie.willowave.in.
                         </p>
                     </div>
                 </div>
@@ -439,6 +447,6 @@ export default function BillingPage() {
                     </CardContent>
                 </Card>
             )}
-        </div>
+        </AppPageContent>
     );
 }

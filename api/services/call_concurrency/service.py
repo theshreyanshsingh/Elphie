@@ -138,7 +138,7 @@ class CallConcurrencyService:
                     f"{scope_note}, waited={wait_time:.1f}s"
                 )
                 properties = {
-                    "event_source": "dograh",
+                    "event_source": "elphie",
                     "organization_id": organization_id,
                     "source": source,
                     "max_concurrent": max_concurrent,

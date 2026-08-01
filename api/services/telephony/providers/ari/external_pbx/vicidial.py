@@ -23,11 +23,11 @@ class VicidialAdapter(ExternalPBXAdapter):
         self._agent_url = str(agent_api.get("url", "")).strip()
         self._agent_user = str(agent_api.get("username", "")).strip()
         self._agent_password = str(agent_api.get("password", ""))
-        self._agent_source = str(agent_api.get("source", "dograh")).strip()
+        self._agent_source = str(agent_api.get("source", "elphie")).strip()
         self._non_agent_url = str(non_agent_api.get("url", "")).strip()
         self._non_agent_user = str(non_agent_api.get("username", "")).strip()
         self._non_agent_password = str(non_agent_api.get("password", ""))
-        self._non_agent_source = str(non_agent_api.get("source", "dograh")).strip()
+        self._non_agent_source = str(non_agent_api.get("source", "elphie")).strip()
         self._timeout = aiohttp.ClientTimeout(
             total=min(max(int(config.get("timeout_seconds", 8)), 1), 30)
         )

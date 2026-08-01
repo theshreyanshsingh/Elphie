@@ -2,13 +2,15 @@
 
 import { Zap } from 'lucide-react';
 
+import { AppPageContent } from '@/components/layout/AppPageContent';
+import { PageHeading } from '@/components/PageHeading';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function AutomationPage() {
     return (
-        <div className="container mx-auto p-6 space-y-6">
+        <AppPageContent className="space-y-6">
             <div>
-                <h1 className="text-3xl font-bold mb-2">Automation</h1>
+                <PageHeading className="mb-2">Automation</PageHeading>
                 <p>Automate your workflows and processes</p>
             </div>
 
@@ -34,6 +36,6 @@ export default function AutomationPage() {
                     </div>
                 </CardContent>
             </Card>
-        </div>
+        </AppPageContent>
     );
 }

@@ -2,8 +2,10 @@
 
 import { ExternalLink } from "lucide-react";
 
+import { AppPageContent } from "@/components/layout/AppPageContent";
 import { MCPSection } from "@/components/MCPSection";
 import { OrganizationPreferencesSection } from "@/components/OrganizationPreferencesSection";
+import { PageHeading } from "@/components/PageHeading";
 import { TelemetrySection } from "@/components/TelemetrySection";
 import {
   Card,
@@ -15,10 +17,9 @@ import {
 
 export default function SettingsPage() {
   return (
-    <div className="flex justify-center py-12 px-4">
-      <div className="w-full max-w-2xl space-y-6">
+    <AppPageContent width="2xl" className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold">Platform Settings</h1>
+          <PageHeading className="text-2xl">Platform Settings</PageHeading>
           <p className="text-muted-foreground">
             Manage your platform configuration and integrations.
           </p>
@@ -41,10 +42,10 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle>MCP Server</CardTitle>
             <CardDescription>
-              Let AI agents access your Dograh workspace and documentation via
+              Let AI agents access your Elphie workspace and documentation via
               the Model Context Protocol.{" "}
               <a
-                href="https://docs.dograh.com/integrations/mcp"
+                href="https://elphie.willowave.in/integrations/mcp"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-0.5 underline"
@@ -64,7 +65,7 @@ export default function SettingsPage() {
             <CardDescription>
               Configure Langfuse tracing for your voice agent calls.{" "}
               <a
-                href="https://docs.dograh.com/configurations/tracing"
+                href="https://elphie.willowave.in/configurations/tracing"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-0.5 underline"
@@ -77,7 +78,6 @@ export default function SettingsPage() {
             <TelemetrySection />
           </CardContent>
         </Card>
-      </div>
-    </div>
+    </AppPageContent>
   );
 }

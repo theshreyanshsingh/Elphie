@@ -1,4 +1,4 @@
-// HTTP client for the Dograh REST API.
+// HTTP client for the Elphie REST API.
 //
 // Most endpoint methods come from `_GeneratedClient` (auto-generated from
 // the FastAPI OpenAPI spec — see `scripts/generate_sdk.sh`). This class
@@ -20,14 +20,14 @@ type RuntimeProcess = {
     env?: Record<string, string | undefined>;
 };
 
-export interface DograhFetchInit {
+export interface ElphieFetchInit {
     method?: string;
     headers?: Record<string, string>;
     body?: string;
     signal?: unknown;
 }
 
-export interface DograhFetchResponse {
+export interface ElphieFetchResponse {
     ok: boolean;
     status: number;
     statusText: string;
@@ -35,43 +35,43 @@ export interface DograhFetchResponse {
     text(): Promise<string>;
 }
 
-export type DograhFetch = (
+export type ElphieFetch = (
     url: string,
-    init?: DograhFetchInit,
-) => Promise<DograhFetchResponse>;
+    init?: ElphieFetchInit,
+) => Promise<ElphieFetchResponse>;
 
 function getRuntimeEnv(name: string): string | undefined {
     const runtime = globalThis as typeof globalThis & { process?: RuntimeProcess };
     return runtime.process?.env?.[name];
 }
 
-export interface DograhClientOptions {
+export interface ElphieClientOptions {
     baseUrl?: string;
     apiKey?: string;
     /** Request timeout in ms. */
     timeoutMs?: number;
     /** Optional fetch override for tests / custom transports. */
-    fetch?: DograhFetch;
+    fetch?: ElphieFetch;
 }
 
-export class DograhClient extends _GeneratedClient implements SpecProvider {
+export class ElphieClient extends _GeneratedClient implements SpecProvider {
     readonly baseUrl: string;
     readonly apiKey: string | undefined;
-    private readonly fetchImpl: DograhFetch;
+    private readonly fetchImpl: ElphieFetch;
     private readonly timeoutMs: number;
     private readonly headers: Record<string, string>;
     private readonly specCache = new Map<string, NodeSpec>();
     private specVersionCache: string | null = null;
 
-    constructor(opts: DograhClientOptions = {}) {
+    constructor(opts: ElphieClientOptions = {}) {
         super();
         const rawBase =
             opts.baseUrl ??
-            getRuntimeEnv("DOGRAH_API_URL") ??
+            getRuntimeEnv("ELPHIE_API_URL") ??
             "http://localhost:8000";
         this.baseUrl = rawBase.replace(/\/+$/, "");
-        this.apiKey = opts.apiKey ?? getRuntimeEnv("DOGRAH_API_KEY");
-        this.fetchImpl = opts.fetch ?? (globalThis.fetch as unknown as DograhFetch);
+        this.apiKey = opts.apiKey ?? getRuntimeEnv("ELPHIE_API_KEY");
+        this.fetchImpl = opts.fetch ?? (globalThis.fetch as unknown as ElphieFetch);
         this.timeoutMs = opts.timeoutMs ?? 30_000;
         this.headers = { Accept: "application/json" };
         if (this.apiKey) this.headers["X-API-Key"] = this.apiKey;
@@ -153,7 +153,7 @@ export class DograhClient extends _GeneratedClient implements SpecProvider {
         }
 
         const hasBody = opts?.json !== undefined;
-        const init: DograhFetchInit = {
+        const init: ElphieFetchInit = {
             method,
             headers: {
                 ...this.headers,
@@ -166,7 +166,7 @@ export class DograhClient extends _GeneratedClient implements SpecProvider {
         const timer = setTimeout(() => controller.abort(), this.timeoutMs);
         init.signal = controller.signal;
 
-        let resp: DograhFetchResponse;
+        let resp: ElphieFetchResponse;
         try {
             resp = await this.fetchImpl(url, init);
         } finally {

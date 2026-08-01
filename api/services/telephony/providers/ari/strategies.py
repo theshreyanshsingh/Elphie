@@ -259,7 +259,7 @@ class ARIHangupStrategy(HangupStrategy):
 
         Reuses the same channel->run lookup the transfer strategy uses
         (Redis ``ari:channel:{id}`` -> run_id -> ``initial_context``). Best-effort:
-        never blocks dograh's own hangup if the upstream call fails.
+        never blocks elphie's own hangup if the upstream call fails.
         """
         redis = None
         try:
@@ -280,7 +280,7 @@ class ARIHangupStrategy(HangupStrategy):
             identity = identity or (run.initial_context or {}).get("upstream_pbx")
             # If the call was already transferred to the external PBX, the customer
             # leg has moved on -- do NOT hang it up (that would drop the transferred
-            # customer); just let dograh's own legs tear down below.
+            # customer); just let elphie's own legs tear down below.
             transferred = (run.gathered_context or {}).get("external_pbx_transferred")
             transferred = transferred or (run.gathered_context or {}).get(
                 "upstream_transferred"
@@ -311,7 +311,7 @@ class ARIHangupStrategy(HangupStrategy):
                 logger.info(
                     "[ARI Hangup] External PBX call "
                     f"({self._external_pbx_adapter.type}); "
-                    f"terminating customer leg via API before dropping dograh leg"
+                    f"terminating customer leg via API before dropping elphie leg"
                 )
                 result = await self._external_pbx_adapter.hangup(identity)
                 if not result.ok:

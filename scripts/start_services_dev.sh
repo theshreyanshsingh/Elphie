@@ -8,7 +8,7 @@ set -e  # Exit on error
 # Determine BASE_DIR as parent of the scripts directory
 BASE_DIR="$(cd "$(dirname "$(dirname "${BASH_SOURCE[0]}")")" && pwd)"
 
-ENV_FILE="${DOGRAH_ENV_FILE:-$BASE_DIR/api/.env}"
+ENV_FILE="${ELPHIE_ENV_FILE:-$BASE_DIR/api/.env}"
 RUN_DIR="$BASE_DIR/run"                 # Where we keep *.pid
 BASE_LOG_DIR="$BASE_DIR/logs"           # Base logs directory
 
@@ -24,7 +24,7 @@ HEALTH_MAX_ATTEMPTS=${HEALTH_MAX_ATTEMPTS:-30}
 HEALTH_INTERVAL=${HEALTH_INTERVAL:-2}
 
 cd "$BASE_DIR"
-echo "Starting Dograh Services (DEV MODE) at $(date) in BASE_DIR: ${BASE_DIR}"
+echo "Starting Elphie Services (DEV MODE) at $(date) in BASE_DIR: ${BASE_DIR}"
 echo "Auto-reload enabled for api/ directory changes"
 echo "Environment file: $ENV_FILE"
 
@@ -181,15 +181,13 @@ for i in "${!SERVICE_NAMES[@]}"; do
   cmd="${SERVICE_COMMANDS[$i]}"
   echo "→ Starting $name"
 
-  (
-    cd "$BASE_DIR"
-    if [[ "$LOG_TO_FILE" == "true" ]]; then
-      export LOG_FILE_PATH="$LOG_DIR/$name.log"
-      exec $cmd >>"$LOG_DIR/$name.log" 2>&1
-    else
-      exec $cmd
-    fi
-  ) &
+  if [[ "$LOG_TO_FILE" == "true" ]]; then
+    log_file="$LOG_DIR/$name.log"
+    nohup bash -c "cd \"$BASE_DIR\" && export LOG_FILE_PATH=\"$log_file\" && exec $cmd" >>"$log_file" 2>&1 &
+  else
+    log_file="$LOG_DIR/$name.log"
+    nohup bash -c "cd \"$BASE_DIR\" && exec $cmd" >>"$log_file" 2>&1 &
+  fi
 
   pid=$!
   echo $pid >"$RUN_DIR/$name.pid"

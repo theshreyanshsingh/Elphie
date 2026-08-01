@@ -1,16 +1,16 @@
 /**
- * Dograh SDK — typed builder for voice-AI workflows.
+ * Elphie SDK — typed builder for voice-AI workflows.
  *
- * Runtime SDK: fetches the spec catalog from the Dograh backend at session
+ * Runtime SDK: fetches the spec catalog from the Elphie backend at session
  * start and validates every `Workflow.add()` call against it. Don't import
  * per-node-type classes — the `type` argument is a string keyed against the
  * fetched spec catalog.
  *
  * @example
  * ```ts
- * import { DograhClient, Workflow } from "@dograh/sdk";
+ * import { ElphieClient, Workflow } from "@elphie/sdk";
  *
- * const client = new DograhClient({ baseUrl: "http://localhost:8000", apiKey: "..." });
+ * const client = new ElphieClient({ baseUrl: "http://localhost:8000", apiKey: "..." });
  * const wf = new Workflow({ client, name: "loan_qualification" });
  *
  * const start = await wf.add({
@@ -25,16 +25,16 @@
  * ```
  */
 
-export { DograhClient } from "./client.js";
+export { ElphieClient } from "./client.js";
 export type {
-    DograhClientOptions,
-    DograhFetch,
-    DograhFetchInit,
-    DograhFetchResponse,
+    ElphieClientOptions,
+    ElphieFetch,
+    ElphieFetchInit,
+    ElphieFetchResponse,
 } from "./client.js";
 export {
     ApiError,
-    DograhSdkError,
+    ElphieSdkError,
     SpecMismatchError,
     ValidationError,
 } from "./errors.js";
@@ -59,6 +59,6 @@ export type {
 } from "./types.js";
 
 // Typed SDK — generated per-node interfaces + factories. Importable as
-// `import { startCall, type StartCall } from "@dograh/sdk/typed"` for
+// `import { startCall, type StartCall } from "@elphie/sdk/typed"` for
 // tree-shaking, or via the `TypedNode` union here.
 export type { TypedNode } from "./typed/index.js";

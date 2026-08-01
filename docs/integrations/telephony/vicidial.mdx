@@ -1,12 +1,12 @@
 ---
 title: "VICIdial Integration"
-description: "Connect Dograh to VICIdial through Asterisk ARI for call control, in-group transfers, and lead updates"
+description: "Connect Elphie to VICIdial through Asterisk ARI for call control, in-group transfers, and lead updates"
 ---
 
 ## Overview
 
-Use this integration when VICIdial owns the customer call and connects Dograh
-to it through Asterisk. Dograh uses Asterisk ARI for audio and VICIdial APIs for
+Use this integration when VICIdial owns the customer call and connects Elphie
+to it through Asterisk. Elphie uses Asterisk ARI for audio and VICIdial APIs for
 operations that must affect the original customer leg:
 
 - Hang up the customer call when the agent ends the conversation
@@ -21,10 +21,10 @@ mappings in the UI.
 
 Before configuring VICIdial, ensure that:
 
-- Asterisk ARI is connected to Dograh as described in the
+- Asterisk ARI is connected to Elphie as described in the
   [Asterisk ARI integration](./asterisk-ari)
 - VICIdial sends the customer call to the Asterisk dialplan that enters the
-  Dograh Stasis application
+  Elphie Stasis application
 - You have VICIdial agent API credentials with permission to hang up and
   perform in-group transfers
 - If workflows will update leads, you also have non-agent API credentials with
@@ -32,7 +32,7 @@ Before configuring VICIdial, ensure that:
 
 ## Enable the organization feature
 
-1. Open **Platform Settings** by going to https://app.dograh.com/settings
+1. Open **Platform Settings** by going to https://elphie.willowave.in/settings
 2. Enable **External PBX integrations**.
 
 This switch reveals the advanced settings in Asterisk telephony
@@ -56,13 +56,13 @@ hides and disables those controls without deleting their saved values.
 
 The non-agent API is optional when no lead updates are required. If it is used,
 its URL, user, and password must all be present. Credentials are stored with the
-telephony configuration and are returned masked by the Dograh API.
+telephony configuration and are returned masked by the Elphie API.
 
 ## Pass VICIdial call identity to Asterisk
 
-Dograh needs VICIdial's call identity to control the original customer leg.
+Elphie needs VICIdial's call identity to control the original customer leg.
 Configure VICIdial or the connecting dialplan to preserve these SIP headers on
-the call that enters the Dograh Stasis application:
+the call that enters the Elphie Stasis application:
 
 | Header | Purpose |
 | --- | --- |
@@ -90,7 +90,7 @@ the agent during a call.
    caller to the original in-group captured from the SIP headers.
 6. Save the tool and attach it to the workflow.
 
-The match is case-insensitive. Dograh performs final variable extraction before
+The match is case-insensitive. Elphie performs final variable extraction before
 resolving the mapping. If no route or fallback matches, the transfer fails and
 the agent can recover instead of silently hanging up the caller.
 
@@ -111,15 +111,15 @@ whose source value is absent are skipped.
 The VICIdial adapter ignores mappings that target the API control parameters
 `source`, `user`, `pass`, `function`, and `lead_id`. The non-agent API
 configuration is required for mappings to be applied. A lead-update failure
-does not prevent Dograh from attempting the requested transfer or hangup.
+does not prevent Elphie from attempting the requested transfer or hangup.
 
 ## Runtime behavior
 
-When the workflow transfers the call, Dograh resolves the configured in-group,
+When the workflow transfers the call, Elphie resolves the configured in-group,
 applies available lead updates, asks VICIdial to transfer the customer leg, and
 then closes only the local Asterisk media leg.
 
-When the conversation ends without a transfer, Dograh persists final gathered
+When the conversation ends without a transfer, Elphie persists final gathered
 context, applies available lead updates, asks VICIdial to hang up the customer
 leg, and then closes the local Asterisk leg.
 

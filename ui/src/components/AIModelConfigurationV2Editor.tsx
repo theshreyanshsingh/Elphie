@@ -24,12 +24,12 @@ import { VoiceSelectorModal } from "@/components/VoiceSelectorModal";
 import { LANGUAGE_DISPLAY_NAMES } from "@/constants/languages";
 import { formatRoundingPolicy } from "@/lib/billingDisplay";
 
-type ModelMode = "realtime" | "dograh" | "byok";
+type ModelMode = "realtime" | "elphie" | "byok";
 
 // Sentinel language value for "Multilingual (Auto-detect)".
 const MULTILINGUAL_LANGUAGE_CODE = "multi";
 
-interface DograhDefaults {
+interface ElphieDefaults {
     voices: string[];
     allow_custom_input?: boolean;
     speeds: number[];
@@ -49,7 +49,7 @@ interface DograhDefaults {
 }
 
 export interface ModelConfigurationDefaultsV2 {
-    dograh: DograhDefaults;
+    elphie: ElphieDefaults;
     byok: {
         pipeline: ServiceConfigurationDefaults;
         realtime: {
@@ -61,7 +61,7 @@ export interface ModelConfigurationDefaultsV2 {
     };
 }
 
-interface DograhFormState {
+interface ElphieFormState {
     api_key: string;
     voice: string;
     speed: number;
@@ -93,12 +93,12 @@ function asRecord(value: unknown): Record<string, unknown> | null {
         : null;
 }
 
-function isDograhEffectiveConfig(config: Record<string, unknown> | null | undefined): boolean {
+function isElphieEffectiveConfig(config: Record<string, unknown> | null | undefined): boolean {
     if (!config || config.is_realtime) return false;
     const llm = asRecord(config.llm);
     const tts = asRecord(config.tts);
     const stt = asRecord(config.stt);
-    return llm?.provider === "dograh" && tts?.provider === "dograh" && stt?.provider === "dograh";
+    return llm?.provider === "elphie" && tts?.provider === "elphie" && stt?.provider === "elphie";
 }
 
 function byokDefaults(defaults: ModelConfigurationDefaultsV2): ServiceConfigurationDefaults {
@@ -172,7 +172,7 @@ function getByokInitialConfig(
         return matchesTab(byokConfiguration) ? byokConfiguration : emptyByokInitialConfig(wantRealtime);
     }
 
-    if (configuration?.mode === "dograh" || isDograhEffectiveConfig(effectiveConfiguration)) {
+    if (configuration?.mode === "elphie" || isElphieEffectiveConfig(effectiveConfiguration)) {
         return emptyByokInitialConfig(wantRealtime);
     }
 
@@ -180,23 +180,23 @@ function getByokInitialConfig(
     return matchesTab(effective) ? (effective as Record<string, unknown>) : emptyByokInitialConfig(wantRealtime);
 }
 
-function buildDograhState(
+function buildElphieState(
     defaults: ModelConfigurationDefaultsV2,
     configuration: Record<string, unknown> | null,
     effectiveConfiguration: Record<string, unknown> | null,
-): DograhFormState {
-    const fallback = defaults.dograh.defaults;
-    const configuredDograh = configuration?.mode === "dograh" ? asRecord(configuration.dograh) : null;
-    if (configuredDograh) {
+): ElphieFormState {
+    const fallback = defaults.elphie.defaults;
+    const configuredElphie = configuration?.mode === "elphie" ? asRecord(configuration.elphie) : null;
+    if (configuredElphie) {
         return {
-            api_key: String(configuredDograh.api_key || ""),
-            voice: String(configuredDograh.voice || fallback.voice),
-            speed: numberOrDefault(configuredDograh.speed, fallback.speed),
-            language: String(configuredDograh.language || fallback.language),
+            api_key: String(configuredElphie.api_key || ""),
+            voice: String(configuredElphie.voice || fallback.voice),
+            speed: numberOrDefault(configuredElphie.speed, fallback.speed),
+            language: String(configuredElphie.language || fallback.language),
         };
     }
 
-    if (isDograhEffectiveConfig(effectiveConfiguration)) {
+    if (isElphieEffectiveConfig(effectiveConfiguration)) {
         const llm = asRecord(effectiveConfiguration?.llm);
         const tts = asRecord(effectiveConfiguration?.tts);
         const stt = asRecord(effectiveConfiguration?.stt);
@@ -220,11 +220,11 @@ function preferredMode(
     configuration: Record<string, unknown> | null,
     effectiveConfiguration: Record<string, unknown> | null,
 ): ModelMode {
-    if (configuration?.mode === "dograh") return "dograh";
+    if (configuration?.mode === "elphie") return "elphie";
     if (configuration?.mode === "byok") {
         return asRecord(configuration.byok)?.mode === "realtime" ? "realtime" : "byok";
     }
-    if (isDograhEffectiveConfig(effectiveConfiguration)) return "dograh";
+    if (isElphieEffectiveConfig(effectiveConfiguration)) return "elphie";
     return Boolean(effectiveConfiguration?.is_realtime) ? "realtime" : "byok";
 }
 
@@ -257,7 +257,7 @@ function requireByokService(
     if (
         !serviceConfiguration
         || !serviceConfiguration.provider
-        || serviceConfiguration.provider === "dograh"
+        || serviceConfiguration.provider === "elphie"
         || !hasRequiredApiKey(service, serviceConfiguration, defaults)
     ) {
         throw new Error(`${service} configuration is required`);
@@ -267,7 +267,7 @@ function requireByokService(
 
 function optionalByokService(config: Record<string, unknown>, service: ServiceSegment): Record<string, unknown> | undefined {
     const serviceConfiguration = asRecord(config[service]);
-    if (!serviceConfiguration?.provider || serviceConfiguration.provider === "dograh") return undefined;
+    if (!serviceConfiguration?.provider || serviceConfiguration.provider === "elphie") return undefined;
     return serviceConfiguration;
 }
 
@@ -278,7 +278,7 @@ function ThirdPartyProviderNotice() {
             <div>
                 <p className="font-medium">Third-party provider data notice</p>
                 <p className="mt-1 leading-6">
-                    Dograh sends data required by the selected model service. This may include prompts,
+                    Elphie sends data required by the selected model service. This may include prompts,
                     transcripts, audio, generated text, tool data, and request metadata depending on the
                     provider and service type. Review the provider&apos;s data and retention policies before
                     using sensitive data.
@@ -318,16 +318,16 @@ function MetricPrice({
 
 function PricingSummary({
     pricing,
-    includeDograhModel,
+    includeElphieModel,
     thirdPartyModels,
 }: {
     pricing?: ModelConfigurationPricingResponse | null;
-    includeDograhModel: boolean;
+    includeElphieModel: boolean;
     thirdPartyModels?: boolean;
 }) {
     const platformPrice = pricing?.platform_usage;
-    const dograhModelPrice = includeDograhModel ? pricing?.dograh_model : null;
-    if (!platformPrice && !dograhModelPrice) return null;
+    const elphieModelPrice = includeElphieModel ? pricing?.elphie_model : null;
+    if (!platformPrice && !elphieModelPrice) return null;
 
     return (
         <Card className="mb-4 border-primary/20 bg-primary/[0.03]">
@@ -336,8 +336,8 @@ function PricingSummary({
                 {platformPrice && (
                     <MetricPrice label="Platform usage" price={platformPrice} />
                 )}
-                {dograhModelPrice && (
-                    <MetricPrice label="Dograh model usage" price={dograhModelPrice} />
+                {elphieModelPrice && (
+                    <MetricPrice label="Elphie model usage" price={elphieModelPrice} />
                 )}
                 {thirdPartyModels && (
                     <p className="text-muted-foreground">
@@ -358,63 +358,63 @@ export function AIModelConfigurationV2Editor({
     submitLabel = "Save Configuration",
 }: AIModelConfigurationV2EditorProps) {
     const defaultsForByok = useMemo(() => byokDefaults(defaults), [defaults]);
-    const [mode, setMode] = useState<ModelMode>("dograh");
-    const [dograh, setDograh] = useState<DograhFormState>(() => ({
+    const [mode, setMode] = useState<ModelMode>("elphie");
+    const [elphie, setElphie] = useState<ElphieFormState>(() => ({
         api_key: "",
-        voice: defaults.dograh.defaults.voice,
-        speed: defaults.dograh.defaults.speed,
-        language: defaults.dograh.defaults.language,
+        voice: defaults.elphie.defaults.voice,
+        speed: defaults.elphie.defaults.speed,
+        language: defaults.elphie.defaults.language,
     }));
     const [realtimeInitialConfig, setRealtimeInitialConfig] = useState<Record<string, unknown> | null>(null);
     const [pipelineInitialConfig, setPipelineInitialConfig] = useState<Record<string, unknown> | null>(null);
-    const [isSavingDograh, setIsSavingDograh] = useState(false);
+    const [isSavingElphie, setIsSavingElphie] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const allowCustomVoice = defaults.dograh.allow_custom_input ?? false;
-    const dograhSpeedRange = defaults.dograh.speed_range ?? { min: 0.5, max: 2.0, step: 0.1 };
+    const allowCustomVoice = defaults.elphie.allow_custom_input ?? false;
+    const elphieSpeedRange = defaults.elphie.speed_range ?? { min: 0.5, max: 2.0, step: 0.1 };
     const multilingualLanguageNames = useMemo(() => {
-        const codes = defaults.dograh.multilingual_languages ?? [];
+        const codes = defaults.elphie.multilingual_languages ?? [];
         if (codes.length === 0) return null;
         return codes.map((code) => LANGUAGE_DISPLAY_NAMES[code] || code).join(", ");
-    }, [defaults.dograh.multilingual_languages]);
+    }, [defaults.elphie.multilingual_languages]);
 
     useEffect(() => {
         const rawConfiguration = asRecord(configuration);
         const rawEffectiveConfiguration = asRecord(effectiveConfiguration);
         setMode(preferredMode(rawConfiguration, rawEffectiveConfiguration));
-        const nextDograh = buildDograhState(defaults, rawConfiguration, rawEffectiveConfiguration);
-        setDograh(nextDograh);
+        const nextElphie = buildElphieState(defaults, rawConfiguration, rawEffectiveConfiguration);
+        setElphie(nextElphie);
         setRealtimeInitialConfig(getByokInitialConfig(rawConfiguration, rawEffectiveConfiguration, true));
         setPipelineInitialConfig(getByokInitialConfig(rawConfiguration, rawEffectiveConfiguration, false));
     }, [configuration, defaults, effectiveConfiguration, allowCustomVoice]);
 
-    const saveDograhConfiguration = async () => {
-        setIsSavingDograh(true);
+    const saveElphieConfiguration = async () => {
+        setIsSavingElphie(true);
         setError(null);
         try {
             if (
-                !Number.isFinite(dograh.speed)
-                || dograh.speed < dograhSpeedRange.min
-                || dograh.speed > dograhSpeedRange.max
+                !Number.isFinite(elphie.speed)
+                || elphie.speed < elphieSpeedRange.min
+                || elphie.speed > elphieSpeedRange.max
             ) {
                 throw new Error(
-                    `Dograh speed must be between ${dograhSpeedRange.min} and ${dograhSpeedRange.max}.`,
+                    `Elphie speed must be between ${elphieSpeedRange.min} and ${elphieSpeedRange.max}.`,
                 );
             }
             await onSave({
                 version: 2,
-                mode: "dograh",
-                dograh: {
-                    api_key: dograh.api_key.trim(),
-                    voice: dograh.voice,
-                    speed: dograh.speed,
-                    language: dograh.language,
+                mode: "elphie",
+                elphie: {
+                    api_key: elphie.api_key.trim(),
+                    voice: elphie.voice,
+                    speed: elphie.speed,
+                    language: elphie.language,
                 },
             });
         } catch (err) {
             setError(err instanceof Error ? err.message : "Failed to save configuration");
         } finally {
-            setIsSavingDograh(false);
+            setIsSavingElphie(false);
         }
     };
 
@@ -460,7 +460,7 @@ export function AIModelConfigurationV2Editor({
             <Tabs value={mode} onValueChange={(value) => setMode(value as ModelMode)} className="space-y-6">
                 <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="realtime">Speech to Speech</TabsTrigger>
-                    <TabsTrigger value="dograh">Dograh</TabsTrigger>
+                    <TabsTrigger value="elphie">Elphie</TabsTrigger>
                     <TabsTrigger value="byok">BYOK</TabsTrigger>
                 </TabsList>
 
@@ -468,7 +468,7 @@ export function AIModelConfigurationV2Editor({
                     <p className="mb-4 text-sm text-muted-foreground">
                         A single speech-to-speech model handles the conversation in realtime (no separate transcriber or voice). An LLM is still required for variable extraction and QA.
                     </p>
-                    <PricingSummary pricing={pricing} includeDograhModel={false} thirdPartyModels />
+                    <PricingSummary pricing={pricing} includeElphieModel={false} thirdPartyModels />
                     <ServiceConfigurationForm
                         key={`realtime-${JSON.stringify(realtimeInitialConfig)}`}
                         mode="global"
@@ -481,12 +481,12 @@ export function AIModelConfigurationV2Editor({
                     <ThirdPartyProviderNotice />
                 </TabsContent>
 
-                <TabsContent value="dograh" className="mt-0">
+                <TabsContent value="elphie" className="mt-0">
                     <p className="mb-4 text-sm text-muted-foreground">
-                        Dograh provides a managed transcriber, LLM, and voice pipeline. Select a voice and language while Dograh manages the underlying model providers.{" "}
+                        Elphie provides a managed transcriber, LLM, and voice pipeline. Select a voice and language while Elphie manages the underlying model providers.{" "}
                         We offer custom pricing and a 15-second pulse with a monthly commitment.{" "}
                         <a
-                            href="https://www.dograh.com/contact"
+                            href="https://www.elphie.com/contact"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="underline"
@@ -495,35 +495,35 @@ export function AIModelConfigurationV2Editor({
                         </a>
                         .
                     </p>
-                    <PricingSummary pricing={pricing} includeDograhModel />
+                    <PricingSummary pricing={pricing} includeElphieModel />
                     <Card>
                         <CardContent className="pt-6">
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <div className="space-y-2 sm:col-span-2">
                                     <Label>Voice</Label>
                                     <VoiceSelectorModal
-                                        provider="dograh"
-                                        value={dograh.voice}
-                                        onChange={(voice) => setDograh({ ...dograh, voice })}
+                                        provider="elphie"
+                                        value={elphie.voice}
+                                        onChange={(voice) => setElphie({ ...elphie, voice })}
                                         allowManualInput={allowCustomVoice}
                                     />
                                 </div>
 
                                 <div className="space-y-2 sm:col-span-2">
                                     <Label>Language</Label>
-                                    <Select value={dograh.language} onValueChange={(language) => setDograh({ ...dograh, language })}>
+                                    <Select value={elphie.language} onValueChange={(language) => setElphie({ ...elphie, language })}>
                                         <SelectTrigger className="w-full">
                                             <SelectValue placeholder="Select language" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {defaults.dograh.languages.map((language) => (
+                                            {defaults.elphie.languages.map((language) => (
                                                 <SelectItem key={language} value={language}>
                                                     {LANGUAGE_DISPLAY_NAMES[language] || language}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    {dograh.language === MULTILINGUAL_LANGUAGE_CODE && multilingualLanguageNames && (
+                                    {elphie.language === MULTILINGUAL_LANGUAGE_CODE && multilingualLanguageNames && (
                                         <p className="text-xs text-muted-foreground">
                                             Auto-detects {multilingualLanguageNames}.
                                         </p>
@@ -531,42 +531,42 @@ export function AIModelConfigurationV2Editor({
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="dograh-speed">Speed</Label>
+                                    <Label htmlFor="elphie-speed">Speed</Label>
                                     <Input
-                                        id="dograh-speed"
+                                        id="elphie-speed"
                                         type="number"
-                                        min={dograhSpeedRange.min}
-                                        max={dograhSpeedRange.max}
-                                        step={dograhSpeedRange.step ?? 0.1}
-                                        value={dograh.speed}
+                                        min={elphieSpeedRange.min}
+                                        max={elphieSpeedRange.max}
+                                        step={elphieSpeedRange.step ?? 0.1}
+                                        value={elphie.speed}
                                         onChange={(event) => {
                                             const speed = event.currentTarget.valueAsNumber;
-                                            setDograh({
-                                                ...dograh,
-                                                speed: Number.isFinite(speed) ? speed : defaults.dograh.defaults.speed,
+                                            setElphie({
+                                                ...elphie,
+                                                speed: Number.isFinite(speed) ? speed : defaults.elphie.defaults.speed,
                                             });
                                         }}
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="dograh-api-key">API Key</Label>
+                                    <Label htmlFor="elphie-api-key">API Key</Label>
                                     <div className="relative">
                                         <KeyRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                         <Input
-                                            id="dograh-api-key"
+                                            id="elphie-api-key"
                                             className="pl-9"
-                                            value={dograh.api_key}
-                                            onChange={(event) => setDograh({ ...dograh, api_key: event.target.value })}
+                                            value={elphie.api_key}
+                                            onChange={(event) => setElphie({ ...elphie, api_key: event.target.value })}
                                             placeholder="Enter API key"
                                         />
                                     </div>
                                 </div>
                             </div>
 
-                            <Button type="button" className="mt-6 w-full" onClick={saveDograhConfiguration} disabled={isSavingDograh}>
+                            <Button type="button" className="mt-6 w-full" onClick={saveElphieConfiguration} disabled={isSavingElphie}>
                                 <Save className="mr-2 h-4 w-4" />
-                                {isSavingDograh ? "Saving..." : submitLabel}
+                                {isSavingElphie ? "Saving..." : submitLabel}
                             </Button>
                         </CardContent>
                     </Card>
@@ -576,7 +576,7 @@ export function AIModelConfigurationV2Editor({
                     <p className="mb-4 text-sm text-muted-foreground">
                         Configure separate transcriber, LLM, and voice providers using your own API keys. An embeddings model can also be configured for knowledge retrieval.
                     </p>
-                    <PricingSummary pricing={pricing} includeDograhModel={false} thirdPartyModels />
+                    <PricingSummary pricing={pricing} includeElphieModel={false} thirdPartyModels />
                     <ServiceConfigurationForm
                         key={`byok-${JSON.stringify(pipelineInitialConfig)}`}
                         mode="global"

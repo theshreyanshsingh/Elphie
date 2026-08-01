@@ -14,6 +14,8 @@ import {
     listTelephonyConfigurationsApiV1OrganizationsTelephonyConfigsGet
 } from '@/client/sdk.gen';
 import type { TelephonyConfigurationListItem, WorkflowSummaryResponse } from '@/client/types.gen';
+import { AppPageContent } from '@/components/layout/AppPageContent';
+import { PageHeading } from '@/components/PageHeading';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -347,7 +349,7 @@ export default function NewCampaignPage() {
     };
 
     return (
-        <div className="container mx-auto p-6 pb-12 space-y-6 max-w-2xl">
+        <AppPageContent width="2xl" className="space-y-6 pb-12">
             <div>
                 <Button
                     variant="ghost"
@@ -357,7 +359,7 @@ export default function NewCampaignPage() {
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     Back to Campaigns
                 </Button>
-                <h1 className="text-3xl font-bold mb-2">Create New Campaign</h1>
+                <PageHeading className="mb-2">Create New Campaign</PageHeading>
                 <p className="text-muted-foreground">Set up a new campaign to execute workflows at scale</p>
             </div>
 
@@ -571,6 +573,6 @@ export default function NewCampaignPage() {
                         </form>
                     </CardContent>
                 </Card>
-        </div>
+        </AppPageContent>
     );
 }

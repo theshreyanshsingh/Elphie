@@ -1,16 +1,16 @@
 // Fetch a workflow by ID and place a test phone call using the TypeScript SDK.
 //
 // Requirements:
-//   npm install @dograh/sdk
+//   npm install @elphie/sdk
 //
 // Environment variables:
-//   DOGRAH_API_ENDPOINT  - Dograh API base URL (e.g. http://localhost:8000)
-//   DOGRAH_API_TOKEN     - API token sent as X-API-Key
+//   ELPHIE_API_ENDPOINT  - Elphie API base URL (e.g. http://localhost:8000)
+//   ELPHIE_API_TOKEN     - API token sent as X-API-Key
 //
 // Run:
 //   npx tsx fetch_workflow_and_call.ts
 
-import { DograhClient } from "@dograh/sdk";
+import { ElphieClient } from "@elphie/sdk";
 
 // Numeric workflow ID to fetch and call with.
 const WORKFLOW_ID = 1;
@@ -18,12 +18,12 @@ const WORKFLOW_ID = 1;
 const PHONE_NUMBER = "+11187619471";
 
 async function main(): Promise<void> {
-    const apiEndpoint = process.env.DOGRAH_API_ENDPOINT ?? "http://localhost:8000";
-    const apiToken = process.env.DOGRAH_API_TOKEN;
+    const apiEndpoint = process.env.ELPHIE_API_ENDPOINT ?? "http://localhost:8000";
+    const apiToken = process.env.ELPHIE_API_TOKEN;
 
-    if (!apiToken) throw new Error("DOGRAH_API_TOKEN is required");
+    if (!apiToken) throw new Error("ELPHIE_API_TOKEN is required");
 
-    const client = new DograhClient({
+    const client = new ElphieClient({
         baseUrl: apiEndpoint,
         apiKey: apiToken,
     });

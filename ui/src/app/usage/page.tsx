@@ -11,7 +11,9 @@ import type { DailyUsageBreakdownResponse, OrganizationPreferences, UsageHistory
 import { CallTypeCell } from '@/components/CallTypeCell';
 import { DailyUsageTable } from '@/components/DailyUsageTable';
 import { FilterBuilder } from '@/components/filters/FilterBuilder';
+import { AppPageContent } from "@/components/layout/AppPageContent";
 import { MediaPreviewButton, MediaPreviewDialog } from '@/components/MediaPreviewDialog';
+import { PageHeading } from "@/components/PageHeading";
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -401,11 +403,11 @@ export default function UsagePage() {
     };
 
     return (
-        <div className="container mx-auto p-6 space-y-6">
+        <AppPageContent width="full" className="space-y-6">
             <div>
                 <div className="flex justify-between items-start">
                     <div>
-                        <h1 className="text-3xl font-bold mb-2">Agent Runs</h1>
+                        <PageHeading className="text-3xl mb-2">Agent Runs</PageHeading>
                         <p className="text-muted-foreground">See all your Agent Runs across all Voice Agents. You can use filters to filter out required Agent Runs.</p>
                     </div>
                         <div className="flex items-center gap-2">
@@ -617,7 +619,7 @@ export default function UsagePage() {
                                     <div className="mt-4 p-3 bg-muted rounded-md">
                                         <p className="text-sm text-muted-foreground">
                                             Total for filtered period: <span className="font-semibold text-foreground">
-                                                {usageHistory.total_dograh_tokens.toLocaleString()} Dograh Tokens
+                                                {usageHistory.total_elphie_tokens.toLocaleString()} Elphie Tokens
                                             </span>
                                             {' • '}
                                             <span className="font-semibold text-foreground">
@@ -664,6 +666,6 @@ export default function UsagePage() {
 
                 {/* Media Preview Dialog */}
                 {mediaPreview.dialog}
-        </div>
+    </AppPageContent>
     );
 }
