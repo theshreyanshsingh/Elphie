@@ -28,7 +28,7 @@ async function WorkflowList() {
         if (authProvider === 'stack') {
             redirect('/');
         } else {
-            // For OSS mode, this shouldn't happen as token is auto-generated
+            // For self-hosted mode, this shouldn't happen as token is auto-generated
             return (
                 <div className="text-red-500">
                     Authentication required. Please refresh the page.
@@ -47,6 +47,17 @@ async function WorkflowList() {
                 status: 'active,archived'
             }
         });
+
+        if (response.error) {
+            const detail = typeof response.error === 'object' && response.error && 'detail' in response.error
+                ? String((response.error as { detail?: unknown }).detail ?? '')
+                : '';
+            if (/invalid or expired token|not authenticated|unauthorized/i.test(detail)) {
+                const { redirect } = await import('next/navigation');
+                redirect('/auth/login');
+            }
+            throw new Error('Failed to fetch agents');
+        }
 
         const allWorkflowData = response.data ? (Array.isArray(response.data) ? response.data : [response.data]) : [];
 
@@ -83,7 +94,7 @@ async function WorkflowList() {
                     ) : (
                         <Card>
                             <CardContent className="p-8 text-center text-muted-foreground">
-                                No active workflows found. Create your first workflow to get started.
+                                No active agents found. Create your first agent to get started.
                             </CardContent>
                         </Card>
                     )}
@@ -101,7 +112,7 @@ async function WorkflowList() {
         logger.error(`Error fetching workflows: ${err}`);
         return (
             <div className="text-red-500">
-                Failed to load Workflows. Please Try Again Later.
+                Failed to load agents. Please try again later.
             </div>
         );
     }

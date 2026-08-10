@@ -1,7 +1,7 @@
 $ErrorActionPreference = 'Stop'
 
 $EnvFile = '.env'
-$Registry = if ([string]::IsNullOrEmpty($env:REGISTRY)) { 'ghcr.io/theshreyanshsingh' } else { $env:REGISTRY }
+$Registry = if ([string]::IsNullOrEmpty($env:REGISTRY)) { 'ghcr.io/elphie-hq' } else { $env:REGISTRY }
 $EnableTelemetry = if ([string]::IsNullOrEmpty($env:ENABLE_TELEMETRY)) { 'true' } else { $env:ENABLE_TELEMETRY }
 $Utf8NoBom = [System.Text.UTF8Encoding]::new($false)
 
@@ -154,12 +154,19 @@ if (-not (Test-Path 'docker-compose.yaml')) {
 
 $envFileExisted = Test-Path $EnvFile
 
-$existingSecret = Get-DotEnvValue -Path $EnvFile -Key 'OSS_JWT_SECRET'
+$existingSecret = Get-DotEnvValue -Path $EnvFile -Key 'SELFHOSTED_JWT_SECRET'
 if ([string]::IsNullOrEmpty($existingSecret)) {
-    Set-DotEnvValue -Path $EnvFile -Key 'OSS_JWT_SECRET' -Value (New-HexSecret)
-    Write-Host "Created OSS_JWT_SECRET in $EnvFile."
+    # Migrate legacy OSS_JWT_SECRET so existing installs keep sessions.
+    $legacySecret = Get-DotEnvValue -Path $EnvFile -Key 'OSS_JWT_SECRET'
+    if (-not [string]::IsNullOrEmpty($legacySecret)) {
+        Set-DotEnvValue -Path $EnvFile -Key 'SELFHOSTED_JWT_SECRET' -Value $legacySecret
+        Write-Host "Migrated OSS_JWT_SECRET → SELFHOSTED_JWT_SECRET in $EnvFile."
+    } else {
+        Set-DotEnvValue -Path $EnvFile -Key 'SELFHOSTED_JWT_SECRET' -Value (New-HexSecret)
+        Write-Host "Created SELFHOSTED_JWT_SECRET in $EnvFile."
+    }
 } else {
-    Write-Host "OSS_JWT_SECRET is already set in $EnvFile."
+    Write-Host "SELFHOSTED_JWT_SECRET is already set in $EnvFile."
 }
 
 $existingPostgresPassword = Get-DotEnvValue -Path $EnvFile -Key 'POSTGRES_PASSWORD'

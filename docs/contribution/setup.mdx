@@ -5,18 +5,13 @@ description: Get a Elphie dev environment running and learn the daily commands.
 
 Elphie is a Next.js UI (`ui/`), a FastAPI backend (`api/`), and a [Pipecat](https://github.com/pipecat-ai/pipecat)-based voice pipeline (`pipecat/`, a git submodule), backed by Postgres, Redis, and MinIO.
 
-<Tip>
-**Using Claude Code or Codex?** Install the [Elphie setup skill](https://github.com/theshreyanshsingh/Elphie-plugins) (`/plugin marketplace add theshreyanshsingh/Elphie-plugins`, then `/plugin install elphie@elphie`) and ask your agent to *"set up Elphie for development"* — it runs the steps below for you and verifies the stack is healthy.
-</Tip>
-
 ## Set up
 
 You need Git, a local Docker engine (such as Docker Desktop), and VS Code with the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers).
 
-1. Fork [theshreyanshsingh/Elphie](https://github.com/theshreyanshsingh/Elphie) and clone **your fork**:
+1. Obtain a local clone of the Elphie repository and enter it:
 
 ```bash
-git clone https://github.com/<YOUR_HANDLE>/elphie
 cd elphie
 ```
 
@@ -36,11 +31,11 @@ cd ui && npm run dev -- --hostname 0.0.0.0
 
 5. Open the app at `http://localhost:3000`.
 
-If these steps do not work for you, please open an issue on [GitHub](https://github.com/theshreyanshsingh/Elphie/issues).
+If these steps do not work for you, please ask in the [Elphie Community Slack](https://join.slack.com/t/elphie-community/shared_invite/zt-3zjb5vwvl-j7hRz3_F1SOn5cH~jm5f5g).
 
 <AccordionGroup>
-<Accordion title="Cloned theshreyanshsingh/Elphie directly instead of your fork?">
-Run `bash scripts/setup_fork.sh` once. It prompts for your fork URL, points `origin` at it, and adds `upstream` as `theshreyanshsingh/Elphie`. See [Fork and upstream remotes](/contribution/reference#fork-and-upstream-remotes).
+<Accordion title="Need to configure git remotes for contribution?">
+Run `bash scripts/setup_fork.sh` once. It prompts for your remote URLs and configures `origin` / `upstream` as needed. See [Fork and upstream remotes](/contribution/reference#fork-and-upstream-remotes).
 </Accordion>
 <Accordion title="No VS Code? No devcontainer at all?">
 The devcontainer also runs headless via the [Dev Container CLI](/contribution/reference#dev-container-cli), or you can run everything [directly on your host](/contribution/reference#host-managed-setup).
@@ -94,9 +89,9 @@ All configurations load `api/.env` (test configs use `api/.env.test`) and set `j
 ## Contributing a change
 
 1. Create a branch and make your change.
-2. Push to your fork (`origin`) and open a pull request against `theshreyanshsingh/Elphie:main`.
+2. Push to your contribution remote (`origin`) and share the change with maintainers.
 3. A maintainer reviews and merges.
 
-Bug reports and feature ideas go through [GitHub Issues](https://github.com/theshreyanshsingh/Elphie/issues) and [Ideas](https://github.com/orgs/theshreyanshsingh/discussions/categories/ideas). Issues tagged `good first issue` are a good place to start. For questions while you're working, use the [Elphie Community Slack](https://join.slack.com/t/elphie-community/shared_invite/zt-3zjb5vwvl-j7hRz3_F1SOn5cH~jm5f5g).
+Bug reports and feature ideas go through the [Elphie Community Slack](https://join.slack.com/t/elphie-community/shared_invite/zt-3zjb5vwvl-j7hRz3_F1SOn5cH~jm5f5g). For questions while you're working, use Slack as well.
 
 Deploying your own build instead of contributing upstream? See [Deployments](/deployment/introduction) instead.

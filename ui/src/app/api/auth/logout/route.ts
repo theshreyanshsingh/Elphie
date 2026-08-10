@@ -1,13 +1,13 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
-const OSS_TOKEN_COOKIE = 'elphie_auth_token';
-const OSS_USER_COOKIE = 'elphie_auth_user';
+const LOCAL_AUTH_TOKEN_COOKIE = 'elphie_auth_token';
+const LOCAL_AUTH_USER_COOKIE = 'elphie_auth_user';
 
 export async function POST() {
   const cookieStore = await cookies();
 
-  cookieStore.set(OSS_TOKEN_COOKIE, '', {
+  cookieStore.set(LOCAL_AUTH_TOKEN_COOKIE, '', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
@@ -15,7 +15,7 @@ export async function POST() {
     path: '/',
   });
 
-  cookieStore.set(OSS_USER_COOKIE, '', {
+  cookieStore.set(LOCAL_AUTH_USER_COOKIE, '', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',

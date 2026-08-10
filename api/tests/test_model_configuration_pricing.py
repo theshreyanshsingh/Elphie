@@ -7,9 +7,9 @@ from api.routes import organization as organization_routes
 
 
 @pytest.mark.asyncio
-async def test_model_configuration_pricing_returns_empty_in_oss(monkeypatch):
+async def test_model_configuration_pricing_returns_empty_in_selfhosted(monkeypatch):
     get_pricing = AsyncMock()
-    monkeypatch.setattr(organization_routes, "DEPLOYMENT_MODE", "oss")
+    monkeypatch.setattr(organization_routes, "DEPLOYMENT_MODE", "selfhosted")
     monkeypatch.setattr(
         organization_routes.mps_service_key_client,
         "get_billing_pricing",

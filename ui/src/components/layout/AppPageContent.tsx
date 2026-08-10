@@ -29,7 +29,7 @@ export function AppPageContent({
   return (
     <div
       className={cn(
-        "app-page-content mx-auto w-full min-w-0 bg-paper-bg text-foreground shadow-none",
+        "app-page-content mx-auto w-full min-w-0 bg-paper-bg text-xs text-foreground shadow-none",
         WIDTH_CLASSES[width],
         APP_PAGE_GUTTER,
         className,

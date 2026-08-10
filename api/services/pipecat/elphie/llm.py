@@ -41,7 +41,7 @@ class ElphieLLMService(OpenAILLMService):
         self,
         *,
         api_key: str,
-        base_url: str = "https://services.elphie.willowave.in/api/v1/llm",
+        base_url: str = "https://services.dograh.com/api/v1/llm",
         correlation_id: str | None = None,
         usage_context: str | None = None,
         settings: OpenAILLMSettings | None = None,
@@ -51,7 +51,8 @@ class ElphieLLMService(OpenAILLMService):
 
         Args:
             api_key: The Elphie API key for authentication.
-            base_url: The base URL for Elphie API. Defaults to "https://services.elphie.willowave.in/api/v1/llm".
+            base_url: The base URL for managed LLM API. Defaults to Dograh MPS;
+                production callers pass ``MPS_API_URL`` from env.
             correlation_id: Optional server-generated correlation ID for MPS billing v2.
             usage_context: Optional tag describing what this LLM instance is used
                 for (e.g. "voicemail_detection"). Sent as request metadata.

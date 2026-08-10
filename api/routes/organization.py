@@ -377,7 +377,7 @@ async def get_model_configuration_pricing(
     user: UserModel = Depends(get_user_with_selected_organization),
 ) -> ModelConfigurationPricingResponse:
     """Return the hosted organization prices shown in Model Configurations."""
-    if DEPLOYMENT_MODE == "oss":
+    if DEPLOYMENT_MODE == "selfhosted":
         return ModelConfigurationPricingResponse()
 
     try:
@@ -474,7 +474,7 @@ async def migrate_model_configuration_v2(
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=exc.args[0])
 
-    if DEPLOYMENT_MODE != "oss":
+    if DEPLOYMENT_MODE != "selfhosted":
         try:
             await ensure_hosted_mps_billing_account_v2(
                 organization_id,

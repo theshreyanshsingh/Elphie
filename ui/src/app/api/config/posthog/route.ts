@@ -2,7 +2,7 @@
   Route to enable/ disable posthog from a NextJS backend route,
   rather than NEXT_PUBLIC_* keys, since NEXT_PUBLIC_* keys are
   injected during build time, and we need to provide the option
-  to OSS users to disable telemetry from docker-compose.yaml
+  to self-hosted users to disable telemetry from docker-compose.yaml
 */
 import { NextResponse } from 'next/server';
 

@@ -211,7 +211,7 @@ class UserClient(BaseDBClient):
         """Create a new user with email and password hash."""
         async with self.async_session() as session:
             user = UserModel(
-                provider_id=f"oss_{int(datetime.now(timezone.utc).timestamp())}_{uuid.uuid4()}",
+                provider_id=f"selfhosted_{int(datetime.now(timezone.utc).timestamp())}_{uuid.uuid4()}",
                 email=email.lower(),
                 password_hash=password_hash,
             )

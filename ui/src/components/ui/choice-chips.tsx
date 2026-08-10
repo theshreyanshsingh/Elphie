@@ -20,7 +20,7 @@ export function ChoiceChips({ options, value, onChange, className }: ChoiceChips
                     key={option.value}
                     onClick={() => onChange(option.value)}
                     className={cn(
-                        "px-4 py-2 rounded-full text-sm font-medium transition-all",
+                        "rounded-md px-2 py-1 text-xs font-medium transition-all",
                         value === option.value
                             ? "bg-primary text-primary-foreground"
                             : "bg-secondary text-secondary-foreground hover:bg-secondary/80"

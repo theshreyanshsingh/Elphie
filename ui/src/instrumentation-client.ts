@@ -5,6 +5,16 @@
 import * as Sentry from "@sentry/nextjs";
 import posthog from "posthog-js";
 
+const isDevelopment =
+  process.env.NODE_ENV === "development" ||
+  process.env.NEXT_PUBLIC_NODE_ENV === "development";
+
+function devLog(...args: unknown[]) {
+  if (isDevelopment) {
+    console.log(...args);
+  }
+}
+
 // Drop errors originating from browser extensions (MetaMask's inpage.js,
 // injected widgets, etc.) by matching their URL scheme.
 const sharedSentryOptions = {
@@ -28,7 +38,7 @@ const initSentry = () => {
       dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
       ...sharedSentryOptions,
     });
-    console.log('Sentry initialized from NEXT_PUBLIC config');
+    devLog('Sentry initialized from NEXT_PUBLIC config');
   } else {
     // Fallback to API-based configuration
     fetch('/api/config/sentry')
@@ -39,13 +49,15 @@ const initSentry = () => {
             dsn: config.dsn,
             ...sharedSentryOptions,
           });
-          console.log('Sentry initialized from API config');
+          devLog('Sentry initialized from API config');
         } else {
-          console.log('Sentry disabled (not enabled or DSN not configured)');
+          devLog('Sentry disabled (not enabled or DSN not configured)');
         }
       })
       .catch(err => {
-        console.error('Failed to fetch Sentry configuration:', err);
+        if (isDevelopment) {
+          console.error('Failed to fetch Sentry configuration:', err);
+        }
       });
   }
 };
@@ -68,9 +80,9 @@ const initPostHog = () => {
       capture_pageleave: true,
       capture_exceptions: true,
       cross_subdomain_cookie: true,
-      debug: process.env.NEXT_PUBLIC_NODE_ENV === 'development',
+      debug: isDevelopment,
     });
-    console.log('PostHog initialized from NEXT_PUBLIC config');
+    devLog('PostHog initialized from NEXT_PUBLIC config');
   } else {
     // Fallback to API-based configuration
     fetch('/api/config/posthog')
@@ -84,15 +96,17 @@ const initPostHog = () => {
             capture_pageleave: true,
             capture_exceptions: true,
             cross_subdomain_cookie: true,
-            debug: process.env.NEXT_PUBLIC_NODE_ENV === 'development',
+            debug: isDevelopment,
           });
-          console.log('PostHog initialized from API config');
+          devLog('PostHog initialized from API config');
         } else {
-          console.log('PostHog disabled (not enabled or key not configured)');
+          devLog('PostHog disabled (not enabled or key not configured)');
         }
       })
       .catch(err => {
-        console.error('Failed to fetch PostHog configuration:', err);
+        if (isDevelopment) {
+          console.error('Failed to fetch PostHog configuration:', err);
+        }
       });
   }
 };

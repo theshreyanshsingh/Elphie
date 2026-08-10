@@ -19,7 +19,7 @@ cd deploy/helm/elphie
 # The bundled Postgres/Redis/MinIO are in-chart manifests on official upstream
 # images — no `helm dependency` / subchart pull step needed.
 helm install elphie . \
-  --set secrets.ossJwtSecret="$(openssl rand -hex 32)" \
+  --set secrets.selfhostedJwtSecret="$(openssl rand -hex 32)" \
   --set secrets.turnSecret="$(openssl rand -hex 32)" \
   --set exposure.gatewayApi.gatewayClassName=istio
 ```

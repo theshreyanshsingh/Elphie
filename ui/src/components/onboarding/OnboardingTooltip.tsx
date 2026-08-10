@@ -1,11 +1,13 @@
 'use client';
 
 import { arrow, autoUpdate, flip, offset, shift, useFloating } from '@floating-ui/react-dom';
+import type { Placement } from '@floating-ui/react-dom';
 import { X } from 'lucide-react';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { type TooltipKey, useOnboarding } from '@/context/OnboardingContext';
+
 
 interface OnboardingTooltipProps {
     /** Onboarding flag this tooltip is keyed to. Visibility ("not seen yet")
@@ -20,6 +22,8 @@ interface OnboardingTooltipProps {
     enabled?: boolean;
     onNext?: () => void;
     showNext?: boolean;
+    /** Preferred side relative to the target. Defaults to bottom. */
+    placement?: Placement;
 }
 
 export const OnboardingTooltip = ({
@@ -30,6 +34,7 @@ export const OnboardingTooltip = ({
     enabled = true,
     onNext,
     showNext = true,
+    placement: preferredPlacement = 'bottom',
 }: OnboardingTooltipProps) => {
     const { hasSeenTooltip, markTooltipSeen } = useOnboarding();
     const arrowRef = useRef<HTMLDivElement>(null);
@@ -40,17 +45,17 @@ export const OnboardingTooltip = ({
     const dismiss = useCallback(() => markTooltipSeen(tooltipKey), [markTooltipSeen, tooltipKey]);
 
     const { refs, floatingStyles, middlewareData, placement, isPositioned, elements } = useFloating({
-        placement: 'bottom',
+        placement: preferredPlacement,
         strategy: 'fixed',
         open: isVisible,
         // Tracks the target through scrolling (including nested overflow
         // containers), resizes, and layout shifts.
         whileElementsMounted: autoUpdate,
         middleware: [
-            offset(8),
-            flip({ padding: 16 }),
+            offset(12),
+            flip({ padding: 16, fallbackAxisSideDirection: 'start' }),
             shift({ padding: 16 }),
-            arrow({ element: arrowRef }),
+            arrow({ element: arrowRef, padding: 12 }),
         ],
     });
 
@@ -94,70 +99,91 @@ export const OnboardingTooltip = ({
 
     if (!mounted || !isVisible) return null;
 
-    // Actual side after flip(): 'bottom' (below target) or 'top' (above).
-    const side = placement.split('-')[0] === 'top' ? 'top' : 'bottom';
+    // Actual side after flip(), used only for arrow placement (not transforms).
+    const side = placement.split('-')[0] as 'top' | 'bottom' | 'left' | 'right';
+    const staticSide = (
+        {
+            top: 'bottom',
+            bottom: 'top',
+            left: 'right',
+            right: 'left',
+        } as const
+    )[side];
 
     const tooltipContent = (
         <div
             ref={refs.setFloating}
-            className={`z-[100] animate-in fade-in duration-300 ${side === 'bottom' ? 'slide-in-from-top-2' : 'slide-in-from-bottom-2'}`}
+            className="z-[200] pointer-events-auto"
             style={{
                 ...floatingStyles,
                 // Avoid a flash at (0,0) before the first position resolves.
                 visibility: isPositioned ? 'visible' : 'hidden',
             }}
         >
-            {/* Arrow pointing at the target; floating-ui keeps it aligned even
-                when the tooltip body is shifted to stay on-screen. */}
-            <div
-                ref={arrowRef}
-                className="absolute h-4 w-4 rotate-45 bg-blue-500"
-                style={{
-                    left: middlewareData.arrow?.x != null ? `${middlewareData.arrow.x}px` : undefined,
-                    ...(side === 'bottom' ? { top: '-8px' } : { bottom: '-8px' }),
-                    boxShadow: '-2px -2px 4px rgba(0, 0, 0, 0.1)',
-                }}
-            />
+            {/*
+              Keep enter animations on an INNER node. slide-in-* / zoom-*
+              animations apply CSS transforms that fight floating-ui's
+              positioning transform on the outer node — which visually offsets
+              the dialog from its real click hitbox (buttons look unclickable).
+            */}
+            <div className="relative animate-in fade-in duration-200">
+                {/* Arrow pointing at the target; never intercept clicks. */}
+                <div
+                    ref={arrowRef}
+                    className="absolute h-3.5 w-3.5 rotate-45 bg-blue-500 pointer-events-none"
+                    style={{
+                        left: middlewareData.arrow?.x != null ? `${middlewareData.arrow.x}px` : '',
+                        top: middlewareData.arrow?.y != null ? `${middlewareData.arrow.y}px` : '',
+                        [staticSide]: '-7px',
+                        boxShadow: '-1px -1px 2px rgba(0, 0, 0, 0.08)',
+                    }}
+                />
 
-            {/* Tooltip content */}
-            <div className="relative bg-blue-500 text-white rounded-lg shadow-2xl p-6 max-w-sm">
-                {/* Close button */}
-                <button
-                    onClick={dismiss}
-                    className="absolute top-2 right-2 p-1 hover:bg-blue-600 rounded-full transition-colors"
-                    aria-label="Close tooltip"
+                <div
+                    role="dialog"
+                    aria-modal="false"
+                    aria-labelledby={`${messageId}-title`}
+                    className="relative bg-blue-500 text-white rounded-lg shadow-2xl p-5 max-w-sm"
                 >
-                    <X className="h-4 w-4" />
-                </button>
-
-                {/* Title */}
-                <h3 className="text-lg font-semibold mb-3">{title}</h3>
-
-                {/* Message */}
-                <p id={messageId} className="text-sm leading-relaxed mb-4 pr-4">
-                    {message}
-                </p>
-
-                {/* Footer actions */}
-                <div className="flex items-center justify-end gap-3">
                     <button
+                        type="button"
                         onClick={dismiss}
-                        className="bg-white text-blue-500 px-4 py-1.5 rounded font-medium text-sm hover:bg-blue-50 transition-colors cursor-pointer"
+                        className="absolute top-1.5 right-1.5 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full hover:bg-blue-600 transition-colors cursor-pointer"
+                        aria-label="Close tooltip"
                     >
-                        Close
+                        <X className="h-4 w-4" />
                     </button>
 
-                    {showNext && (
+                    <h3 id={`${messageId}-title`} className="text-base font-semibold mb-2 pr-8">
+                        {title}
+                    </h3>
+
+                    <p id={messageId} className="text-sm leading-relaxed mb-4 pr-2">
+                        {message}
+                    </p>
+
+                    <div className="flex items-center justify-end gap-2">
                         <button
-                            onClick={() => {
-                                onNext?.();
-                                dismiss();
-                            }}
-                            className="bg-white text-blue-500 px-4 py-1.5 rounded font-medium text-sm hover:bg-blue-50 transition-colors"
+                            type="button"
+                            onClick={dismiss}
+                            className="bg-white text-blue-600 min-h-9 px-4 py-2 rounded-md font-medium text-sm hover:bg-blue-50 transition-colors cursor-pointer"
                         >
-                            Next
+                            Close
                         </button>
-                    )}
+
+                        {showNext && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    onNext?.();
+                                    dismiss();
+                                }}
+                                className="bg-white text-blue-600 min-h-9 px-4 py-2 rounded-md font-medium text-sm hover:bg-blue-50 transition-colors cursor-pointer"
+                            >
+                                Next
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

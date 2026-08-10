@@ -33,7 +33,6 @@ dev = [
 [project.urls]
 Homepage = "https://elphie.com"
 Documentation = "https://elphie.willowave.in"
-Repository = "https://github.com/theshreyanshsingh/Elphie"
 
 [project.scripts]
 elphie-sdk-codegen = "elphie_sdk.codegen:main"

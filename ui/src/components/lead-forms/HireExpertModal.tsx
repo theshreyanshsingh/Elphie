@@ -36,9 +36,9 @@ interface HireExpertModalProps {
 export function HireExpertModal({ open, onOpenChange, source, onOpenEnterprise }: HireExpertModalProps) {
   const { user } = useAuth();  // logged-in identity (prefills the email field)
   const { config } = useAppConfig();
-  // Deployment provenance (analytics only): cloud → cloud_app, else oss_app. OSS submits the
-  // lead anonymously (cloud can't verify its token), so the email field below is the identity.
-  const origin = config?.deploymentMode === "cloud" ? "cloud_app" : "oss_app";
+  // Deployment provenance (analytics only): cloud → cloud_app, else selfhosted_app.
+  // Self-hosted submits the lead anonymously (cloud can't verify its token), so the email field is the identity.
+  const origin = config?.deploymentMode === "cloud" ? "cloud_app" : "selfhosted_app";
   // Logged-in user's email (Stack uses primaryEmail; local uses email) — prefilled, editable.
   const userEmail = user ? ("primaryEmail" in user ? user.primaryEmail ?? "" : user.email ?? "") : "";
 

@@ -112,7 +112,7 @@ curl -k https://YOUR_SERVER_IP/api/v1/health
 
 ### Why not just re-run `setup_remote.sh`?
 
-`setup_remote.sh` refuses to overwrite an existing install by design — re-running it would regenerate `OSS_JWT_SECRET` (logging everyone out), reset the TURN shared secret (breaking WebRTC auth on connected clients), and regenerate SSL certificates. The two-file edit above is the supported way to change worker count after install.
+`setup_remote.sh` refuses to overwrite an existing install by design — re-running it would regenerate `SELFHOSTED_JWT_SECRET` (logging everyone out), reset the TURN shared secret (breaking WebRTC auth on connected clients), and regenerate SSL certificates. The two-file edit above is the supported way to change worker count after install.
 
 If you genuinely want a clean reinstall, see the `ELPHIE_FORCE_OVERWRITE=1` escape hatch documented in the script.
 

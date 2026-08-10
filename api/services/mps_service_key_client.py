@@ -30,21 +30,21 @@ class MPSServiceKeyClient:
 
         Args:
             organization_id: Organization ID for authenticated mode
-            created_by: User provider ID for OSS mode
+            created_by: User provider ID for self-hosted mode
 
         Returns:
             Dictionary of headers
         """
         headers = {"Content-Type": "application/json"}
 
-        # Add authentication for non-OSS mode
-        if DEPLOYMENT_MODE != "oss":
+        # Add authentication for non-self-hosted mode
+        if DEPLOYMENT_MODE != "selfhosted":
             if ELPHIE_MPS_SECRET_KEY:
                 headers["X-Secret-Key"] = ELPHIE_MPS_SECRET_KEY
             if organization_id:
                 headers["X-Organization-Id"] = str(organization_id)
         else:
-            # OSS mode
+            # self-hosted mode
             if created_by:
                 headers["X-Created-By"] = created_by
 
@@ -61,7 +61,7 @@ class MPSServiceKeyClient:
         """
         Create a new service key via MPS API.
 
-        For OSS mode: organization_id should be None
+        For self-hosted mode: organization_id should be None
         For authenticated mode: organization_id should be provided
         """
         async with httpx.AsyncClient(timeout=self.timeout) as client:
@@ -72,8 +72,8 @@ class MPSServiceKeyClient:
                 "created_by": created_by,
             }
 
-            # Only add organization_id for non-OSS mode
-            if DEPLOYMENT_MODE != "oss" and organization_id:
+            # Only add organization_id for non-self-hosted mode
+            if DEPLOYMENT_MODE != "selfhosted" and organization_id:
                 request_body["organization_id"] = organization_id
 
             response = await client.post(
@@ -116,14 +116,14 @@ class MPSServiceKeyClient:
         """
         Get service keys from MPS.
 
-        For OSS mode: Use created_by to filter keys
+        For self-hosted mode: Use created_by to filter keys
         For authenticated mode: Use organization_id to filter keys
         """
         async with httpx.AsyncClient(timeout=self.timeout) as client:
             params = {}
 
-            if DEPLOYMENT_MODE == "oss":
-                # In OSS mode, filter by created_by
+            if DEPLOYMENT_MODE == "selfhosted":
+                # In self-hosted mode, filter by created_by
                 if created_by:
                     params["created_by"] = created_by
             else:
@@ -179,8 +179,8 @@ class MPSServiceKeyClient:
             if response.status_code == 200:
                 key = response.json()
 
-                # Validate ownership for OSS mode
-                if DEPLOYMENT_MODE == "oss" and created_by:
+                # Validate ownership for self-hosted mode
+                if DEPLOYMENT_MODE == "selfhosted" and created_by:
                     if key.get("created_by") != created_by:
                         logger.warning(
                             f"Access denied: User {created_by} tried to access key created by {key.get('created_by')}"
@@ -188,7 +188,7 @@ class MPSServiceKeyClient:
                         return None
 
                 # Validate organization for authenticated mode
-                if DEPLOYMENT_MODE != "oss" and organization_id:
+                if DEPLOYMENT_MODE != "selfhosted" and organization_id:
                     if key.get("organization_id") != organization_id:
                         logger.warning(
                             f"Access denied: Org {organization_id} tried to access key for org {key.get('organization_id')}"
@@ -218,7 +218,7 @@ class MPSServiceKeyClient:
         """
         Archive (soft delete) a service key.
 
-        For OSS mode: Validates that created_by matches the key creator
+        For self-hosted mode: Validates that created_by matches the key creator
         For authenticated mode: Validates organization_id matches
         """
         # First, verify ownership
@@ -283,7 +283,7 @@ class MPSServiceKeyClient:
 
     async def get_usage_by_created_by(self, created_by: str) -> dict:
         """
-        Get aggregated usage for all service keys created by a user (OSS mode).
+        Get aggregated usage for all service keys created by a user (self-hosted mode).
 
         Args:
             created_by: The user's provider ID
@@ -384,8 +384,8 @@ class MPSServiceKeyClient:
 
     async def get_billing_pricing(self, organization_id: int) -> dict:
         """Return MPS-owned effective platform and Elphie model prices for an org."""
-        if DEPLOYMENT_MODE == "oss":
-            raise ValueError("OSS deployments do not fetch hosted billing prices")
+        if DEPLOYMENT_MODE == "selfhosted":
+            raise ValueError("self-hosted deployments do not fetch hosted billing prices")
 
         async with httpx.AsyncClient(timeout=self.timeout) as client:
             response = await client.get(
@@ -523,8 +523,8 @@ class MPSServiceKeyClient:
         max_attempts: int = 3,
     ) -> dict:
         """Report hosted Elphie platform usage for a completed workflow run."""
-        if DEPLOYMENT_MODE == "oss":
-            raise ValueError("OSS deployments must not report platform usage to MPS")
+        if DEPLOYMENT_MODE == "selfhosted":
+            raise ValueError("self-hosted deployments must not report platform usage to MPS")
         if not correlation_id and duration_seconds is None:
             raise ValueError(
                 "Platform usage reports require correlation_id or duration_seconds"
@@ -603,7 +603,7 @@ class MPSServiceKeyClient:
             model: Model tier name (default: "default")
             correlation_id: Optional correlation ID for tracking
             organization_id: Organization ID (for authenticated mode)
-            created_by: User provider ID (for OSS mode)
+            created_by: User provider ID (for self-hosted mode)
 
         Returns:
             Dictionary containing transcription result with keys like
@@ -656,7 +656,16 @@ class MPSServiceKeyClient:
         Synchronously validate a Elphie service key by checking usage via MPS.
 
         Returns True if the key is valid, False otherwise.
+
+        On self-hosted, when MPS is unreachable (DNS/connect failures to
+        ``MPS_API_URL``), validation fails open for a non-empty key. Managed
+        Elphie clouds are often unavailable on self-hosted; treating that as "invalid
+        key" produces false 422s that block web-call setup. Runtime calls still
+        require a reachable MPS or BYOK providers.
         """
+        if not service_key:
+            return False
+
         try:
             with httpx.Client(timeout=self.timeout) as client:
                 response = client.get(
@@ -667,8 +676,25 @@ class MPSServiceKeyClient:
                     },
                 )
                 return response.status_code == 200
-        except Exception:
-            logger.warning("Failed to validate Elphie service key via MPS")
+        except (httpx.ConnectError, httpx.TimeoutException, httpx.NetworkError) as exc:
+            if DEPLOYMENT_MODE == "selfhosted":
+                logger.warning(
+                    "MPS unreachable while validating Elphie service key ({}). "
+                    "Skipping key check in self-hosted mode.",
+                    exc,
+                )
+                return True
+            logger.warning("Failed to validate Elphie service key via MPS: {}", exc)
+            return False
+        except Exception as exc:
+            if DEPLOYMENT_MODE == "selfhosted" and _is_mps_resolution_error(exc):
+                logger.warning(
+                    "MPS DNS/network failure while validating Elphie service key ({}). "
+                    "Skipping key check in self-hosted mode.",
+                    exc,
+                )
+                return True
+            logger.warning("Failed to validate Elphie service key via MPS: {}", exc)
             return False
 
     async def get_voices(
@@ -690,7 +716,7 @@ class MPSServiceKeyClient:
             model: Optional model ID to filter voices (e.g., "arcana", "mistv2")
             language: Optional language code to filter voices (e.g., "eng", "en")
             organization_id: Organization ID (for authenticated mode)
-            created_by: User provider ID (for OSS mode)
+            created_by: User provider ID (for self-hosted mode)
 
         Returns:
             Dictionary containing provider name and list of voices
@@ -804,7 +830,7 @@ class MPSServiceKeyClient:
         """
         Call the MPS workflow creation API using secret key authentication.
 
-        For OSS mode: Pass created_by in headers
+        For self-hosted mode: Pass created_by in headers
         For authenticated mode: Pass organization_id in headers
 
         Args:
@@ -812,7 +838,7 @@ class MPSServiceKeyClient:
             use_case: Description of the use case
             activity_description: Description of what the agent should do
             organization_id: Organization ID (for authenticated mode)
-            created_by: User provider ID (for OSS mode)
+            created_by: User provider ID (for self-hosted mode)
 
         Returns:
             Workflow data from MPS API
@@ -843,6 +869,19 @@ class MPSServiceKeyClient:
                     response=response,
                 )
 
+def _is_mps_resolution_error(exc: Exception) -> bool:
+    """True for DNS / name-resolution failures wrapped by httpx or the OS."""
+    message = str(exc).lower()
+    return any(
+        needle in message
+        for needle in (
+            "name or service not known",
+            "nodename nor servname",
+            "temporary failure in name resolution",
+            "getaddrinfo failed",
+            "name resolution",
+        )
+    )
 
 # Create a singleton instance
 mps_service_key_client = MPSServiceKeyClient()

@@ -2,7 +2,6 @@
 
 import {
   AlertTriangle,
-  ArrowUpCircle,
   AudioLines,
   Brain,
   ChevronLeft,
@@ -18,7 +17,6 @@ import {
   Phone,
   Settings,
   TrendingUp,
-  UserRound,
   Workflow,
   Wrench,
 } from "lucide-react";
@@ -54,9 +52,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAppConfig } from "@/context/AppConfigContext";
-import { useLeadForms } from "@/context/LeadFormsContext";
 import { useTelephonyConfigWarnings } from "@/context/TelephonyConfigWarningsContext";
-import { useLatestReleaseVersion } from "@/hooks/useLatestReleaseVersion";
 import type { LocalUser } from "@/lib/auth";
 import { useAuth } from "@/lib/auth";
 import { isBillingAvailable } from "@/lib/deploymentFeatures";
@@ -160,7 +156,6 @@ export function AppSidebar() {
   const { state, isMobile, setOpenMobile } = useSidebar();
   const { provider, logout, user } = useAuth();
   const { config } = useAppConfig();
-  const { openHireExpert } = useLeadForms();
   const {
     telnyxMissingWebhookPublicKeyCount,
     vonageMissingSignatureSecretCount,
@@ -169,15 +164,6 @@ export function AppSidebar() {
     telnyxMissingWebhookPublicKeyCount > 0 ||
     vonageMissingSignatureSecretCount > 0;
   const isCollapsed = !isMobile && state === "collapsed";
-
-  // Version info from app config context
-  const versionInfo = config ? { ui: config.uiVersion, api: config.apiVersion } : null;
-
-  // Check for updates only on self-hosted (OSS) deployments — cloud is managed for the user.
-  const { latest: latestRelease, isBehind, isLatest } = useLatestReleaseVersion(
-    versionInfo?.ui,
-    { enabled: config?.deploymentMode === "oss" },
-  );
 
   const isActive = (path: string) => pathname.startsWith(path);
 
@@ -216,7 +202,7 @@ export function AppSidebar() {
         asChild
         tooltip={tooltip}
         className={cn(
-          "rounded-xl transition-colors hover:bg-accent hover:text-accent-foreground",
+          "rounded-md px-2 py-1 text-xs transition-colors hover:bg-accent hover:text-accent-foreground",
           isItemActive &&
             "bg-cta/15 font-semibold text-foreground hover:bg-cta/20 hover:text-foreground"
         )}
@@ -229,18 +215,18 @@ export function AppSidebar() {
         >
           {isItemActive && !isCollapsed && (
             <span
-              className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-cta"
+              className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full bg-cta"
               aria-hidden
             />
           )}
           <Icon
             className={cn(
-              "h-4 w-4 shrink-0",
+              "h-3.5 w-3.5 shrink-0",
               isItemActive && "text-cta drop-shadow-[0_0_6px_rgba(240,170,70,0.8)]"
             )}
           />
           <span
-            className={cn("notranslate min-w-0 flex-1 truncate", isCollapsed && "sr-only")}
+            className={cn("notranslate min-w-0 flex-1 truncate text-xs", isCollapsed && "sr-only")}
             translate="no"
           >
             {item.title}
@@ -264,58 +250,56 @@ export function AppSidebar() {
     );
   };
 
-  // Footer identity trigger: avatar initials only (no name), in a subtle
-  // bordered circle. Same treatment expanded and collapsed.
-  const displayIdentity =
-    user?.displayName ||
-    (user as { primaryEmail?: string } | undefined)?.primaryEmail ||
+  // Prefer the signed-in email for the footer identity chip.
+  const userEmail =
     (user as LocalUser | undefined)?.email ||
+    (user as { primaryEmail?: string } | undefined)?.primaryEmail ||
+    user?.displayName ||
     "";
-  const userInitials =
-    displayIdentity
-      .split(/[\s@]/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((s: string) => s[0]?.toUpperCase())
-      .join("") || "U";
 
   const userChipTrigger = (
     <Button
       variant="ghost"
-      size="icon"
-      className="h-7 w-7 shrink-0 cursor-pointer rounded-full border border-border/80 bg-muted/40 hover:bg-muted/60"
+      className={cn(
+        "h-auto min-w-0 flex-1 cursor-pointer justify-start rounded-md px-2 py-1 text-xs font-normal",
+        isCollapsed && "justify-center px-1"
+      )}
+      aria-label="Account menu"
     >
-      <span className="text-xs font-medium">{userInitials}</span>
+      <span
+        className={cn(
+          "notranslate min-w-0 truncate text-xs",
+          isCollapsed && "sr-only"
+        )}
+        translate="no"
+        title={userEmail || undefined}
+      >
+        {userEmail || "Account"}
+      </span>
+      {isCollapsed && (
+        <span className="text-xs font-medium">
+          {(userEmail || "U").slice(0, 1).toUpperCase()}
+        </span>
+      )}
     </Button>
   );
 
-  // "Hire an Expert" CTA, rendered INSIDE the shared footer pill next to the
-  // profile icon. Expanded: label pill filling the row. Collapsed: icon-only.
-  const hireExpertButton = isCollapsed ? (
+  const themeToggleButton = (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button
-          size="icon"
-          className="h-7 w-7 rounded-full"
-          onClick={() => openHireExpert("sidebar")}
-          aria-label="Hire an Expert"
-        >
-          <UserRound className="h-3.5 w-3.5" />
-        </Button>
+        <div className="notranslate shrink-0" translate="no">
+          <ThemeToggle
+            showLabel={false}
+            variant="outline"
+            size="icon"
+            className="rounded-md"
+          />
+        </div>
       </TooltipTrigger>
-      <TooltipContent side="right">
-        <p>Hire an Expert</p>
+      <TooltipContent side={isCollapsed ? "right" : "top"}>
+        <p>Toggle theme</p>
       </TooltipContent>
     </Tooltip>
-  ) : (
-    <Button
-      size="sm"
-      className="h-7 gap-1.5 rounded-full px-3 text-xs"
-      onClick={() => openHireExpert("sidebar")}
-    >
-      <UserRound className="h-3.5 w-3.5" />
-      Hire an Expert
-    </Button>
   );
 
   return (
@@ -329,45 +313,7 @@ export function AppSidebar() {
               translate="no"
             >
               <BrandLogo mark className="h-6" />
-              {versionInfo && (
-                <span
-                  className="notranslate text-xs font-normal text-muted-foreground"
-                  translate="no"
-                >
-                  v{versionInfo.ui}
-                </span>
-              )}
             </Link>
-            {isBehind && latestRelease && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <a
-                    href="https://docs.elphie.com/deployment/update"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 rounded-md border bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium leading-none text-amber-900 transition-opacity hover:opacity-80 dark:bg-amber-950 dark:text-amber-200"
-                  >
-                    <ArrowUpCircle className="h-3 w-3" />
-                    Update
-                  </a>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">
-                  <p>Latest: {latestRelease} - click to see the update guide</p>
-                </TooltipContent>
-              </Tooltip>
-            )}
-            {isLatest && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className="inline-flex items-center rounded-md border bg-emerald-50 px-1.5 py-0.5 text-[10px] font-medium leading-none text-emerald-900 dark:bg-emerald-950 dark:text-emerald-200">
-                    Latest
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">
-                  <p>You&apos;re running the latest release</p>
-                </TooltipContent>
-              </Tooltip>
-            )}
           </div>
 
           <SidebarTrigger className={cn("hover:bg-accent", isCollapsed && "mx-auto")}>
@@ -418,97 +364,48 @@ export function AppSidebar() {
         className={cn("p-3 notranslate", isCollapsed && "p-2")}
         translate="no"
       >
-        <div className="space-y-2">
-          {provider !== "stack" && (
-            <div
-              className={cn(
-                "flex items-center justify-between gap-1 rounded-full border border-border/60 bg-muted/30 p-1",
-                isCollapsed && "flex-col"
-              )}
-            >
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  {userChipTrigger}
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="top" align="start" className="w-56">
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      {(user as LocalUser | undefined)?.email && (
-                        <p className="text-xs text-muted-foreground">{(user as LocalUser).email}</p>
-                      )}
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => router.push("/settings")} className="cursor-pointer">
-                    <Settings className="mr-2 h-4 w-4" />
-                    Platform Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => logout()} className="cursor-pointer">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sign out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              {hireExpertButton}
-            </div>
+        <div
+          className={cn(
+            "flex w-full items-center gap-1 rounded-md border border-border/60 bg-muted/30 p-1",
+            isCollapsed && "flex-col"
           )}
-
-          {provider === "stack" && (
-            <div
-              className={cn(
-                "flex items-center justify-between gap-1 rounded-full border border-border/60 bg-muted/30 p-1",
-                isCollapsed && "flex-col"
-              )}
-            >
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  {userChipTrigger}
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="top" align="start" className="w-56">
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      {user?.displayName && (
-                        <p className="text-sm font-medium">{user.displayName}</p>
-                      )}
-                      {(user as { primaryEmail?: string })?.primaryEmail && (
-                        <p className="text-xs text-muted-foreground">{(user as { primaryEmail?: string }).primaryEmail}</p>
-                      )}
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => router.push("/handler/account-settings")} className="cursor-pointer">
-                    <Settings className="mr-2 h-4 w-4" />
-                    Account settings
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push("/settings")} className="cursor-pointer">
-                    <Settings className="mr-2 h-4 w-4" />
-                    Platform Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => logout()} className="cursor-pointer">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sign out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              {hireExpertButton}
-            </div>
-          )}
-
-          <div className="mt-1 flex justify-center">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="notranslate" translate="no">
-                  <ThemeToggle
-                    showLabel={false}
-                    className="rounded-full hover:bg-accent hover:text-accent-foreground"
-                  />
+        >
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              {userChipTrigger}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="top" align="start" className="w-56">
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  {provider === "stack" && user?.displayName && (
+                    <p className="text-sm font-medium">{user.displayName}</p>
+                  )}
+                  {userEmail && (
+                    <p className="text-xs text-muted-foreground">{userEmail}</p>
+                  )}
                 </div>
-              </TooltipTrigger>
-              <TooltipContent side={isCollapsed ? "right" : "top"}>
-                <p>Toggle theme</p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {provider === "stack" && (
+                <DropdownMenuItem
+                  onClick={() => router.push("/handler/account-settings")}
+                  className="cursor-pointer"
+                >
+                  <Settings className="mr-2 h-4 w-4" />
+                  Account settings
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem onClick={() => router.push("/settings")} className="cursor-pointer">
+                <Settings className="mr-2 h-4 w-4" />
+                Platform Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => logout()} className="cursor-pointer">
+                <LogOut className="mr-2 h-4 w-4" />
+                Sign out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {themeToggleButton}
         </div>
       </SidebarFooter>
       <SidebarRail />

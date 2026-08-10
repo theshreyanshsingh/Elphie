@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useAppConfig } from '@/context/AppConfigContext';
+import { isSelfHostedDeployment } from '@/lib/deploymentFeatures';
 import logger from '@/lib/logger';
 
 interface DocumentUploadProps {
@@ -25,7 +26,7 @@ const ACCEPTED_FILE_TYPES = ['.pdf', '.docx', '.doc', '.txt', '.json'];
 
 export default function DocumentUpload({ onUploadSuccess }: DocumentUploadProps) {
   const { config } = useAppConfig();
-  const isOSS = config?.deploymentMode === 'oss';
+  const isSelfHosted = isSelfHostedDeployment(config?.deploymentMode);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [retrievalMode, setRetrievalMode] = useState<string>('full_document');
   const [uploading, setUploading] = useState(false);
@@ -33,7 +34,7 @@ export default function DocumentUpload({ onUploadSuccess }: DocumentUploadProps)
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const ossNotice = isOSS ? (
+  const selfHostedNotice = isSelfHosted ? (
     <div className="flex gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-900/50 dark:bg-amber-950/30">
       <Info className="h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
       <div className="text-xs text-amber-900 dark:text-amber-200">
@@ -182,7 +183,7 @@ export default function DocumentUpload({ onUploadSuccess }: DocumentUploadProps)
   if (selectedFile && !uploading) {
     return (
       <div className="space-y-4">
-        {ossNotice}
+        {selfHostedNotice}
         {/* Selected file info */}
         <div className="flex items-center gap-3 p-3 border rounded-lg bg-muted/30">
           <FileText className="w-8 h-8 text-primary flex-shrink-0" />
@@ -244,7 +245,7 @@ export default function DocumentUpload({ onUploadSuccess }: DocumentUploadProps)
 
   return (
     <div className="space-y-4">
-      {ossNotice}
+      {selfHostedNotice}
       <input
         ref={fileInputRef}
         type="file"

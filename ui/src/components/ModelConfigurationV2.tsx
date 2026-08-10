@@ -110,7 +110,7 @@ export default function ModelConfigurationV2({ docsUrl }: { docsUrl?: string }) 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                     <PageHeading>AI Models Configuration</PageHeading>
-                    <p className="mt-2 text-sm text-muted-foreground">
+                    <p className="mt-1 text-xs text-muted-foreground">
                         Organization-scoped model settings.{" "}
                         {docsUrl && (
                             <a href={docsUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5 underline">
@@ -122,12 +122,12 @@ export default function ModelConfigurationV2({ docsUrl }: { docsUrl?: string }) 
             </div>
 
             {error && (
-                <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                <div className="rounded-md border border-destructive/40 bg-destructive/10 px-2 py-1 text-xs text-destructive">
                     {error}
                 </div>
             )}
             {notice && (
-                <div className="rounded-md border border-green-500/40 bg-green-500/10 px-4 py-3 text-sm text-green-700 dark:text-green-300">
+                <div className="rounded-md border border-green-500/40 bg-green-500/10 px-2 py-1 text-xs text-green-700 dark:text-green-300">
                     {notice}
                 </div>
             )}

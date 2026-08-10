@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 class TwilioProvider(TelephonyProvider):
     """
     Twilio implementation of TelephonyProvider.
-    Accepts configuration and works the same regardless of OSS/SaaS mode.
+    Accepts configuration and works the same regardless of self-hosted/SaaS mode.
     """
 
     PROVIDER_NAME = WorkflowRunMode.TWILIO.value

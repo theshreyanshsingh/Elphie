@@ -28,13 +28,14 @@ import { useOrganizationTimezone } from '@/hooks/useOrganizationTimezone';
 import { useAuth } from '@/lib/auth';
 import { copyTextToClipboard } from '@/lib/clipboard';
 import { formatDateTime } from '@/lib/dateTime';
+import { isSelfHostedDeployment } from '@/lib/deploymentFeatures';
 import logger from '@/lib/logger';
 
 export default function APIKeysPage() {
     const { user, getAccessToken, redirectToLogin, loading } = useAuth();
     const { config } = useAppConfig();
     const organizationTimezone = useOrganizationTimezone();
-    const isOSS = config?.deploymentMode === 'oss';
+    const isSelfHosted = isSelfHostedDeployment(config?.deploymentMode);
 
     logger.debug('[APIKeysPage] Component render', {
         loading,
@@ -316,10 +317,10 @@ export default function APIKeysPage() {
         );
     }
 
-    // In OSS mode, check if there's already an active service key
+    // In self-hosted mode, check if there's already an active service key
     const activeServiceKeys = serviceKeys.filter(key => !key.archived_at);
-    const canCreateServiceKey = !isOSS || activeServiceKeys.length === 0;
-    const showServiceKeyArchiveControls = !isOSS;
+    const canCreateServiceKey = !isSelfHosted || activeServiceKeys.length === 0;
+    const showServiceKeyArchiveControls = !isSelfHosted;
 
     return (
         <AppPageContent width="6xl">

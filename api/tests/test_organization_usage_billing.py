@@ -7,8 +7,8 @@ from api.routes import organization_usage
 
 
 @pytest.mark.asyncio
-async def test_get_billing_credits_oss_aggregates_by_created_by(monkeypatch):
-    monkeypatch.setattr(organization_usage, "DEPLOYMENT_MODE", "oss")
+async def test_get_billing_credits_selfhosted_aggregates_by_created_by(monkeypatch):
+    monkeypatch.setattr(organization_usage, "DEPLOYMENT_MODE", "selfhosted")
     get_usage = AsyncMock(
         return_value={"total_credits_used": 12.5, "remaining_credits": 487.5}
     )

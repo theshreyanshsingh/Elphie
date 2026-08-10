@@ -3,7 +3,7 @@ from datetime import UTC, datetime, timedelta
 import bcrypt
 import jwt
 
-from api.constants import OSS_JWT_EXPIRY_HOURS, OSS_JWT_SECRET
+from api.constants import SELFHOSTED_JWT_EXPIRY_HOURS, SELFHOSTED_JWT_SECRET
 
 
 def hash_password(password: str) -> str:
@@ -18,11 +18,11 @@ def create_jwt_token(user_id: int, email: str) -> str:
     payload = {
         "sub": str(user_id),
         "email": email,
-        "exp": datetime.now(UTC) + timedelta(hours=OSS_JWT_EXPIRY_HOURS),
+        "exp": datetime.now(UTC) + timedelta(hours=SELFHOSTED_JWT_EXPIRY_HOURS),
         "iat": datetime.now(UTC),
     }
-    return jwt.encode(payload, OSS_JWT_SECRET, algorithm="HS256")
+    return jwt.encode(payload, SELFHOSTED_JWT_SECRET, algorithm="HS256")
 
 
 def decode_jwt_token(token: str) -> dict:
-    return jwt.decode(token, OSS_JWT_SECRET, algorithms=["HS256"])
+    return jwt.decode(token, SELFHOSTED_JWT_SECRET, algorithms=["HS256"])

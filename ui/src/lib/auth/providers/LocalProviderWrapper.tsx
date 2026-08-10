@@ -17,12 +17,12 @@ export function LocalProviderWrapper({ children }: { children: React.ReactNode }
 
     const initializeAuth = async () => {
       try {
-        const response = await fetch('/api/auth/oss');
+        const response = await fetch('/api/auth/local');
         if (response.ok) {
           const data = await response.json();
           tokenRef.current = data.token;
           setUser(data.user);
-          logger.info('OSS auth initialized', { user: data.user });
+          logger.info('self-hosted auth initialized', { user: data.user });
         } else if (response.status === 401) {
           // No token - redirect to login (but not if already on auth pages)
           if (!window.location.pathname.startsWith('/auth/')) {
@@ -30,10 +30,10 @@ export function LocalProviderWrapper({ children }: { children: React.ReactNode }
             return;
           }
         } else {
-          logger.error('Failed to initialize OSS auth');
+          logger.error('Failed to initialize self-hosted auth');
         }
       } catch (error) {
-        logger.error('Error initializing OSS auth', error);
+        logger.error('Error initializing self-hosted auth', error);
       } finally {
         setLoading(false);
       }
@@ -47,7 +47,7 @@ export function LocalProviderWrapper({ children }: { children: React.ReactNode }
       return 'ssr-placeholder-token';
     }
     if (!tokenRef.current) {
-      logger.warn('No OSS token available after initialization');
+      logger.warn('No self-hosted token available after initialization');
       return '';
     }
     return tokenRef.current;

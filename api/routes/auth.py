@@ -1,18 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException
-from loguru import logger
 
 from api.constants import ENABLE_SIGNUP
 from api.db import db_client
 from api.db.models import UserModel
-from api.enums import OrganizationConfigurationKey, PostHogEvent
+from api.enums import PostHogEvent
 from api.schemas.auth import AuthResponse, LoginRequest, SignupRequest, UserResponse
 from api.services.auth.depends import (
-    create_user_configuration_with_mps_key,
+    ensure_default_mps_model_configuration,
     get_user,
     require_local_auth,
-)
-from api.services.configuration.ai_model_configuration import (
-    convert_legacy_ai_model_configuration_to_v2,
 )
 from api.services.posthog_client import capture_event
 from api.utils.auth import create_jwt_token, hash_password, verify_password
@@ -55,23 +51,8 @@ async def signup(request: SignupRequest):
     await db_client.add_user_to_organization(user.id, organization.id)
     await db_client.update_user_selected_organization(user.id, organization.id)
 
-    # Create default service configuration
-    try:
-        mps_config = await create_user_configuration_with_mps_key(
-            user.id, organization.id, user.provider_id
-        )
-        if mps_config:
-            await db_client.update_user_configuration(user.id, mps_config)
-            model_config_v2 = convert_legacy_ai_model_configuration_to_v2(mps_config)
-            await db_client.upsert_configuration(
-                organization.id,
-                OrganizationConfigurationKey.MODEL_CONFIGURATION_V2.value,
-                model_config_v2.model_dump(mode="json", exclude_none=True),
-            )
-    except Exception:
-        logger.warning(
-            "Failed to create default configuration for OSS user", exc_info=True
-        )
+    # Create default managed LLM/TTS/STT configuration (MPS trial key)
+    await ensure_default_mps_model_configuration(user)
 
     # Create JWT token
     token = create_jwt_token(user.id, request.email)
@@ -111,6 +92,9 @@ async def login(request: LoginRequest):
     # Verify password
     if not verify_password(request.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid email or password")
+
+    # Heal accounts that missed signup-time MPS provisioning
+    await ensure_default_mps_model_configuration(user)
 
     # Create JWT token
     token = create_jwt_token(user.id, user.email)

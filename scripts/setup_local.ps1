@@ -117,8 +117,8 @@ function Download-File([string]$Url, [string]$Destination) {
 }
 
 function Download-BundleFileForRef([string]$Destination, [string]$RemotePath, [string]$Ref) {
-    $rawBase = "https://raw.githubusercontent.com/theshreyanshsingh/Elphie/$Ref"
-    $fallbackBase = 'https://raw.githubusercontent.com/theshreyanshsingh/Elphie/main'
+    $rawBase = "https://raw.githubusercontent.com/elphie-hq/elphie/$Ref"
+    $fallbackBase = 'https://raw.githubusercontent.com/elphie-hq/elphie/main'
 
     try {
         Download-File "$rawBase/$RemotePath" $Destination
@@ -201,7 +201,7 @@ if ($UseCoturn) {
 }
 
 $EnableTelemetry = if ([string]::IsNullOrEmpty($env:ENABLE_TELEMETRY)) { 'true' } else { $env:ENABLE_TELEMETRY }
-$Registry = if ([string]::IsNullOrEmpty($env:REGISTRY)) { 'ghcr.io/theshreyanshsingh' } else { $env:REGISTRY }
+$Registry = if ([string]::IsNullOrEmpty($env:REGISTRY)) { 'ghcr.io/elphie-hq' } else { $env:REGISTRY }
 
 Write-Host ''
 Write-Success 'Configuration:'
@@ -225,7 +225,7 @@ if ($env:ELPHIE_SKIP_DOWNLOAD -ne '1') {
         Write-Info "[1/$TotalSteps] Downloading docker-compose.yaml..."
     }
 
-    Download-File 'https://raw.githubusercontent.com/theshreyanshsingh/Elphie/main/docker-compose.yaml' (Join-Path $CurrentDir 'docker-compose.yaml')
+    Download-File 'https://raw.githubusercontent.com/elphie-hq/elphie/main/docker-compose.yaml' (Join-Path $CurrentDir 'docker-compose.yaml')
     if ($UseCoturn) {
         Download-InitSupportBundle $CurrentDir 'main'
     }
@@ -242,7 +242,7 @@ if ($UseCoturn) {
 }
 
 Write-Info "[2/$TotalSteps] Creating environment file..."
-$ossJwtSecret = New-HexSecret 32
+$selfhostedJwtSecret = New-HexSecret 32
 $postgresPassword = New-HexSecret 32
 $redisPassword = New-HexSecret 32
 $minioRootUser = "elphie$((New-HexSecret 6).Substring(0, 12))"
@@ -252,8 +252,8 @@ $envLines = @(
     '# Container registry for Elphie images'
     "REGISTRY=$Registry"
     ''
-    '# JWT secret for OSS authentication'
-    "OSS_JWT_SECRET=$ossJwtSecret"
+    '# JWT secret for self-hosted authentication'
+    "SELFHOSTED_JWT_SECRET=$selfhostedJwtSecret"
     ''
     '# PostgreSQL password. Used by the postgres container on first init and by'
     "# the API's DATABASE_URL. Do not change after the first start — the password"

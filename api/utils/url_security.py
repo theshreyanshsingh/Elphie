@@ -14,11 +14,11 @@ def validate_user_configured_service_url(
 ) -> None:
     """Restrict user-configured service URLs in hosted deployments.
 
-    OSS deployments commonly point model services at localhost or private LAN
+    self-hosted deployments commonly point model services at localhost or private LAN
     hosts. SaaS deployments must not allow users to make Elphie infrastructure
     connect to private/internal network locations.
     """
-    if DEPLOYMENT_MODE == "oss":
+    if DEPLOYMENT_MODE == "selfhosted":
         return
 
     parsed = urlparse(url)

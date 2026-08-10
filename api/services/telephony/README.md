@@ -84,7 +84,7 @@ class TelephonyProvider(ABC):
 
 The `factory.py` loads configuration from the database:
 
-**Both Saas and OSS Modes**: Database configuration via UI
+**Both Saas and Self-hosted Modes**: Database configuration via UI
    ```python
    # Loaded from organization_configuration table
    key: "TELEPHONY_CONFIGURATION"

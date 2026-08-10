@@ -1,6 +1,6 @@
 # Devcontainer contributor setup
 
-`setup_local.sh` and `setup_local.ps1` provision the OSS Docker stack for local
+`setup_local.sh` and `setup_local.ps1` provision the self-hosted Docker stack for local
 deployments. They are not the recommended contributor workflow for this
 repository.
 

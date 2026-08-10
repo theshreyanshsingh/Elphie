@@ -15,7 +15,7 @@ setup_logging()
 
 
 if SENTRY_DSN and (
-    DEPLOYMENT_MODE != "oss" or (DEPLOYMENT_MODE == "oss" and ENABLE_TELEMETRY)
+    DEPLOYMENT_MODE != "selfhosted" or (DEPLOYMENT_MODE == "selfhosted" and ENABLE_TELEMETRY)
 ):
     sentry_sdk.init(
         dsn=SENTRY_DSN,
@@ -96,18 +96,18 @@ app = FastAPI(
 
 
 # Configure CORS.
-# OSS is typically deployed with UI and API behind a single reverse proxy
+# Self-hosted is typically deployed with UI and API behind a single reverse proxy
 # (same-origin, so CORS does not apply). Keep it permissive without
 # credentials — wildcard + credentials is rejected by browsers and unsafe.
 # SaaS deployments must set CORS_ALLOWED_ORIGINS to an explicit allowlist.
-if DEPLOYMENT_MODE == "oss":
+if DEPLOYMENT_MODE == "selfhosted":
     cors_origins: list[str] = ["*"]
     cors_allow_credentials = False
 else:
     if not CORS_ALLOWED_ORIGINS:
         raise RuntimeError(
             "CORS_ALLOWED_ORIGINS must be set to an explicit origin allowlist "
-            "when DEPLOYMENT_MODE != 'oss'"
+            "when DEPLOYMENT_MODE != 'selfhosted'"
         )
     if "*" in CORS_ALLOWED_ORIGINS:
         raise RuntimeError(

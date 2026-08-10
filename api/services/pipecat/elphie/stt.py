@@ -72,7 +72,7 @@ class ElphieSTTService(STTService, WebsocketService):
         self,
         *,
         api_key: str,
-        base_url: str = "wss://services.elphie.willowave.in",
+        base_url: str = "wss://services.dograh.com",
         ws_path: str = "/api/v1/stt/stream",
         correlation_id: str | None = None,
         sample_rate: int | None = None,
@@ -87,7 +87,8 @@ class ElphieSTTService(STTService, WebsocketService):
 
         Args:
             api_key: The Elphie API key for authentication.
-            base_url: WebSocket base URL for Elphie API. Defaults to "wss://services.elphie.willowave.in".
+            base_url: WebSocket base URL for managed STT. Defaults to Dograh MPS;
+                production callers pass ``MPS_API_URL`` from env.
             ws_path: WebSocket path for STT streaming. Defaults to "/api/v1/stt/stream".
             correlation_id: Optional server-generated correlation ID for MPS billing v2.
             sample_rate: Audio sample rate in Hz. Defaults to None.

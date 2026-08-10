@@ -286,7 +286,7 @@ export const createWorkflowApiV1WorkflowCreateDefinitionPost = <ThrowOnError ext
  *
  * This endpoint:
  * 1. Uses mps_service_key_client to call MPS workflow API
- * 2. Passes organization ID (authenticated mode) or created_by (OSS mode)
+ * 2. Passes organization ID (authenticated mode) or created_by (self-hosted mode)
  * 3. Creates the workflow in the database
  *
  * Args:
@@ -1304,7 +1304,7 @@ export const getCurrentPeriodUsageApiV1OrganizationsUsageCurrentPeriodGet = <Thr
 /**
  * Get Billing Credits
  *
- * Return per-key MPS credits (OSS) or the org's paginated billing ledger.
+ * Return per-key MPS credits (self-hosted) or the org's paginated billing ledger.
  */
 export const getBillingCreditsApiV1OrganizationsBillingCreditsGet = <ThrowOnError extends boolean = false>(options?: Options<GetBillingCreditsApiV1OrganizationsBillingCreditsGetData, ThrowOnError>): RequestResult<GetBillingCreditsApiV1OrganizationsBillingCreditsGetResponses, GetBillingCreditsApiV1OrganizationsBillingCreditsGetErrors, ThrowOnError> => (options?.client ?? client).get<GetBillingCreditsApiV1OrganizationsBillingCreditsGetResponses, GetBillingCreditsApiV1OrganizationsBillingCreditsGetErrors, ThrowOnError>({ url: '/api/v1/organizations/billing/credits', ...options });
 

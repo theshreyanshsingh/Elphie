@@ -67,8 +67,10 @@ You must be at the same place where you had run `setup_remote.sh` from. The dire
 You must not move the `elphie/` directory to a different location after running `setup_custom_domain.sh`, since we set up auto certificate renewal script as certbot renewal hook pointing to the `elphie/` directory.
 </Note>
 
+From a local checkout or distribution (run from the same parent directory as when you ran `setup_remote.sh`):
+
 ```bash
-curl -o setup_custom_domain.sh https://raw.githubusercontent.com/theshreyanshsingh/Elphie/main/scripts/setup_custom_domain.sh && chmod +x setup_custom_domain.sh && sudo ./setup_custom_domain.sh
+sudo ./scripts/setup_custom_domain.sh
 ```
 
 The script will prompt you for:

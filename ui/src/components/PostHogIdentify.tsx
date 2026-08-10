@@ -35,7 +35,7 @@ export default function PostHogIdentify() {
 
                     // Use provider_id as distinct_id to match backend PostHog events.
                     // Stack Auth users: user.id is already the provider_id.
-                    // OSS users: provider_id is returned from the auth API.
+                    // self-hosted users: provider_id is returned from the auth API.
                     const distinctId =
                         'provider_id' in user && user.provider_id
                             ? String(user.provider_id)

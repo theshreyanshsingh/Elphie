@@ -4,7 +4,7 @@
 # REQUIRED OVERRIDES at install time:
 #   --set secrets.databaseUrl=...
 #   --set secrets.redisUrl=...
-#   --set secrets.ossJwtSecret=$(openssl rand -hex 32)
+#   --set secrets.selfhostedJwtSecret=$(openssl rand -hex 32)
 #   --set secrets.turnSecret=$(openssl rand -hex 32)
 #   --set exposure.gatewayApi.gatewayClassName=<your-class>
 #   --set exposure.gatewayApi.listenerHostname=elphie.example.com

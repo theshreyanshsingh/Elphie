@@ -15,14 +15,14 @@ There are three update flows depending on how you deployed:
 
 Elphie publishes two images — `elphie-api` and `elphie-ui` — to both container registries:
 
-- **GitHub Container Registry** — [github.com/orgs/theshreyanshsingh/packages](https://github.com/orgs/theshreyanshsingh/packages)
+- **Container registry** — `ghcr.io/theshreyanshsingh`
 - **Docker Hub** — [hub.docker.com/u/elphieai](https://hub.docker.com/u/elphieai)
 
-Each release is published under release tags. Note the formats differ between GitHub releases and Docker image tags — `update_remote.sh` understands both and normalizes for you.
+Each release is published under release tags. Note the formats differ between release labels and Docker image tags — `update_remote.sh` understands both and normalizes for you.
 
 | Where | Tag format | Example | When to use |
 |-------|-----------|---------|-------------|
-| GitHub release tag | `elphie-vX.Y.Z` | `elphie-v1.28.0` | Use when copying the version from a GitHub release |
+| Release tag | `elphie-vX.Y.Z` | `elphie-v1.28.0` | Use when copying the version from a release label |
 | Docker image tag (semver) | `X.Y.Z` | `1.28.0` | Stable, recommended for production |
 | Docker image tag (`latest`) | `latest` | `latest` | Tracks the most recent release tag |
 
@@ -34,21 +34,27 @@ Always update **`elphie-api`** and **`elphie-ui`** to the **same tag**. The two 
 
 `update_remote.sh` is the supported path for updating a stack created with `setup_remote.sh`. In one shot it:
 
-- Asks for a target version (defaults to the latest release tag on GitHub).
-- Pulls `docker-compose.yaml` at that version and pins both `api` and `ui` images to it.
+- Asks for a target version (defaults to the latest published release tag).
+- Refreshes `docker-compose.yaml` at that version and pins both `api` and `ui` images to it.
 - Refreshes the remote helper bundle (`remote_up.sh` plus shared templates/helpers).
 - Synchronizes the canonical remote keys in `.env` and validates the runtime config that `elphie-init` will render from it.
 - Backs up every file it changes with a `.bak.<timestamp>` suffix.
 
-From your install directory:
+From your install directory (with the Elphie scripts available locally):
 
 ```bash
 cd elphie
-curl -o update_remote.sh https://raw.githubusercontent.com/theshreyanshsingh/Elphie/main/scripts/update_remote.sh
+bash ../scripts/update_remote.sh
+```
+
+Or, if `update_remote.sh` is already in the install directory:
+
+```bash
+cd elphie
 bash update_remote.sh
 ```
 
-You'll be prompted for the target version, defaulting to the most recent release. Accepted forms: bare semver (`1.28.0`), v-prefixed (`v1.28.0`), the full GitHub tag (`elphie-v1.28.0`), or `main` to refresh deployment files from the default branch — the script normalizes them. Non-interactive callers can set it via environment variable and skip the confirmation prompt:
+You'll be prompted for the target version, defaulting to the most recent release. Accepted forms: bare semver (`1.28.0`), v-prefixed (`v1.28.0`), the full release tag (`elphie-v1.28.0`), or `main` to refresh deployment files from the default branch — the script normalizes them. Non-interactive callers can set it via environment variable and skip the confirmation prompt:
 
 ```bash
 TARGET_VERSION=1.28.0 ELPHIE_UPDATE_YES=1 bash update_remote.sh
@@ -66,17 +72,15 @@ The script overwrites `docker-compose.yaml` and the remote helper bundle (`remot
 
 ## Local deployment
 
-For local Docker installs (the [Quick Start](/deployment/docker#quick-start) flow or `setup_local.sh` / `setup_local.ps1`), refresh `docker-compose.yaml` and the startup script, stop the stack, then run the startup script. The script preserves existing `.env` secrets, creates `REDIS_PASSWORD` and MinIO credentials if they are missing, and only creates `POSTGRES_PASSWORD` for brand-new `.env` files. If a retained local Postgres volume already exists, it syncs the database user's password to `.env` before starting the full stack:
+For local Docker installs (the [Quick Start](/deployment/docker#quick-start) flow or `setup_local.sh` / `setup_local.ps1`), refresh your checkout if needed, stop the stack, then run the startup script. The script preserves existing `.env` secrets, creates `REDIS_PASSWORD` and MinIO credentials if they are missing, and only creates `POSTGRES_PASSWORD` for brand-new `.env` files. If a retained local Postgres volume already exists, it syncs the database user's password to `.env` before starting the full stack:
 
 <CodeGroup>
 ```bash macOS/Linux
-curl -o docker-compose.yaml https://raw.githubusercontent.com/theshreyanshsingh/Elphie/main/docker-compose.yaml
-curl -o start_docker.sh https://raw.githubusercontent.com/theshreyanshsingh/Elphie/main/scripts/start_docker.sh && chmod +x start_docker.sh
 docker compose down
-./start_docker.sh
+./scripts/start_docker.sh
 ```
 ```powershell Windows
-Invoke-WebRequest -OutFile docker-compose.yaml https://raw.githubusercontent.com/theshreyanshsingh/Elphie/main/docker-compose.yaml; Invoke-WebRequest -OutFile start_docker.ps1 https://raw.githubusercontent.com/theshreyanshsingh/Elphie/main/scripts/start_docker.ps1; docker compose down; .\start_docker.ps1
+docker compose down; .\scripts\start_docker.ps1
 ```
 </CodeGroup>
 
@@ -114,20 +118,17 @@ done
 Your Postgres data volume persists across `down`/`up` cycles, so agents and call history are preserved.
 
 <Warning>
-Rolling back across a database migration is not always safe — if the newer release ran a schema migration, downgrading may leave the DB in a state the older API doesn't understand. If in doubt, [open an issue](https://github.com/theshreyanshsingh/Elphie/issues) before rolling back.
+Rolling back across a database migration is not always safe — if the newer release ran a schema migration, downgrading may leave the DB in a state the older API doesn't understand. If in doubt, ask in [Slack](https://join.slack.com/t/elphie-community/shared_invite/zt-3zjb5vwvl-j7hRz3_F1SOn5cH~jm5f5g) before rolling back.
 </Warning>
 
 ## Updating a source build
 
-If you deployed in **build mode** (you'll have a `docker-compose.override.yaml` in your install directory), `update_remote.sh` deliberately refuses to run — you already have the full repo locally and update via git:
+If you deployed in **build mode** (you'll have a `docker-compose.override.yaml` in your install directory), `update_remote.sh` deliberately refuses to run — you already have the full source tree locally and update from that:
 
 ```bash
 cd elphie
-git fetch
 
-# Track latest main:
-git pull
-# Or pin to a specific release (git tag format is elphie-vX.Y.Z):
+# Refresh local source to the desired release tag (format: elphie-vX.Y.Z), e.g.:
 git checkout elphie-v1.28.0
 
 # Pick up pipecat and other submodule bumps
@@ -142,6 +143,6 @@ sudo docker compose --profile remote up -d
 If you update the `pipecat` submodule, you **must** run `git submodule update --init --recursive` before rebuilding, or the Docker build will not pick up `pipecat` changes.
 </Warning>
 
-If you maintain a fork with local customizations on top of upstream, merging conflicts in `docker-compose.yaml`, `remote_up.sh`, `scripts/run_elphie_init.sh`, `deploy/templates/*`, or `setup_remote.sh` is up to you — resolve them as you would any other git merge. Leave `OSS_JWT_SECRET`, `TURN_SECRET`, `POSTGRES_PASSWORD`, `REDIS_PASSWORD`, `MINIO_ROOT_USER`, and `MINIO_ROOT_PASSWORD` in `.env` unchanged across updates to preserve sessions, WebRTC auth, and service credentials.
+If you maintain a customized tree on top of upstream, resolving conflicts in `docker-compose.yaml`, `remote_up.sh`, `scripts/run_elphie_init.sh`, `deploy/templates/*`, or `setup_remote.sh` is up to you — resolve them as you would any other merge. Leave `SELFHOSTED_JWT_SECRET`, `TURN_SECRET`, `POSTGRES_PASSWORD`, `REDIS_PASSWORD`, `MINIO_ROOT_USER`, and `MINIO_ROOT_PASSWORD` in `.env` unchanged across updates to preserve sessions, WebRTC auth, and service credentials.
 
 The same migration warning above applies: rolling back across a schema change can leave the DB in a state the older API can't read.

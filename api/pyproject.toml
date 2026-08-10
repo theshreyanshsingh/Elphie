@@ -1,5 +1,5 @@
 [project]
 name = "elphie-api"
-version = "1.43.0"
+version = "0.0.2"
 description = "Backend API for Elphie voice AI platform"
 requires-python = ">=3.13,<3.14"

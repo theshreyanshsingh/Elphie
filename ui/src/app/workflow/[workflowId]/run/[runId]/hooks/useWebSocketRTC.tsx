@@ -669,7 +669,7 @@ export const useWebSocketRTC = ({ workflowId, workflowRunId, accessToken, initia
         try {
             // Fetch time-limited TURN credentials from backend API only if the
             // server reports a TURN server is configured. Skipping the request
-            // avoids a 503 on OSS local deployments that don't run coturn.
+            // avoids a 503 on self-hosted local deployments that don't run coturn.
             if (appConfig?.turnEnabled === false) {
                 logger.info('TURN server disabled in app config, using STUN only');
             } else {

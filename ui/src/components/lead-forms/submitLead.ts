@@ -19,7 +19,7 @@ const SUBMIT_EVENT: Record<LeadKind, string> = {
 export interface SubmitLeadArgs {
   kind: LeadKind;
   source: LeadSource;
-  // Deployment provenance (analytics only): "cloud_app" | "oss_app".
+  // Deployment provenance (analytics only): "cloud_app" | "selfhosted_app".
   origin: LeadOrigin;
   // Field values, already validated by the caller. Includes the contact email.
   payload: Record<string, unknown>;

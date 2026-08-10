@@ -5,6 +5,16 @@
 
 import * as Sentry from "@sentry/nextjs";
 
+const isDevelopment =
+  process.env.NODE_ENV === "development" ||
+  process.env.NEXT_PUBLIC_NODE_ENV === "development";
+
+function devLog(...args: unknown[]) {
+  if (isDevelopment) {
+    console.log(...args);
+  }
+}
+
 // Only initialize Sentry if explicitly enabled and DSN is provided
 const enableSentry = process.env.NEXT_PUBLIC_SENTRY_DSN;
 
@@ -16,7 +26,7 @@ if (enableSentry) {
     debug: false,
     enabled: process.env.NEXT_PUBLIC_NODE_ENV === 'production'
   });
-  console.log('Sentry initialized for edge runtime error tracking');
+  devLog('Sentry initialized for edge runtime error tracking');
 } else {
-  console.log('Sentry disabled on edge runtime (NEXT_PUBLIC_ENABLE_SENTRY=false or DSN not configured)');
+  devLog('Sentry disabled on edge runtime (NEXT_PUBLIC_ENABLE_SENTRY=false or DSN not configured)');
 }

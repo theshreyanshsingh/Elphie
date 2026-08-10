@@ -142,12 +142,19 @@ if [[ -f "$ENV_FILE" ]]; then
     env_file_existed=true
 fi
 
-existing_secret="$(dotenv_value OSS_JWT_SECRET || true)"
+existing_secret="$(dotenv_value SELFHOSTED_JWT_SECRET || true)"
 if [[ -z "$existing_secret" ]]; then
-    set_dotenv_value OSS_JWT_SECRET "$(generate_secret)"
-    echo "Created OSS_JWT_SECRET in $ENV_FILE."
+    # Migrate legacy OSS_JWT_SECRET so existing installs keep sessions.
+    legacy_secret="$(dotenv_value OSS_JWT_SECRET || true)"
+    if [[ -n "$legacy_secret" ]]; then
+        set_dotenv_value SELFHOSTED_JWT_SECRET "$legacy_secret"
+        echo "Migrated OSS_JWT_SECRET → SELFHOSTED_JWT_SECRET in $ENV_FILE."
+    else
+        set_dotenv_value SELFHOSTED_JWT_SECRET "$(generate_secret)"
+        echo "Created SELFHOSTED_JWT_SECRET in $ENV_FILE."
+    fi
 else
-    echo "OSS_JWT_SECRET is already set in $ENV_FILE."
+    echo "SELFHOSTED_JWT_SECRET is already set in $ENV_FILE."
 fi
 
 existing_postgres_password="$(dotenv_value POSTGRES_PASSWORD || true)"

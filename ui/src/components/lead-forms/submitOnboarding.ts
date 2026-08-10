@@ -4,7 +4,7 @@
 // on the server-backed onboarding state by the caller, not here.
 //
 // No auth token. The logged-in user's email is passed in from the modal (available in
-// the frontend session for both cloud and OSS) and sent in the body — there is no
+// the frontend session for both cloud and self-hosted) and sent in the body — there is no
 // visible email field. `country` is detected silently and sent too. Onboarding is now
 // COMPULSORY (no skip).
 

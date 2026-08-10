@@ -63,11 +63,11 @@ strategy=Recreate by design. Do NOT scale these via kubectl scale —
 they use in-memory locks and would silently corrupt with >1 replica.
 
 === Required overrides ===
-{{- if eq .Values.secrets.ossJwtSecret "ChangeMeInProduction" }}
-WARNING: secrets.ossJwtSecret is still the chart default. Override before
+{{- if eq .Values.secrets.selfhostedJwtSecret "ChangeMeInProduction" }}
+WARNING: secrets.selfhostedJwtSecret is still the chart default. Override before
 running in any non-dev environment:
 
-  --set secrets.ossJwtSecret="$(openssl rand -hex 32)"
+  --set secrets.selfhostedJwtSecret="$(openssl rand -hex 32)"
 {{- end }}
 {{- if and (eq .Values.database.mode "external") (empty .Values.secrets.databaseUrl) }}
 ERROR: database.mode=external but secrets.databaseUrl is empty.

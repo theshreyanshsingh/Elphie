@@ -52,7 +52,7 @@ async def process_knowledge_base_document(
         document_id: Database ID of the document
         s3_key: S3 key where the file is stored
         organization_id: Organization ID
-        created_by_provider_id: Uploading user's provider ID (for OSS-mode auth to MPS)
+        created_by_provider_id: Uploading user's provider ID (for self-hosted-mode auth to MPS)
         max_tokens: Maximum number of tokens per chunk (default: 128)
         retrieval_mode: "chunked" for vector search or "full_document" for full text
     """

@@ -7,6 +7,7 @@ import {
     ReactFlow,
 } from "@xyflow/react";
 import { BrushCleaning, Maximize2, Minus, Plus, Settings } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -14,7 +15,6 @@ import { createWorkflowDraftApiV1WorkflowWorkflowIdCreateDraftPost, getWorkflowV
 import type { DocumentResponseSchema, RecordingResponseSchema, ToolResponse } from '@/client/types.gen';
 import { useNodeSpecs } from "@/components/flow/renderer";
 import { FlowEdge, FlowNode, NodeType } from "@/components/flow/types";
-import { HireExpertNudge } from "@/components/lead-forms/HireExpertNudge";
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -75,6 +75,8 @@ function RenderWorkflow({
     user,
 }: RenderWorkflowProps) {
     const router = useRouter();
+    const { resolvedTheme } = useTheme();
+    const isDarkTheme = resolvedTheme === "dark";
     const { specs } = useNodeSpecs();
     const { hasCompletedAction } = useOnboarding();
     const [isPhoneCallDialogOpen, setIsPhoneCallDialogOpen] = useState(false);
@@ -483,7 +485,6 @@ function RenderWorkflow({
     return (
         <WorkflowProvider value={workflowContextValue}>
             <div className="flex flex-col h-screen min-w-fit">
-                <HireExpertNudge workflowId={workflowId} />
                 {/* New Workflow Editor Header */}
                 <WorkflowEditorHeader
                     workflowName={workflowName}
@@ -520,6 +521,7 @@ function RenderWorkflow({
                                 edgeTypes={edgeTypes}
                                 onConnect={isViewingHistoricalVersion ? undefined : onConnect}
                                 minZoom={0.2}
+                                colorMode={isDarkTheme ? "dark" : "light"}
                                 onInit={(instance) => {
                                     rfInstance.current = instance;
                                     // Center the workflow on load
@@ -534,12 +536,13 @@ function RenderWorkflow({
                                 edgesReconnectable={!isViewingHistoricalVersion}
                                 zoomOnDoubleClick={false}
                                 deleteKeyCode={isViewingHistoricalVersion ? null : "Backspace"}
+                                className="bg-background"
                             >
                                 <Background
                                     variant={BackgroundVariant.Dots}
                                     gap={16}
                                     size={1}
-                                    color="#94a3b8"
+                                    color={isDarkTheme ? "#525252" : "#94a3b8"}
                                 />
 
                                 {/* Top-right controls - vertical layout (hidden when viewing history) */}
@@ -569,7 +572,7 @@ function RenderWorkflow({
                                                             variant="outline"
                                                             size="icon"
                                                             onClick={() => router.push(`/workflow/${workflowId}/settings`)}
-                                                            className="bg-white shadow-sm hover:shadow-md"
+                                                            className="bg-background shadow-sm hover:shadow-md"
                                                         >
                                                             <Settings className="h-4 w-4" />
                                                         </Button>

@@ -116,11 +116,11 @@ async def test_report_workflow_run_platform_usage_skips_missing_duration_without
 
 
 @pytest.mark.asyncio
-async def test_report_workflow_run_platform_usage_skips_oss(monkeypatch):
+async def test_report_workflow_run_platform_usage_skips_selfhosted(monkeypatch):
     workflow_run = _make_workflow_run()
     report_usage = AsyncMock()
 
-    monkeypatch.setattr(workflow_run_billing_mod, "DEPLOYMENT_MODE", "oss")
+    monkeypatch.setattr(workflow_run_billing_mod, "DEPLOYMENT_MODE", "selfhosted")
     monkeypatch.setattr(
         workflow_run_billing_mod.mps_service_key_client,
         "report_platform_usage",

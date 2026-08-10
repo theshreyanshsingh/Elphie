@@ -1,14 +1,14 @@
 #!/usr/bin/env pwsh
 # Contributor bootstrap (Windows). Run this once after cloning your fork.
-# Configures git remotes (origin = your fork, upstream = theshreyanshsingh/Elphie),
+# Configures git remotes (origin = your fork, upstream = elphie-hq/elphie),
 # initializes the pipecat submodule, creates the Python venv, and copies
 # the .env templates.
 
 $ErrorActionPreference = 'Stop'
 
-$UpstreamUrl    = 'https://github.com/theshreyanshsingh/Elphie.git'
+$UpstreamUrl    = 'https://github.com/elphie-hq/elphie.git'
 $CanonicalHttps = $UpstreamUrl
-$CanonicalSsh   = 'git@github.com:theshreyanshsingh/Elphie.git'
+$CanonicalSsh   = 'git@github.com:elphie-hq/elphie.git'
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $BaseDir   = Split-Path -Parent $ScriptDir
@@ -70,7 +70,7 @@ if (-not $existingUpstream) {
     Write-Host "OK upstream set to $UpstreamUrl" -ForegroundColor Green
 } elseif ($existingUpstream -ne $UpstreamUrl -and $existingUpstream -ne $CanonicalSsh) {
     Write-Host "upstream currently points at $existingUpstream (expected $UpstreamUrl)." -ForegroundColor Yellow
-    $reset = (Read-Host 'Reset upstream to theshreyanshsingh/Elphie? [y/N]').Trim()
+    $reset = (Read-Host 'Reset upstream to elphie-hq/elphie? [y/N]').Trim()
     if ($reset -match '^[Yy]') {
         git remote set-url upstream $UpstreamUrl
         Write-Host "OK upstream reset to $UpstreamUrl" -ForegroundColor Green

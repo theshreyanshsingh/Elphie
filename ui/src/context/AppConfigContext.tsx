@@ -8,8 +8,6 @@ import { resolveBrowserBackendUrl } from '@/lib/apiClient';
 type BackendStatus = 'reachable' | 'unreachable';
 
 interface AppConfig {
-    uiVersion: string;
-    apiVersion: string;
     deploymentMode: string;
     authProvider: string;
     turnEnabled: boolean;
@@ -34,9 +32,7 @@ interface AppConfigContextType {
 }
 
 const defaultConfig: AppConfig = {
-    uiVersion: 'dev',
-    apiVersion: 'unavailable',
-    deploymentMode: 'oss',
+    deploymentMode: "selfhosted",
     authProvider: 'local',
     turnEnabled: false,
     forceTurnRelay: false,
@@ -86,9 +82,7 @@ export function AppConfigProvider({ children }: { children: ReactNode }) {
             }
 
             setConfig({
-                uiVersion: data.ui || 'dev',
-                apiVersion: data.api || 'unknown',
-                deploymentMode: data.deploymentMode || 'oss',
+                deploymentMode: data.deploymentMode || "selfhosted",
                 authProvider: data.authProvider || 'local',
                 turnEnabled: Boolean(data.turnEnabled),
                 forceTurnRelay: Boolean(data.forceTurnRelay),

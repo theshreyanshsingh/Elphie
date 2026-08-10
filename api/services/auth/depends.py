@@ -8,7 +8,7 @@ from pydantic import ValidationError
 from api.constants import AUTH_PROVIDER, ELPHIE_MPS_SECRET_KEY, MPS_API_URL
 from api.db import db_client
 from api.db.models import UserModel
-from api.enums import PostHogEvent
+from api.enums import OrganizationConfigurationKey, PostHogEvent
 from api.schemas.ai_model_configuration import EffectiveAIModelConfiguration
 from api.services.auth.stack_auth import stackauth
 from api.services.configuration.registry import ServiceProviders
@@ -23,12 +23,12 @@ from api.utils.auth import decode_jwt_token
 
 
 async def require_local_auth() -> None:
-    """Reject email/password auth requests outside OSS (local) deployments.
+    """Reject email/password auth requests outside self-hosted (local) deployments.
 
     The auth router stays mounted in every mode so the OpenAPI spec — and the
     clients generated from it — don't vary with AUTH_PROVIDER; the gate has to
     happen at request time. Without it, the SaaS deployment accepts
-    unauthenticated signups that mint oss_* users bypassing Stack Auth.
+    unauthenticated signups that mint selfhosted_* users bypassing Stack Auth.
     """
     if AUTH_PROVIDER != "local":
         raise HTTPException(status_code=404, detail="Not found")
@@ -48,7 +48,7 @@ async def get_user(
     # Check if we're using local (email/password) auth
     # ------------------------------------------------------------------
     if AUTH_PROVIDER == "local":
-        return await _handle_oss_auth(authorization)
+        return await _handle_selfhosted_auth(authorization)
 
     # ------------------------------------------------------------------
     # 1. Validate and fetch the authenticated Stack user
@@ -284,9 +284,9 @@ async def get_user_with_selected_organization(
     return user
 
 
-async def _handle_oss_auth(authorization: str | None) -> UserModel:
+async def _handle_selfhosted_auth(authorization: str | None) -> UserModel:
     """
-    Handle authentication for OSS deployment mode.
+    Handle authentication for self-hosted deployment mode.
     Validates JWT tokens issued by the email/password auth flow.
     """
     if not authorization:
@@ -306,6 +306,8 @@ async def _handle_oss_auth(authorization: str | None) -> UserModel:
         payload = decode_jwt_token(token)
         user = await db_client.get_user_by_id(int(payload["sub"]))
         if user:
+            # Heal accounts that signed up before MPS was reachable / configured.
+            await ensure_default_mps_model_configuration(user)
             return user
         raise HTTPException(status_code=401, detail="User not found")
     except HTTPException:
@@ -345,6 +347,69 @@ async def _handle_api_key_auth(api_key: str) -> UserModel:
     return user
 
 
+def _mps_created_by(user_provider_id: str) -> str:
+    """Normalize provider ids for MPS hosts that still expect the oss_ prefix.
+
+    Self-hosted Elphie users are stored as ``selfhosted_<ts>_<uuid>``, but
+    Dograh's public MPS rejects that shape and only accepts ``oss_<ts>_<uuid>``.
+    Keep the DB id unchanged; only rewrite what we send to MPS.
+    """
+    if user_provider_id.startswith("selfhosted_"):
+        return "oss_" + user_provider_id.removeprefix("selfhosted_")
+    return user_provider_id
+
+
+async def ensure_default_mps_model_configuration(user: UserModel) -> bool:
+    """Mint managed LLM/TTS/STT keys when the org has no model config yet.
+
+    Returns True when a new configuration was written.
+    """
+    organization_id = getattr(user, "selected_organization_id", None)
+    provider_id = getattr(user, "provider_id", None)
+    if not organization_id or not provider_id:
+        return False
+
+    existing = await db_client.get_configuration(
+        organization_id,
+        OrganizationConfigurationKey.MODEL_CONFIGURATION_V2.value,
+    )
+    if existing and existing.value:
+        return False
+
+    try:
+        mps_config = await create_user_configuration_with_mps_key(
+            user.id, organization_id, provider_id
+        )
+        if not mps_config:
+            return False
+
+        await db_client.update_user_configuration(user.id, mps_config)
+
+        from api.services.configuration.ai_model_configuration import (
+            convert_legacy_ai_model_configuration_to_v2,
+        )
+
+        model_config_v2 = convert_legacy_ai_model_configuration_to_v2(mps_config)
+        await db_client.upsert_configuration(
+            organization_id,
+            OrganizationConfigurationKey.MODEL_CONFIGURATION_V2.value,
+            model_config_v2.model_dump(mode="json", exclude_none=True),
+        )
+        logger.info(
+            "Provisioned default MPS model configuration for user {} org {}",
+            user.id,
+            organization_id,
+        )
+        return True
+    except Exception:
+        logger.warning(
+            "Failed to ensure default MPS model configuration for user {}",
+            getattr(user, "id", None),
+            exc_info=True,
+        )
+        return False
+
+
 async def create_user_configuration_with_mps_key(
     user_id: int, organization_id: int, user_provider_id: str
 ) -> Optional[EffectiveAIModelConfiguration]:
@@ -358,18 +423,19 @@ async def create_user_configuration_with_mps_key(
     Returns:
         EffectiveAIModelConfiguration with MPS-provided API keys or None if failed
     """
+    created_by = _mps_created_by(user_provider_id)
 
     async with httpx.AsyncClient() as client:
-        # Use MPS API URL from constants
+        # Use MPS API URL from constants (overridable via MPS_API_URL)
         if AUTH_PROVIDER == "local":
             # For local auth mode, create a temporary service key without authentication
             response = await client.post(
                 f"{MPS_API_URL}/api/v1/service-keys/",
                 json={
                     "name": "Default Elphie Model Service Key",
-                    "description": "Auto-generated key for OSS user",
-                    "expires_in_days": 7,  # Short-lived for OSS
-                    "created_by": user_provider_id,
+                    "description": "Auto-generated key for self-hosted user",
+                    "expires_in_days": 7,  # Short-lived for self-hosted
+                    "created_by": created_by,
                 },
                 timeout=10.0,
             )
@@ -388,7 +454,7 @@ async def create_user_configuration_with_mps_key(
                     "description": f"Auto-generated key for organization {organization_id}",
                     "organization_id": organization_id,
                     "expires_in_days": 90,  # Longer-lived for authenticated users
-                    "created_by": user_provider_id,
+                    "created_by": created_by,
                 },
                 headers={"X-Secret-Key": ELPHIE_MPS_SECRET_KEY},
                 timeout=10.0,

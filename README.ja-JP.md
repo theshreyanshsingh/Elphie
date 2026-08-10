@@ -1,10 +1,10 @@
 # Elphie AI
 
-> 💡 **Notice**: This documentation is community-maintained. If you spot any translation inaccuracies or content that has drifted from the English version, please feel free to open a PR!
+> 💡 **Notice**: This documentation is community-maintained. If you spot any translation inaccuracies or content that has drifted from the English version, please feel free to reach out on Slack!
 >
-> 💡 **注記**: このドキュメントはコミュニティによって保守されています。翻訳の不正確さや英語版からの内容のずれを見つけた場合は、ぜひ PR を作成してください。
+> 💡 **注記**: このドキュメントはコミュニティによって保守されています。翻訳の不正確さや英語版からの内容のずれを見つけた場合は、Slack でお知らせください。
 
-**オープンソースでセルフホスト可能な Vapi / Retell の代替手段** -- ビジュアルワークフロービルダーで本番向け音声エージェントを構築し、数分でテストし、MCP 経由で AI コーディングアシスタントに設計や編集を任せられます。
+**セルフホスト可能な Vapi / Retell の代替手段** -- ビジュアルワークフロービルダーで本番向け音声エージェントを構築し、数分でテストし、MCP 経由で AI コーディングアシスタントに設計や編集を任せられます。
 
 <p align="center">
   <a href="https://elphie.willowave.in">
@@ -31,13 +31,9 @@
   <img src="docs/images/hero.gif" alt="Elphie の動作デモ -- ワークフローを構築し、音声エージェントを起動して会話する" width="80%">
 </p>
 
-- **100% オープンソース**でセルフホスト可能 -- Vapi や Retell と違い、ベンダーロックインはありません
-- **完全な制御と透明性** -- すべてのコードが公開され、LLM / TTS / STT の統合も柔軟に差し替えられます
-- **YC 卒業生と事業売却を経験した創業者が保守**し、音声 AI をオープンに保つことに取り組んでいます
-
-<p align="center">
-  <a href="https://trendshift.io/repositories/31007" target="_blank"><img src="https://trendshift.io/api/badge/repositories/31007" alt="theshreyanshsingh%2Felphie | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
-</p>
+- **セルフホスト可能** -- Vapi や Retell と違い、ベンダーロックインはありません
+- **完全な制御と透明性** -- LLM / TTS / STT の統合も柔軟に差し替え・カスタマイズできます
+- **YC 卒業生と事業売却を経験した創業者が保守**し、音声 AI を誰もが使えるものに保つことに取り組んでいます
 
 ## 🎥 メディア掲載
 
@@ -66,11 +62,11 @@
 
 |  | **Elphie** | **Vapi** | **Retell** |
 |---|---|---|---|
-| **ライセンス** | BSD 2-Clause (オープンソース) | プロプライエタリ | プロプライエタリ |
+| **ライセンス** | BSD 2-Clause | プロプライエタリ | プロプライエタリ |
 | **セルフホスト** | ✅ 可能 -- Docker コマンド 1 つ | ❌ SaaS のみ | ❌ SaaS のみ |
 | **料金** | 無料(セルフホスト)・従量課金(クラウド) | 分単位課金の SaaS | 分単位課金の SaaS |
 | **独自 LLM / STT / TTS の利用** | ✅ 任意のプロバイダー、または Elphie 標準スタック | 提供範囲内で設定可能 | 提供範囲内で設定可能 |
-| **ソースコードレベルのカスタマイズ** | ✅ すべてのコードを自由に変更可能 | ❌ クローズドソース | ❌ クローズドソース |
+| **ソースコードレベルのカスタマイズ** | ✅ 必要に応じてプラットフォームをカスタマイズ可能 | ❌ クローズドソース | ❌ クローズドソース |
 | **データレジデンシー** | 自社インフラ、自社ルール | ベンダーのクラウド | ベンダーのクラウド |
 | **ベンダーロックイン** | なし | あり | あり |
 
@@ -85,20 +81,19 @@
 > **注記**
 > リモートサーバーでプラットフォームを実行したい場合は、[ドキュメント](https://elphie.willowave.in/deployment/docker#option-2:-remote-server-deployment)を参照してください。
 
+ローカルのチェックアウトまたは配布物から起動します(リポジトリルートに `docker-compose.yaml` があること):
+
 ```bash
-curl -o docker-compose.yaml https://raw.githubusercontent.com/theshreyanshsingh/Elphie/main/docker-compose.yaml && curl -o start_docker.sh https://raw.githubusercontent.com/theshreyanshsingh/Elphie/main/scripts/start_docker.sh && chmod +x start_docker.sh && ./start_docker.sh
+# macOS / Linux
+./scripts/start_docker.sh
 ```
 
-> **⚡ AI エージェントにセットアップを任せたいですか?**
-> **Claude Code** または **Codex** を使っている場合は、公式の [Elphie セットアップ skill](https://github.com/theshreyanshsingh/Elphie-plugins) をインストールすると、インストール、設定、トラブルシューティングをエージェントに任せられます。OS を検出し、適切なデプロイ方法を選び、Elphie 付属のセットアップスクリプトを実行して結果を検証します。
->
-> ```text
-> # Claude Code の場合
-> /plugin marketplace add theshreyanshsingh/Elphie-plugins
-> /plugin install elphie@elphie
-> ```
->
-> その後、新しいセッションを開始して _"set up Elphie"_ と依頼するか、`/elphie-setup` を実行してください。Codex も対応しています。詳しくは[プラグインリポジトリ](https://github.com/theshreyanshsingh/Elphie-plugins#install)を参照してください。
+```powershell
+# Windows
+.\scripts\start_docker.ps1
+```
+
+詳細は [Docker デプロイガイド](https://elphie.willowave.in/deployment/docker) を参照してください。
 
 > **注記**
 > 初回起動では、すべてのイメージをダウンロードするため 2-3 分かかる場合があります。起動後、http://localhost:3010 を開くと最初の AI 音声アシスタントを作成できます。
@@ -168,29 +163,23 @@ Codex、Claude Code、Cursor、または任意の MCP クライアントを接�
 
 ## 🤝 コミュニティとサポート
 
-> 👋 **Better Stack の動画から来ましたか?** [固定された GitHub Discussion](https://github.com/orgs/theshreyanshsingh/discussions/291) にユースケースを投稿してください。すべての返信を確認し、創業チームが初期ユーザーを直接オンボーディングします。
+> 👋 **Better Stack の動画から来ましたか?** [Slack コミュニティ](https://join.slack.com/t/elphie-community/shared_invite/zt-3zjb5vwvl-j7hRz3_F1SOn5cH~jm5f5g) にユースケースを投稿してください。すべての返信を確認し、創業チームが初期ユーザーを直接オンボーディングします。
 
 - **Slack** -- Elphie AI のコラボレーションの中心です。メンテナーとつながり、実装前に機能を相談し、セットアップの支援を受け、コントリビューション活動の最新情報を追えます。
-- **GitHub Discussions** -- ユースケースを共有し、質問し、ワークフローのレシピを交換できます。
-- **GitHub Issues** -- バグ報告や機能リクエストに利用してください。
+- **ドキュメント** -- ガイドとリファレンスは [elphie.willowave.in](https://elphie.willowave.in) にあります。
 
 👉 参加はこちら → [Elphie Community Slack](https://join.slack.com/t/elphie-community/shared_invite/zt-3zjb5vwvl-j7hRz3_F1SOn5cH~jm5f5g)
 
 ## 🙌 コントリビューション
 
-コントリビューションを歓迎します。Elphie AI は 100% オープンソースであり、今後もそうあり続けます。
+コントリビューションを歓迎します。[Slack コミュニティ](https://join.slack.com/t/elphie-community/shared_invite/zt-3zjb5vwvl-j7hRz3_F1SOn5cH~jm5f5g) でアイデアを相談し、[コントリビューター向けセットアップ](https://elphie.willowave.in/contribution/setup) でローカル環境を用意してください。
 
 ### はじめに
 
-- このリポジトリを Fork する
+- リポジトリのローカルコピーを用意する
 - 機能ブランチを作成する(`git checkout -b feature/AmazingFeature`)
 - 変更をコミットする(`git commit -m 'Add some AmazingFeature'`)
-- ブランチへプッシュする(`git push origin feature/AmazingFeature`)
-- Pull Request を作成する
-
-## ⭐ Star 履歴
-
-<img src="docs/images/star-history.png" alt="Elphie star history" width="80%">
+- Slack 経由でメンテナーに変更を共有し、レビューを依頼する
 
 ## 📄 ライセンス
 
@@ -198,13 +187,12 @@ Elphie AI は [BSD 2-Clause License](LICENSE) のもとで公開されていま�
 
 ## 🏢 私たちについて
 
-**Elphie** (Zansat Technologies Private Limited) が ❤️ を込めて開発しています。
+**Elphie** が ❤️ を込めて開発しています。
 創業チームは YC 卒業生と事業売却を経験した創業者で構成され、音声 AI をオープンで誰もが利用できるものに保つことに取り組んでいます。
 
 <br><br><br>
 
   <p align="center">
-    <a href="https://github.com/theshreyanshsingh/Elphie">⭐ GitHub で Star する</a> |
     <a href="https://elphie.willowave.in">☁️ クラウド版を試す</a> |
     <a href="https://join.slack.com/t/elphie-community/shared_invite/zt-3zjb5vwvl-j7hRz3_F1SOn5cH~jm5f5g">💬 Slack に参加</a>
   </p>

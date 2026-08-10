@@ -1,10 +1,10 @@
 # Elphie AI
 
-> 💡 **Notice**: This documentation is community-maintained. If you spot any translation inaccuracies or content that has drifted from the English version, please feel free to open a PR!
+> 💡 **Notice**: This documentation is community-maintained. If you spot any translation inaccuracies or content that has drifted from the English version, please feel free to reach out on Slack!
 >
-> 💡 **提示**:本文档由社区共同维护。如果您发现翻译不准确,或与英文版本存在出入,欢迎随时提交 PR!
+> 💡 **提示**:本文档由社区共同维护。如果您发现翻译不准确,或与英文版本存在出入,欢迎在 Slack 中反馈!
 
-**开源、可自托管的 Vapi 与 Retell 替代方案** —— 使用可视化工作流构建器搭建生产级语音智能体,几分钟内完成测试,并让 AI 编码助手通过 MCP 帮你设计和编辑。
+**可自托管的 Vapi 与 Retell 替代方案** —— 使用可视化工作流构建器搭建生产级语音智能体,几分钟内完成测试,并让 AI 编码助手通过 MCP 帮你设计和编辑。
 
 <p align="center">
   <a href="https://elphie.willowave.in">
@@ -31,9 +31,9 @@
   <img src="docs/images/hero.gif" alt="Elphie 实战演示 —— 搭建工作流、启动语音智能体、直接对话" width="80%">
 </p>
 
-- **100% 开源**,可自托管 —— 不像 Vapi 或 Retell,没有任何厂商绑定
-- **完全可控且透明** —— 每一行代码都是开放的,LLM / TTS / STT 集成灵活可换
-- **由 YC 校友与连续创业者维护**,致力于让语音 AI 始终保持开放
+- **可自托管** —— 不像 Vapi 或 Retell,没有任何厂商绑定
+- **完全可控且透明** —— LLM / TTS / STT 集成灵活可换、可定制
+- **由 YC 校友与连续创业者维护**,致力于让语音 AI 始终易于获取
 
 ## 🎥 媒体推荐
 
@@ -62,11 +62,11 @@
 
 |  | **Elphie** | **Vapi** | **Retell** |
 |---|---|---|---|
-| **协议** | BSD 2-Clause(开源) | 闭源 | 闭源 |
+| **协议** | BSD 2-Clause | 闭源 | 闭源 |
 | **可自托管** | ✅ 可以 —— 一条 Docker 命令 | ❌ 仅 SaaS | ❌ 仅 SaaS |
 | **定价** | 免费(自托管)·按用量计费(云端) | 按分钟计费的 SaaS | 按分钟计费的 SaaS |
 | **自带 LLM / STT / TTS** | ✅ 任意厂商,也可使用 Elphie 自带方案 | 在其集成范围内可配置 | 在其集成范围内可配置 |
-| **源码级定制** | ✅ 每行代码都可自由修改 | ❌ 闭源 | ❌ 闭源 |
+| **源码级定制** | ✅ 可按需定制平台 | ❌ 闭源 | ❌ 闭源 |
 | **数据驻留** | 部署在自家基础设施,规则自己定 | 厂商云端 | 厂商云端 |
 | **厂商绑定** | 无 | 完全绑定 | 完全绑定 |
 
@@ -76,25 +76,24 @@
 ##### 在本地机器下载并部署 Elphie
 
 > **提示**
-> 我们会收集匿名使用数据以改进产品。如需关闭,请在下面的命令中将 `ENABLE_TELEMETRY` 设为 `false`。
+> 我们会收集匿名使用数据以改进产品。如需关闭,请在运行启动脚本前将 `ENABLE_TELEMETRY` 设为 `false`。
 
 > **提示**
 > 如果希望在远程服务器上运行该平台,请参考[文档](https://elphie.willowave.in/deployment/docker#option-2:-remote-server-deployment)。
 
+从本地检出或分发包中启动(仓库根目录需有 `docker-compose.yaml`):
+
 ```bash
-curl -o docker-compose.yaml https://raw.githubusercontent.com/theshreyanshsingh/Elphie/main/docker-compose.yaml && REGISTRY=ghcr.io/theshreyanshsingh ENABLE_TELEMETRY=true docker compose up --pull always
+# macOS / Linux
+./scripts/start_docker.sh
 ```
 
-> **⚡ 想让 AI 智能体帮你完成部署?**
-> 如果你使用 **Claude Code** 或 **Codex**,可以安装官方的 [Elphie 部署技能(skill)](https://github.com/theshreyanshsingh/Elphie-plugins),让智能体替你完成安装、配置与排障——它会识别你的操作系统、选择合适的部署方式、运行 Elphie 自带的部署脚本并验证结果。
->
-> ```text
-> # 在 Claude Code 中
-> /plugin marketplace add theshreyanshsingh/Elphie-plugins
-> /plugin install elphie@elphie
-> ```
->
-> 然后开启一个新会话,让它 _"set up Elphie"_(或运行 `/elphie-setup`)。Codex 同样支持——详见[插件仓库](https://github.com/theshreyanshsingh/Elphie-plugins#install)。
+```powershell
+# Windows
+.\scripts\start_docker.ps1
+```
+
+更多选项请参见 [Docker 部署指南](https://elphie.willowave.in/deployment/docker)。
 
 > **提示**
 > 首次启动需要 2-3 分钟拉取所有镜像。启动完成后,打开 http://localhost:3010 即可创建你的第一个 AI 语音助手!
@@ -159,43 +158,36 @@ Elphie 内置 MCP 服务器,因此编码智能体可以直接在你的 Elphie �
 
 ## 🤝 社区与支持
 
-> 👋 **从 Better Stack 视频过来的朋友?** 欢迎在我们[置顶的 GitHub Discussion](https://github.com/orgs/theshreyanshsingh/discussions/291) 里留下你的使用场景 —— 每一条留言我们都会看,创始团队会亲自对接早期用户。
+> 👋 **从 Better Stack 视频过来的朋友?** 欢迎在我们的 [Slack 社区](https://join.slack.com/t/elphie-community/shared_invite/zt-3zjb5vwvl-j7hRz3_F1SOn5cH~jm5f5g) 里留下你的使用场景 —— 每一条留言我们都会看,创始团队会亲自对接早期用户。
 
 - **Slack** —— Elphie AI 协作的主阵地。在这里和维护者交流、在动手前讨论功能、获取部署帮助,并跟进每一轮贡献活动。
-- **GitHub Discussions** —— 分享使用场景、提问、交流工作流配方。
-- **GitHub Issues** —— 报告 bug 或提交功能请求。
+- **文档** —— 指南与参考文档见 [elphie.willowave.in](https://elphie.willowave.in)。
 
 👉 加入我们 → [Elphie 社区 Slack](https://join.slack.com/t/elphie-community/shared_invite/zt-3zjb5vwvl-j7hRz3_F1SOn5cH~jm5f5g)
 
 ## 🙌 参与贡献
 
-我们欢迎一切贡献!Elphie AI 100% 开源,也会一直保持下去。
+我们欢迎一切贡献!请加入 [Slack 社区](https://join.slack.com/t/elphie-community/shared_invite/zt-3zjb5vwvl-j7hRz3_F1SOn5cH~jm5f5g) 讨论想法,并参阅[贡献者本地环境](https://elphie.willowave.in/contribution/setup)开始开发。
 
 ### 入门步骤
 
-- Fork 本仓库
+- 获取仓库的本地副本
 - 创建特性分支(`git checkout -b feature/AmazingFeature`)
 - 提交你的改动(`git commit -m 'Add some AmazingFeature'`)
-- 推送到该分支(`git push origin feature/AmazingFeature`)
-- 提交一个 Pull Request
-
-## ⭐ Star 历史
-
-<img src="docs/images/star-history.png" alt="Elphie star history" width="80%">
+- 通过 Slack 与维护者分享你的改动以便评审
 
 ## 📄 许可协议
 
-Elphie AI 基于 [BSD 2-Clause 协议](LICENSE)开源 —— 与构建 Elphie AI 时所采用的项目使用相同的协议,确保兼容性,以及自由使用、修改和分发的权利。
+Elphie AI 基于 [BSD 2-Clause 协议](LICENSE) —— 与构建 Elphie AI 时所采用的项目使用相同的协议,确保兼容性,以及自由使用、修改和分发的权利。
 
 ## 🏢 关于我们
 
-由 **Elphie**(Zansat Technologies Private Limited)用 ❤️ 打造。
+由 **Elphie** 用 ❤️ 打造。
 创始团队由 YC 校友与连续创业者组成,致力于让语音 AI 始终开放、人人可用。
 
 <br><br><br>
 
   <p align="center">
-    <a href="https://github.com/theshreyanshsingh/Elphie">⭐ 给我们一个 Star</a> |
     <a href="https://elphie.willowave.in">☁️ 试用云端版本</a> |
     <a href="https://join.slack.com/t/elphie-community/shared_invite/zt-3zjb5vwvl-j7hRz3_F1SOn5cH~jm5f5g">💬 加入 Slack</a>
   </p>

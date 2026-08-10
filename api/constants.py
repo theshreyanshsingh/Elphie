@@ -1,13 +1,20 @@
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 from api.enums import Environment
 
-ENVIRONMENT = os.getenv("ENVIRONMENT", Environment.LOCAL.value)
 # Absolute path to the project root directory (i.e. the directory containing
 # the top-level api/ package). Having a single canonical location helps
 # when constructing file-system paths elsewhere in the codebase.
 APP_ROOT_DIR: Path = Path(__file__).resolve().parent
+
+# Load api/.env for local runs (uvicorn --reload, pytest helpers, etc.).
+# Does not override vars already set in the process environment (Docker/K8s).
+load_dotenv(APP_ROOT_DIR / ".env", override=False)
+
+ENVIRONMENT = os.getenv("ENVIRONMENT", Environment.LOCAL.value)
 
 FILLER_SOUND_PROBABILITY = 0.0
 
@@ -41,7 +48,15 @@ UI_APP_URL = os.getenv("UI_APP_URL", "http://localhost:3010")
 DATABASE_URL = os.environ["DATABASE_URL"]
 REDIS_URL = os.environ["REDIS_URL"]
 
-DEPLOYMENT_MODE = os.getenv("DEPLOYMENT_MODE", "oss")
+def _normalize_deployment_mode(raw: str | None) -> str:
+    """Normalize deployment mode; accept legacy ``oss`` as ``selfhosted``."""
+    value = (raw or "selfhosted").strip().lower()
+    if value in {"oss", "self-hosted", "self_hosted", "selfhosted"}:
+        return "selfhosted"
+    return value
+
+
+DEPLOYMENT_MODE = _normalize_deployment_mode(os.getenv("DEPLOYMENT_MODE"))
 CORS_ALLOWED_ORIGINS = [
     o.strip() for o in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",") if o.strip()
 ]
@@ -53,8 +68,13 @@ ENABLE_SIGNUP = os.getenv("ENABLE_SIGNUP", "true").lower() == "true"
 # needs them baked into the bundle at build time.
 STACK_AUTH_PROJECT_ID = os.getenv("STACK_AUTH_PROJECT_ID")
 STACK_PUBLISHABLE_CLIENT_KEY = os.getenv("STACK_PUBLISHABLE_CLIENT_KEY")
-ELPHIE_MPS_SECRET_KEY = os.getenv("ELPHIE_MPS_SECRET_KEY", None)
-MPS_API_URL = os.getenv("MPS_API_URL", "https://services.elphie.com")
+# Managed Platform Services (auto-minted LLM/TTS/STT keys on signup).
+# Override with MPS_API_URL to point at Dograh's stack, a private MPS, or your own.
+# Default is Dograh's public MPS until an Elphie-hosted endpoint exists.
+ELPHIE_MPS_SECRET_KEY = os.getenv("ELPHIE_MPS_SECRET_KEY") or os.getenv(
+    "DOGRAH_MPS_SECRET_KEY"
+)
+MPS_API_URL = os.getenv("MPS_API_URL", "https://services.dograh.com").rstrip("/")
 ELPHIE_DEVOPS_SECRET = os.getenv("ELPHIE_DEVOPS_SECRET") or None
 
 # Storage Configuration
@@ -200,8 +220,17 @@ TURN_CREDENTIAL_TTL = int(os.getenv("TURN_CREDENTIAL_TTL", "86400"))
 # TURN is misconfigured or unreachable.
 FORCE_TURN_RELAY = os.getenv("FORCE_TURN_RELAY", "false").lower() == "true"
 
-# OSS Email/Password Auth
-OSS_JWT_SECRET = os.getenv("OSS_JWT_SECRET", "change-me-in-production")
-OSS_JWT_EXPIRY_HOURS = int(os.getenv("OSS_JWT_EXPIRY_HOURS", "720"))  # 30 days
+# Self-hosted Email/Password Auth
+# Prefer SELFHOSTED_*; fall back to legacy OSS_* so existing .env files keep working.
+SELFHOSTED_JWT_SECRET = (
+    os.getenv("SELFHOSTED_JWT_SECRET")
+    or os.getenv("OSS_JWT_SECRET")
+    or "change-me-in-production"
+)
+SELFHOSTED_JWT_EXPIRY_HOURS = int(
+    os.getenv("SELFHOSTED_JWT_EXPIRY_HOURS")
+    or os.getenv("OSS_JWT_EXPIRY_HOURS")
+    or "720"
+)  # 30 days
 
 TUNER_BASE_URL = os.getenv("TUNER_BASE_URL", "https://api.usetuner.ai")

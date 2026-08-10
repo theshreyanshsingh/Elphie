@@ -1,6 +1,6 @@
 # Elphie AI
 
-**The open-source, self-hostable alternative to Vapi & Retell** — build production voice agents with a visual workflow builder, test them in minutes, and let AI coding assistants help design and edit them through MCP.
+**The self-hostable alternative to Vapi & Retell** — build production voice agents with a visual workflow builder, test them in minutes, and let AI coding assistants help design and edit them through MCP.
 
 <p align="center">
   <a href="https://elphie.willowave.in">
@@ -27,13 +27,9 @@
   <img src="docs/images/hero.gif" alt="Elphie in action — build a workflow, launch a voice agent, talk to it" width="80%">
 </p>
 
-- **100% open source**, self-hostable — no vendor lock-in, unlike Vapi or Retell
-- **Full control & transparency** — every line of code is open, with flexible LLM / TTS / STT integration
-- **Maintained by YC alumni and exit founders**, committed to keeping voice AI open
-
-<p align="center">
-  <a href="https://trendshift.io/repositories/31007" target="_blank"><img src="https://trendshift.io/api/badge/repositories/31007" alt="theshreyanshsingh%2Felphie | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
-</p>
+- **Self-hostable** — no vendor lock-in, unlike Vapi or Retell
+- **Full control & transparency** — flexible LLM / TTS / STT integration you can customize
+- **Maintained by YC alumni and exit founders**, committed to keeping voice AI accessible
 
 ## 🎥 Featured
 
@@ -62,11 +58,11 @@ An honest comparison on the axes that matter most to teams evaluating voice AI p
 
 |  | **Elphie** | **Vapi** | **Retell** |
 |---|---|---|---|
-| **License** | BSD 2-Clause (open source) | Proprietary | Proprietary |
+| **License** | BSD 2-Clause | Proprietary | Proprietary |
 | **Self-hostable** | ✅ Yes — one Docker command | ❌ SaaS only | ❌ SaaS only |
 | **Pricing** | Free (self-host) · usage-based (cloud) | Per-minute SaaS | Per-minute SaaS |
 | **Bring your own LLM / STT / TTS** | ✅ Any provider, or use Elphie's stack | Configurable within their integrations | Configurable within their integrations |
-| **Source-level customization** | ✅ Every line is yours to modify | ❌ Closed source | ❌ Closed source |
+| **Source-level customization** | ✅ Customize the platform to your needs | ❌ Closed source | ❌ Closed source |
 | **Data residency** | Your infra, your rules | Their cloud | Their cloud |
 | **Vendor lock-in** | None | Full | Full |
 
@@ -81,20 +77,19 @@ An honest comparison on the axes that matter most to teams evaluating voice AI p
 > **Note**
 > If you wish to run the platform on a remote server instead, checkout our [Documentation](https://elphie.willowave.in/deployment/docker#option-2:-remote-server-deployment)
 
+From a local checkout or distribution of Elphie (with `docker-compose.yaml` at the repo root):
+
 ```bash
-curl -o docker-compose.yaml https://raw.githubusercontent.com/theshreyanshsingh/Elphie/main/docker-compose.yaml && curl -o start_docker.sh https://raw.githubusercontent.com/theshreyanshsingh/Elphie/main/scripts/start_docker.sh && chmod +x start_docker.sh && ./start_docker.sh
+# macOS / Linux
+./scripts/start_docker.sh
 ```
 
-> **⚡ Prefer an AI agent to set it up for you?**
-> If you use **Claude Code** or **Codex**, install the official [Elphie setup skill](https://github.com/theshreyanshsingh/Elphie-plugins) and let your agent handle installation, configuration, and troubleshooting — it detects your OS, picks the right deploy path, runs Elphie's own setup scripts, and verifies the result.
->
-> ```text
-> # In Claude Code
-> /plugin marketplace add theshreyanshsingh/Elphie-plugins
-> /plugin install elphie@elphie
-> ```
->
-> Then start a new session and ask it to _"set up Elphie"_ (or run `/elphie-setup`). Codex is supported too — see the [plugin repo](https://github.com/theshreyanshsingh/Elphie-plugins#install).
+```powershell
+# Windows
+.\scripts\start_docker.ps1
+```
+
+For more options, see the [Docker Deployment Guide](https://elphie.willowave.in/deployment/docker).
 
 > **Note**
 > First startup may take 2-3 minutes to download all images. Once running, open http://localhost:3010 to create your first AI voice assistant!
@@ -167,29 +162,23 @@ You can go to [https://elphie.willowave.in](https://elphie.willowave.in/) for ou
 
 ## 🤝Community & Support
 
-> 👋 **Coming from the Better Stack video?** Drop your use case in our [pinned GitHub Discussion](https://github.com/orgs/theshreyanshsingh/discussions/291) — we read every reply and the founders personally onboard early adopters.
+> 👋 **Coming from the Better Stack video?** Drop your use case in our [Slack community](https://join.slack.com/t/elphie-community/shared_invite/zt-3zjb5vwvl-j7hRz3_F1SOn5cH~jm5f5g) — we read every reply and the founders personally onboard early adopters.
 
 - **Slack** — the cornerstone of Elphie AI contributions. Connect with maintainers, discuss features before coding, get help with setup, and stay current on contribution sprints.
-- **GitHub Discussions** — share use cases, ask questions, swap workflow recipes.
-- **GitHub Issues** — report bugs or request features.
+- **Docs** — guides and references at [elphie.willowave.in](https://elphie.willowave.in).
 
 👉 Join us → [Elphie Community Slack](https://join.slack.com/t/elphie-community/shared_invite/zt-3zjb5vwvl-j7hRz3_F1SOn5cH~jm5f5g)
 
 ## 🙌 Contributing
 
-We love contributions! Elphie AI is 100% open source and we intend to keep it that way.
+We love contributions! Join the [Slack community](https://join.slack.com/t/elphie-community/shared_invite/zt-3zjb5vwvl-j7hRz3_F1SOn5cH~jm5f5g) to discuss ideas, and see the [contributor setup](https://elphie.willowave.in/contribution/setup) to get a local environment running.
 
 ### Getting Started
 
-- Fork the repository
+- Clone or obtain a local copy of the repository
 - Create your feature branch (git checkout -b feature/AmazingFeature)
 - Commit your changes (git commit -m 'Add some AmazingFeature')
-- Push to the branch (git push origin feature/AmazingFeature)
-- Open a Pull Request
-
-## ⭐ Star History
-
-<img src="docs/images/star-history.png" alt="Elphie star history" width="80%">
+- Share your changes with maintainers via Slack for review
 
 ## 📄 License
 
@@ -197,13 +186,11 @@ Elphie AI is licensed under the [BSD 2-Clause License](LICENSE)- the same licens
 
 ## 🏢 About
 
-Built with ❤️ by **Elphie** (Zansat Technologies Private Limited)
-Founded by YC alumni and exit founders committed to keeping voice AI open and accessible to everyone.
+Built with ❤️ by **Elphie**
 
 <br><br><br>
 
   <p align="center">
-    <a href="https://github.com/theshreyanshsingh/Elphie">⭐ Star us on GitHub</a> |
     <a href="https://elphie.willowave.in">☁️ Try Cloud Version</a> |
     <a href="https://join.slack.com/t/elphie-community/shared_invite/zt-3zjb5vwvl-j7hRz3_F1SOn5cH~jm5f5g">💬 Join Slack</a>
   </p>

@@ -192,6 +192,9 @@ const logger: Logger = {
   },
 
   info: (...args: unknown[]): void => {
+    // Keep production browser consoles quiet — info is for local development.
+    if (!isDevelopment) return;
+
     if (isBrowser) {
       const caller = getCallerInfo();
       console.info(`[INFO] [${caller}]`, ...args);
@@ -201,6 +204,8 @@ const logger: Logger = {
   },
 
   warn: (...args: unknown[]): void => {
+    if (!isDevelopment) return;
+
     if (isBrowser) {
       const caller = getCallerInfo();
       console.warn(`[WARN] [${caller}]`, ...args);

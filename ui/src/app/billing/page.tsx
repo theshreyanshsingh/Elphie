@@ -35,7 +35,10 @@ import { useAppConfig } from "@/context/AppConfigContext";
 import { useOrganizationTimezone } from "@/hooks/useOrganizationTimezone";
 import { useAuth } from "@/lib/auth";
 import { formatDateTime } from "@/lib/dateTime";
-import { isBillingAvailable } from "@/lib/deploymentFeatures";
+import {
+    isBillingAvailable,
+    isSelfHostedDeployment,
+} from "@/lib/deploymentFeatures";
 
 const LEDGER_PAGE_SIZE = 50;
 
@@ -122,8 +125,10 @@ export default function BillingPage() {
     );
 
     const hasAppConfig = !configLoading && config !== null;
-    const isOssMode = hasAppConfig && config.deploymentMode === "oss";
-    const canPurchaseCredits = hasAppConfig && config.deploymentMode !== "oss";
+    const isSelfHosted =
+        hasAppConfig && isSelfHostedDeployment(config.deploymentMode);
+    const canPurchaseCredits =
+        hasAppConfig && isBillingAvailable(config.deploymentMode);
     const totalQuota = credits?.total_quota ?? 0;
     const remainingCredits = credits?.remaining_credits ?? 0;
     const usedCredits = credits?.total_credits_used ?? 0;
@@ -269,11 +274,11 @@ export default function BillingPage() {
                 </div>
             </div>
 
-            {isOssMode && (
+            {isSelfHosted && (
                 <div className="flex gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/50 dark:bg-amber-950/30">
                     <Info className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400" />
                     <div className="text-sm text-amber-900 dark:text-amber-200">
-                        <p className="font-medium">Credit purchases are unavailable in OSS mode</p>
+                        <p className="font-medium">Credit purchases are unavailable in self-hosted mode</p>
                         <p className="mt-1">
                             You can&apos;t purchase credits from this self-hosted app. Sign up and
                             purchase credits at{" "}
@@ -302,7 +307,7 @@ export default function BillingPage() {
             <div className="grid gap-4 md:grid-cols-2">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardDescription>{isOssMode ? "Credits remaining" : "Credit balance"}</CardDescription>
+                        <CardDescription>{isSelfHosted ? "Credits remaining" : "Credit balance"}</CardDescription>
                         <CardTitle className="flex items-center gap-2 text-3xl">
                             <CircleDollarSign className="h-6 w-6 text-muted-foreground" />
                             {formatCredits(remainingCredits)}
@@ -320,13 +325,13 @@ export default function BillingPage() {
                     </CardHeader>
                     <CardContent>
                         <p className="text-sm text-muted-foreground">
-                            {isOssMode ? "Current allocation usage" : "Total ledger debits"}
+                            {isSelfHosted ? "Current allocation usage" : "Total ledger debits"}
                         </p>
                     </CardContent>
                 </Card>
             </div>
 
-            {!isOssMode ? (
+            {!isSelfHosted ? (
                 <Card>
                     <CardHeader>
                         <CardTitle>Credit Ledger</CardTitle>

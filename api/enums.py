@@ -77,7 +77,7 @@ class StorageBackend(Enum):
 
     # Currently implemented backends
     S3 = "s3"  # AWS S3 for cloud deployments
-    MINIO = "minio"  # MinIO for local/OSS deployments
+    MINIO = "minio"  # MinIO for local/self-hosted deployments
 
     @classmethod
     def get_current_backend(cls):

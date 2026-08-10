@@ -17,8 +17,8 @@ from api.services.pipecat.service_factory import (
 from api.utils.url_security import validate_user_configured_service_url
 
 
-def test_oss_allows_local_service_urls(monkeypatch):
-    monkeypatch.setattr("api.utils.url_security.DEPLOYMENT_MODE", "oss")
+def test_selfhosted_allows_local_service_urls(monkeypatch):
+    monkeypatch.setattr("api.utils.url_security.DEPLOYMENT_MODE", "selfhosted")
 
     validate_user_configured_service_url(
         "http://localhost:11434/v1",
@@ -143,8 +143,8 @@ def test_validator_blocks_azure_private_endpoint_in_saas(monkeypatch):
     ]
 
 
-def test_validator_allows_speaches_local_base_url_in_oss(monkeypatch):
-    monkeypatch.setattr("api.utils.url_security.DEPLOYMENT_MODE", "oss")
+def test_validator_allows_speaches_local_base_url_in_selfhosted(monkeypatch):
+    monkeypatch.setattr("api.utils.url_security.DEPLOYMENT_MODE", "selfhosted")
     validator = UserConfigurationValidator()
     config = SpeachesLLMConfiguration()
 

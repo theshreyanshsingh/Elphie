@@ -322,7 +322,7 @@ async def transcribe_audio(
     try:
         audio_data = await file.read()
 
-        if DEPLOYMENT_MODE == "oss":
+        if DEPLOYMENT_MODE == "selfhosted":
             result = await mps_service_key_client.transcribe_audio(
                 audio_data=audio_data,
                 filename=file.filename or "audio.wav",
@@ -343,6 +343,14 @@ async def transcribe_audio(
 
     except Exception as exc:
         logger.error(f"Error transcribing audio: {exc}")
+        if DEPLOYMENT_MODE == "selfhosted":
+            raise HTTPException(
+                status_code=503,
+                detail=(
+                    "Audio transcription requires a reachable MPS_API_URL. "
+                    "It is unavailable on self-hosted deployments without managed STT."
+                ),
+            ) from exc
         raise HTTPException(
             status_code=500, detail="Failed to transcribe audio"
         ) from exc

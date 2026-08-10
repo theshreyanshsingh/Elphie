@@ -8,7 +8,7 @@ export interface BaseUser {
   image?: string;
 }
 
-// Local/OSS user type
+// Local/self-hosted user type
 export interface LocalUser extends BaseUser {
   provider: 'local';
   organizationId?: string;

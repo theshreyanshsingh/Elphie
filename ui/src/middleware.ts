@@ -3,9 +3,9 @@ import { NextResponse } from 'next/server';
 
 import { getServerBackendUrl } from '@/lib/apiClient';
 
-const OSS_TOKEN_COOKIE = 'elphie_auth_token';
+const LOCAL_AUTH_TOKEN_COOKIE = 'elphie_auth_token';
 
-// Paths that don't require authentication in OSS mode.
+// Paths that don't require authentication in self-hosted mode.
 // `/embed` serves the public website widget (e.g. /embed/elphie-widget.js),
 // which must be fetchable without a session cookie so third-party sites can
 // embed it — otherwise the middleware 307-redirects the asset to /auth/login.
@@ -45,12 +45,12 @@ async function fetchAuthProvider(): Promise<string> {
 export async function middleware(request: NextRequest) {
   const authProvider = await fetchAuthProvider();
 
-  // Only handle OSS mode
+  // Only handle self-hosted mode
   if (authProvider !== 'local') {
     return NextResponse.next();
   }
 
-  const token = request.cookies.get(OSS_TOKEN_COOKIE)?.value;
+  const token = request.cookies.get(LOCAL_AUTH_TOKEN_COOKIE)?.value;
   const { pathname } = request.nextUrl;
 
   // Allow public paths without auth. Match on a path-segment boundary (exact

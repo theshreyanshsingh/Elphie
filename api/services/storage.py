@@ -27,7 +27,7 @@ def get_storage_for_backend(backend: str) -> BaseFileSystem:
     - Code 1 (S3): AWS S3 via S3FileSystem
     - Code 2 (MINIO): MinIO via MinioFileSystem
     """
-    # Code 2: MinIO implementation (local/OSS deployments)
+    # Code 2: MinIO implementation (local/self-hosted deployments)
     if backend == StorageBackend.MINIO.value:
         if not MINIO_PUBLIC_ENDPOINT:
             raise ValueError(

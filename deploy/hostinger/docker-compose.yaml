@@ -21,7 +21,7 @@
 #   - FASTAPI_WORKERS is pinned to 1 (see the note on the `api` service).
 #
 # Required .env keys — see .env.example. At minimum:
-#   PUBLIC_HOST, TURN_HOST, TURN_SECRET, OSS_JWT_SECRET,
+#   PUBLIC_HOST, TURN_HOST, TURN_SECRET, SELFHOSTED_JWT_SECRET,
 #   TRAEFIK_NETWORK, TRAEFIK_CERTRESOLVER, TRAEFIK_ENTRYPOINT
 # =================================================================
 
@@ -185,7 +185,11 @@ services:
       TURN_SECRET: "${TURN_SECRET:?TURN_SECRET is required for WebRTC media}"
       FORCE_TURN_RELAY: "${FORCE_TURN_RELAY:-false}"
 
-      OSS_JWT_SECRET: "${OSS_JWT_SECRET:?OSS_JWT_SECRET must be set to a strong secret}"
+      SELFHOSTED_JWT_SECRET: "${SELFHOSTED_JWT_SECRET:?SELFHOSTED_JWT_SECRET must be set to a strong secret}"
+
+      # Managed LLM/TTS/STT — override to switch MPS hosts without rebuilding.
+      MPS_API_URL: "${MPS_API_URL:-https://services.dograh.com}"
+      ELPHIE_MPS_SECRET_KEY: "${ELPHIE_MPS_SECRET_KEY:-}"
 
       ENABLE_TELEMETRY: "${ENABLE_TELEMETRY:-true}"
       POSTHOG_API_KEY: "phc_ItizB1dP6yv7ZYobbcqrpxTdbomDA8hJFSEmAMdYvIr"
@@ -230,7 +234,7 @@ services:
       HOSTNAME: "0.0.0.0"
       # Server-side (SSR) calls stay on the internal Docker network.
       BACKEND_URL: "${BACKEND_URL:-http://api:8000}"
-      NODE_ENV: "oss"
+      NODE_ENV: "production"
       ENABLE_TELEMETRY: "${ENABLE_TELEMETRY:-true}"
       POSTHOG_KEY: "phc_ItizB1dP6yv7ZYobbcqrpxTdbomDA8hJFSEmAMdYvIr"
       POSTHOG_HOST: "https://us.posthog.com"

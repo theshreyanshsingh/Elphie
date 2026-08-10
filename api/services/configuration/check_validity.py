@@ -343,11 +343,24 @@ class UserConfigurationValidator:
                 "You provided a Elphie API key (dgr...) instead of a service key. "
                 "Please use a service key (mps...)."
             )
+        if not api_key:
+            raise ValueError(
+                "Elphie managed models require a service key. On self-hosted deployments, "
+                "switch to Bring Your Own Keys in Model Configurations and add your "
+                "provider API keys (OpenAI, Deepgram, Cartesia, etc.)."
+            )
         auth = getattr(self, "_auth_context", {})
-        return mps_service_key_client.validate_service_key(
+        is_valid = mps_service_key_client.validate_service_key(
             api_key,
             organization_id=auth.get("organization_id"),
             created_by=auth.get("created_by"),
+        )
+        if is_valid:
+            return True
+        raise ValueError(
+            "Elphie managed service key was rejected (or the managed model proxy "
+            "is unavailable). On self-hosted deployments, open Model Configurations, switch "
+            "to Bring Your Own Keys, and configure your own LLM/STT/TTS providers."
         )
 
     def _check_sarvam_api_key(self, model: str, api_key: str) -> bool:

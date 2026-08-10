@@ -99,7 +99,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // For local/OSS provider
+  // For local/self-hosted provider
   return (
     <Suspense fallback={LoadingFallback}>
       <LocalProviderWrapper>

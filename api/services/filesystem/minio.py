@@ -11,7 +11,7 @@ from .base import AsyncReadable, BaseFileSystem
 
 
 class MinioFileSystem(BaseFileSystem):
-    """MinIO implementation of the filesystem interface for OSS users.
+    """MinIO implementation of the filesystem interface for self-hosted users.
 
     Two endpoints, two different purposes:
     - endpoint (host:port) + secure (bool): used by the MinIO SDK for

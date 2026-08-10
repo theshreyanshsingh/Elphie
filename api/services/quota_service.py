@@ -33,7 +33,7 @@ _MPS_UNREACHABLE_ERRORS = (
     httpx.ProxyError,
 )
 
-OSS_QUOTA_EXCEEDED_MESSAGE = (
+SELFHOSTED_QUOTA_EXCEEDED_MESSAGE = (
     "You have exhausted your trial credits. "
     "Please sign up on elphie.willowave.in to create a "
     "new service key and set up in your model configurations."
@@ -49,6 +49,13 @@ SERVICE_TOKEN_ORG_MISMATCH_MESSAGE = (
     "The Elphie service token being used is created from another account. "
     "Please create a new service token from the Developers tab and use it in "
     "your model configuration."
+)
+
+MPS_UNREACHABLE_MANAGED_MESSAGE = (
+    "Managed Elphie models need the Model Proxy Service (MPS), which is "
+    "unreachable from this server. Go to Models, switch to BYOK, and add your "
+    "own provider API keys (e.g. OpenAI for LLM, Deepgram for STT, ElevenLabs "
+    "or OpenAI for TTS), or set a reachable MPS_API_URL."
 )
 
 
@@ -76,11 +83,11 @@ def _insufficient_hosted_quota_result() -> QuotaCheckResult:
     )
 
 
-def _insufficient_oss_quota_result() -> QuotaCheckResult:
+def _insufficient_selfhosted_quota_result() -> QuotaCheckResult:
     return QuotaCheckResult(
         has_quota=False,
         error_code="quota_exceeded",
-        error_message=OSS_QUOTA_EXCEEDED_MESSAGE,
+        error_message=SELFHOSTED_QUOTA_EXCEEDED_MESSAGE,
     )
 
 
@@ -95,6 +102,28 @@ def _mps_unreachable_result(
         error,
     )
     return QuotaCheckResult(has_quota=True)
+
+
+def _mps_unreachable_managed_result(
+    operation: str,
+    error: httpx.RequestError,
+) -> QuotaCheckResult:
+    """Fail closed when managed Elphie services cannot reach MPS.
+
+    Fail-open is unsafe here: the run would start, then crash later with a
+    missing correlation id / unreachable STT-TTS-LLM, which looks like a
+    silent or empty call in the UI.
+    """
+    logger.warning(
+        "MPS unreachable during {}; blocking managed Elphie workflow run: {}",
+        operation,
+        error,
+    )
+    return QuotaCheckResult(
+        has_quota=False,
+        error_code="mps_unreachable",
+        error_message=MPS_UNREACHABLE_MANAGED_MESSAGE,
+    )
 
 
 def _service_uses_elphie(service: Any) -> bool:
@@ -217,6 +246,8 @@ async def _authorize_hosted_workflow_run_start(
             },
         )
     except _MPS_UNREACHABLE_ERRORS as e:
+        if requires_correlation:
+            return _mps_unreachable_managed_result("hosted run authorization", e)
         return _mps_unreachable_result("hosted run authorization", e)
     except Exception as e:
         logger.warning(
@@ -272,11 +303,11 @@ async def _authorize_hosted_workflow_run_start(
     return QuotaCheckResult(has_quota=True)
 
 
-async def _authorize_oss_elphie_keys(
+async def _authorize_selfhosted_elphie_keys(
     *,
     elphie_api_keys: set[str],
 ) -> QuotaCheckResult:
-    """Check per-key MPS credits for OSS deployments before a run starts."""
+    """Check per-key MPS credits for self-hosted deployments before a run starts."""
     for api_key in elphie_api_keys:
         try:
             usage = await mps_service_key_client.check_service_key_usage(api_key)
@@ -288,14 +319,14 @@ async def _authorize_oss_elphie_keys(
                     f"Insufficient Elphie credits for key ...{api_key[-8:]}: "
                     f"${remaining:.2f} remaining"
                 )
-                return _insufficient_oss_quota_result()
+                return _insufficient_selfhosted_quota_result()
 
             logger.info(
                 f"Elphie quota check passed for key ...{api_key[-8:]}: "
                 f"{remaining:.2f} credits remaining"
             )
         except _MPS_UNREACHABLE_ERRORS as e:
-            return _mps_unreachable_result("OSS service-key quota check", e)
+            return _mps_unreachable_managed_result("self-hosted service-key quota check", e)
         except Exception as e:
             logger.error(f"Failed to check quota for Elphie key: {str(e)}")
             error_str = str(e)
@@ -314,7 +345,7 @@ async def _authorize_oss_elphie_keys(
     return QuotaCheckResult(has_quota=True)
 
 
-async def _authorize_oss_managed_v2_correlation(
+async def _authorize_selfhosted_managed_v2_correlation(
     *,
     workflow_id: int,
     workflow_run_id: int | None,
@@ -344,10 +375,10 @@ async def _authorize_oss_managed_v2_correlation(
             response.get("correlation_id"),
         )
     except _MPS_UNREACHABLE_ERRORS as e:
-        return _mps_unreachable_result("OSS correlation creation", e)
+        return _mps_unreachable_managed_result("self-hosted correlation creation", e)
     except Exception as e:
         logger.error(
-            "Failed to authorize OSS managed v2 workflow start for workflow {} run {}: {}",
+            "Failed to authorize self-hosted managed v2 workflow start for workflow {} run {}: {}",
             workflow_id,
             workflow_run_id,
             e,
@@ -371,7 +402,7 @@ async def authorize_workflow_run_start(
     """Authorize a workflow run before any billable call/text runtime starts.
 
     The workflow organization is the billing subject for hosted deployments.
-    OSS deployments are billed per service key instead. The workflow owner is
+    self-hosted deployments are billed per service key instead. The workflow owner is
     used only as billing metadata.
     """
     if organization_id is None:
@@ -508,7 +539,7 @@ async def authorize_workflow_run_start(
             workflow_configurations=workflow_configurations,
         )
 
-        if DEPLOYMENT_MODE != "oss":
+        if DEPLOYMENT_MODE != "selfhosted":
             return await _authorize_hosted_workflow_run_start(
                 workflow_owner=workflow_owner,
                 organization_id=organization_id,
@@ -519,13 +550,13 @@ async def authorize_workflow_run_start(
 
         elphie_api_keys = _elphie_api_keys(user_config)
         if elphie_api_keys:
-            oss_result = await _authorize_oss_elphie_keys(
+            oss_result = await _authorize_selfhosted_elphie_keys(
                 elphie_api_keys=elphie_api_keys,
             )
             if not oss_result.has_quota:
                 return oss_result
 
-        return await _authorize_oss_managed_v2_correlation(
+        return await _authorize_selfhosted_managed_v2_correlation(
             workflow_id=workflow.id,
             workflow_run_id=workflow_run_id,
             user_config=user_config,

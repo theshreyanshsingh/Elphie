@@ -10,7 +10,7 @@
 #   - ui/.env  : BACKEND_URL           -> http://localhost:<port>
 #                      NEXT_PUBLIC_BACKEND_URL -> http://localhost:<port>
 #
-# CORS is intentionally NOT touched: local dev runs DEPLOYMENT_MODE="oss", where
+# CORS is intentionally NOT touched: local dev runs DEPLOYMENT_MODE="selfhosted", where
 # the API forces allow_origins=["*"] and ignores CORS_ALLOWED_ORIGINS entirely.
 #
 # Idempotent: re-running keeps an already-assigned, non-colliding port. The UI

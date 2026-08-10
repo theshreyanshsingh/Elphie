@@ -47,7 +47,9 @@ async def ensure_mps_correlation_id(
 
     raise ValueError(
         "Managed model services v2 requires workflow run authorization before "
-        f"the run starts. Missing correlation id for workflow_run_id={workflow_run_id}."
+        f"the run starts. Missing correlation id for workflow_run_id={workflow_run_id}. "
+        "On self-hosted deployments, this usually means MPS is unreachable — switch Models to BYOK "
+        "and add your own provider API keys."
     )
 
 

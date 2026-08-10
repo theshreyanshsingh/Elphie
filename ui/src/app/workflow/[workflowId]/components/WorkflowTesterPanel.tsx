@@ -269,6 +269,7 @@ export function WorkflowTesterPanel({
                 message="Start a browser call here to hear the agent, inspect the transcript, and validate the workflow before you customize it further."
                 showNext={false}
                 enabled={runTestTooltipEnabled}
+                placement="left"
             />
         </div>
     );

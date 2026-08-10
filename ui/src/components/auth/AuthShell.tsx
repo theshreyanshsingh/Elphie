@@ -1,4 +1,4 @@
-// Shared auth shell for Stack Auth (/handler/[...stack]) and local/OSS auth
+// Shared auth shell for Stack Auth (/handler/[...stack]) and local/self-hosted auth
 // pages (/auth/login, /auth/signup).
 
 import type { ReactNode } from "react";

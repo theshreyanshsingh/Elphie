@@ -11,25 +11,25 @@ Current pairs:
 - `start_services_dev.{sh,ps1}` — local backend launcher (auto-reload + health-check wait)
 - `stop_services.{sh,ps1}`
 - `makemigrate.{sh,ps1}` / `migrate.{sh,ps1}` — Alembic helpers
-- `setup_local.{sh,ps1}` — OSS local Docker-compose setup (optional coturn/TURN)
+- `setup_local.{sh,ps1}` — self-hosted local Docker-compose setup (optional coturn/TURN)
 
-Bash-only (deployment / CI / OSS-user setup — not intended for Windows contributors):
+Bash-only (deployment / CI / self-hosted-user setup — not intended for Windows contributors):
 
 - `start_services.sh` — VM production
 - `start_services_docker.sh` — Docker image CMD
 - `rolling_update.sh` — zero-downtime VM redeploy
-- `setup_remote.sh` — OSS remote Docker-compose setup
+- `setup_remote.sh` — self-hosted remote Docker-compose setup
 - `format.sh` / `lint.sh` / `pre_commit.sh`
 - `generate_sdk.sh` / `release_sdks.sh` / `dump_docs_openapi.py`
 
-## Deployment Memory — current OSS Docker state
+## Deployment Memory — current self-hosted Docker state
 
-This directory now has a shared deployment model for OSS Docker installs. If you touch any of the scripts below, assume they are coupled and review them together:
+This directory now has a shared deployment model for self-hosted Docker installs. If you touch any of the scripts below, assume they are coupled and review them together:
 
 - `scripts/lib/setup_common.sh` is the shared deployment helper library. It is sourced by `setup_local.sh`, `setup_remote.sh`, `update_remote.sh`, `setup_custom_domain.sh`, `run_elphie_init.sh`, and repo-root `remote_up.sh`.
 - `setup_common.sh` must stay safe to source. It should not set shell options like `set -u` for callers.
 - `.env` is the single operator-owned source of truth for remote deployment settings. Remote/runtime config should derive from it, not the other way around.
-- Canonical remote keys in `.env`: `ENVIRONMENT`, `SERVER_IP`, `PUBLIC_HOST`, `PUBLIC_BASE_URL`, `TURN_SECRET`, `FASTAPI_WORKERS`, `OSS_JWT_SECRET`. `PUBLIC_BASE_URL` (+ `PUBLIC_HOST`, and `SERVER_IP` for coturn's literal `external-ip`) is the single endpoint source of truth.
+- Canonical remote keys in `.env`: `ENVIRONMENT`, `SERVER_IP`, `PUBLIC_HOST`, `PUBLIC_BASE_URL`, `TURN_SECRET`, `FASTAPI_WORKERS`, `SELFHOSTED_JWT_SECRET`. `PUBLIC_BASE_URL` (+ `PUBLIC_HOST`, and `SERVER_IP` for coturn's literal `external-ip`) is the single endpoint source of truth.
 - `BACKEND_API_ENDPOINT`, `MINIO_PUBLIC_ENDPOINT`, `TURN_HOST` are **derived in-app** from `PUBLIC_BASE_URL` / `PUBLIC_HOST` (`api/constants.py`) and are no longer written to a remote `.env`. `elphie_sync_remote_env_file` neither writes nor deletes them — new installs omit them, and a value an operator sets by hand is left untouched as an explicit override for a split deployment (separate object store / TURN host). `elphie_validate_remote_runtime_env` therefore no longer requires them or asserts they equal `PUBLIC_BASE_URL`.
 - `remote_up.sh` is the supported remote startup entrypoint. It runs preflight via `elphie_prepare_remote_install`, runs `docker compose config -q`, then starts the stack.
 - `docker-compose.yaml` uses a one-shot `elphie-init` service for profiles `remote` and `local-turn`.

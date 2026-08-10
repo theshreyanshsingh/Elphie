@@ -273,7 +273,7 @@ function optionalByokService(config: Record<string, unknown>, service: ServiceSe
 
 function ThirdPartyProviderNotice() {
     return (
-        <div className="mt-4 flex gap-3 rounded-md border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-900 dark:text-amber-200">
+        <div className="mt-4 flex gap-3 rounded-md border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-xs text-amber-900 dark:text-amber-200">
             <Info className="mt-0.5 h-4 w-4 shrink-0" />
             <div>
                 <p className="font-medium">Third-party provider data notice</p>
@@ -331,7 +331,7 @@ function PricingSummary({
 
     return (
         <Card className="mb-4 border-primary/20 bg-primary/[0.03]">
-            <CardContent className="space-y-2 pt-5 text-sm">
+            <CardContent className="space-y-2 pt-5 text-xs">
                 <p className="font-medium">Usage pricing</p>
                 {platformPrice && (
                     <MetricPrice label="Platform usage" price={platformPrice} />
@@ -452,7 +452,7 @@ export function AIModelConfigurationV2Editor({
     return (
         <div className="space-y-6">
             {error && (
-                <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-xs text-destructive">
                     {error}
                 </div>
             )}
@@ -465,7 +465,7 @@ export function AIModelConfigurationV2Editor({
                 </TabsList>
 
                 <TabsContent value="realtime" className="mt-0">
-                    <p className="mb-4 text-sm text-muted-foreground">
+                    <p className="mb-4 text-xs text-muted-foreground">
                         A single speech-to-speech model handles the conversation in realtime (no separate transcriber or voice). An LLM is still required for variable extraction and QA.
                     </p>
                     <PricingSummary pricing={pricing} includeElphieModel={false} thirdPartyModels />
@@ -482,7 +482,7 @@ export function AIModelConfigurationV2Editor({
                 </TabsContent>
 
                 <TabsContent value="elphie" className="mt-0">
-                    <p className="mb-4 text-sm text-muted-foreground">
+                    <p className="mb-4 text-xs text-muted-foreground">
                         Elphie provides a managed transcriber, LLM, and voice pipeline. Select a voice and language while Elphie manages the underlying model providers.{" "}
                         We offer custom pricing and a 15-second pulse with a monthly commitment.{" "}
                         <a
@@ -573,7 +573,7 @@ export function AIModelConfigurationV2Editor({
                 </TabsContent>
 
                 <TabsContent value="byok" className="mt-0">
-                    <p className="mb-4 text-sm text-muted-foreground">
+                    <p className="mb-4 text-xs text-muted-foreground">
                         Configure separate transcriber, LLM, and voice providers using your own API keys. An embeddings model can also be configured for knowledge retrieval.
                     </p>
                     <PricingSummary pricing={pricing} includeElphieModel={false} thirdPartyModels />

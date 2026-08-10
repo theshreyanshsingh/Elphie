@@ -12,8 +12,8 @@ import type { LocalUser } from './types';
 // This file should only be imported in server components
 
 let stackServerApp: StackServerApp<boolean, string> | null = null;
-const OSS_TOKEN_COOKIE = 'elphie_auth_token';
-const OSS_USER_COOKIE = 'elphie_auth_user';
+const LOCAL_AUTH_TOKEN_COOKIE = 'elphie_auth_token';
+const LOCAL_AUTH_USER_COOKIE = 'elphie_auth_user';
 
 // Lazy load and cache the stack server app
 export async function getStackServerApp(): Promise<StackServerApp<boolean, string> | null> {
@@ -49,7 +49,7 @@ export async function getStackServerApp(): Promise<StackServerApp<boolean, strin
 
 /**
  * Get the current user on the server side (for SSR)
- * Returns CurrentUser for stack, LocalUser for OSS, or null if not authenticated
+ * Returns CurrentUser for stack, LocalUser for self-hosted, or null if not authenticated
  */
 export async function getServerUser(): Promise<CurrentUser | LocalUser | null> {
   const authProvider = await getAuthProvider();
@@ -66,7 +66,7 @@ export async function getServerUser(): Promise<CurrentUser | LocalUser | null> {
       }
     }
   } else if (authProvider === 'local') {
-    // For OSS mode, get user from cookies (created by middleware)
+    // For self-hosted mode, get user from cookies (created by middleware)
     const user = await getOSSUser();
     return user;
   }
@@ -83,20 +83,20 @@ export async function getServerAuthProvider(): Promise<string> {
 }
 
 /**
- * Get OSS token from cookies (read-only)
+ * Get self-hosted token from cookies (read-only)
  * Token creation happens in middleware
  */
 export async function getOSSToken(): Promise<string | null> {
   const cookieStore = await cookies();
-  return cookieStore.get(OSS_TOKEN_COOKIE)?.value || null;
+  return cookieStore.get(LOCAL_AUTH_TOKEN_COOKIE)?.value || null;
 }
 
 /**
- * Get OSS user from cookies
+ * Get self-hosted user from cookies
  */
 export async function getOSSUser(): Promise<LocalUser | null> {
   const cookieStore = await cookies();
-  const userCookie = cookieStore.get(OSS_USER_COOKIE)?.value;
+  const userCookie = cookieStore.get(LOCAL_AUTH_USER_COOKIE)?.value;
 
   if (userCookie) {
     try {
@@ -116,7 +116,7 @@ export async function getOSSUser(): Promise<LocalUser | null> {
   }
 
   // If no user cookie, but we have a token, create user from token
-  const token = cookieStore.get(OSS_TOKEN_COOKIE)?.value;
+  const token = cookieStore.get(LOCAL_AUTH_TOKEN_COOKIE)?.value;
   if (token) {
     const user: LocalUser = {
       id: token,

@@ -98,6 +98,9 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      # Cloudflare currently origins to :3010 (was the UI). Put nginx here so
+      # /api/v1 WebSockets upgrade correctly instead of hitting Next.js.
+      - "3010:80"
     volumes:
       - nginx-generated:/etc/nginx/conf.d:ro
       - ./certs:/etc/nginx/certs:ro
@@ -188,7 +191,12 @@ services:
       TURN_SECRET: "${TURN_SECRET:-}"
       FORCE_TURN_RELAY: "${FORCE_TURN_RELAY:-false}"
 
-      OSS_JWT_SECRET: "${OSS_JWT_SECRET:?OSS_JWT_SECRET must be set to a strong secret}"
+      SELFHOSTED_JWT_SECRET: "${SELFHOSTED_JWT_SECRET:?SELFHOSTED_JWT_SECRET must be set to a strong secret}"
+
+      # Managed LLM/TTS/STT (signup auto-mints a trial key from this host).
+      # Default: Dograh public MPS. Point elsewhere when you have your own.
+      MPS_API_URL: "${MPS_API_URL:-https://services.dograh.com}"
+      ELPHIE_MPS_SECRET_KEY: "${ELPHIE_MPS_SECRET_KEY:-}"
 
       # Telemetry
       ENABLE_TELEMETRY: "${ENABLE_TELEMETRY:-true}"
@@ -227,7 +235,7 @@ services:
 
       # Server-side URL (SSR, internal Docker network)
       BACKEND_URL: "${BACKEND_URL:-http://api:8000}"
-      NODE_ENV: "oss"
+      NODE_ENV: "production"
 
       # Flag to enable/ disable posthog
       ENABLE_TELEMETRY: "${ENABLE_TELEMETRY:-true}"
@@ -235,8 +243,10 @@ services:
       # Posthog
       POSTHOG_KEY: "phc_ItizB1dP6yv7ZYobbcqrpxTdbomDA8hJFSEmAMdYvIr"
       POSTHOG_HOST: "https://us.posthog.com"
-    ports:
-      - "3010:3010"
+    # UI is reached via nginx (80/443/3010). Keep it off the host so
+    # Cloudflare's :3010 origin can bind to nginx instead.
+    expose:
+      - "3010"
     depends_on:
       api:
         condition: service_healthy

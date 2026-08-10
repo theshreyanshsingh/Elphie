@@ -3,9 +3,9 @@
 // (no auth token); identity is the email carried in the body. Every call is
 // BEST-EFFORT: failures are swallowed so a down/erroring service never blocks the user.
 
-// Base URL of the user_onboarding service. Unset (the default for self-hosted OSS —
+// Base URL of the user_onboarding service. Unset (the default for self-hosted —
 // .env.example ships this commented out) → fall back to our cloud leads backend so we
-// still receive OSS form submissions. Override the env var to point elsewhere (or to a
+// still receive self-hosted form submissions. Override the env var to point elsewhere (or to a
 // local backend) to stop sending leads to us.
 const BASE_URL = process.env.NEXT_PUBLIC_ONBOARDING_API_URL || "https://api-leads.elphie.com";
 

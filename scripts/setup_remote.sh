@@ -250,7 +250,7 @@ echo -e "${BLUE}[3/$TOTAL] Generating SSL certificates...${NC}"
 echo -e "${GREEN}✓ SSL certificates generated${NC}"
 
 echo -e "${BLUE}[4/$TOTAL] Creating environment file...${NC}"
-OSS_JWT_SECRET=$(openssl rand -hex 32)
+SELFHOSTED_JWT_SECRET=$(openssl rand -hex 32)
 POSTGRES_PASSWORD=$(openssl rand -hex 32)
 REDIS_PASSWORD=$(openssl rand -hex 32)
 MINIO_ROOT_USER="elphie$(openssl rand -hex 6)"
@@ -277,8 +277,8 @@ TURN_SECRET=$TURN_SECRET
 # Relay-only ICE candidates for explicit TURN diagnostics
 FORCE_TURN_RELAY=$FORCE_TURN_RELAY
 
-# JWT secret for OSS authentication
-OSS_JWT_SECRET=$OSS_JWT_SECRET
+# JWT secret for self-hosted authentication
+SELFHOSTED_JWT_SECRET=$SELFHOSTED_JWT_SECRET
 
 # PostgreSQL password. Used by the postgres container on first init and by the
 # API's DATABASE_URL. Do not change after the first start — the password is

@@ -56,7 +56,7 @@ spec:
             - name: HOSTNAME
               value: "0.0.0.0"
             - name: NODE_ENV
-              value: "oss"
+              value: "production"
             - name: BACKEND_URL
               value: {{ default (printf "http://%s:%d" (include "elphie.web.fullname" .) (int .Values.web.service.port)) .Values.ui.backendUrl | quote }}
             - name: ENABLE_TELEMETRY

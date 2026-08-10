@@ -1,6 +1,7 @@
 "use client";
 
 import { Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -19,21 +20,19 @@ export default function ThemeToggle({
   variant = "ghost",
   size = "icon"
 }: ThemeToggleProps) {
-  // Start with null to avoid hydration mismatch - theme is set by inline script in layout.tsx
-  const [theme, setTheme] = useState<"light" | "dark" | null>(null);
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Read the current theme from the DOM (already set by inline script in layout.tsx)
-    const isDark = document.documentElement.classList.contains("dark");
-    setTheme(isDark ? "dark" : "light");
+    setMounted(true);
   }, []);
 
   const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-    document.documentElement.classList.toggle("dark", newTheme === "dark");
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
   };
+
+  // Avoid hydration mismatch for the visible icon/label.
+  const isDark = mounted && resolvedTheme === "dark";
 
   return (
     <Button
@@ -46,15 +45,17 @@ export default function ThemeToggle({
       onClick={toggleTheme}
     >
       <Sun className={cn(
-        "h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0",
+        "h-4 w-4 transition-all",
+        isDark ? "-rotate-90 scale-0" : "rotate-0 scale-100",
         showLabel && "absolute"
       )} />
       <Moon className={cn(
-        "h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100",
+        "h-4 w-4 transition-all",
+        isDark ? "rotate-0 scale-100" : "rotate-90 scale-0",
         !showLabel && "absolute"
       )} />
-      {showLabel && theme && (
-        <span className="ml-2">{theme === "light" ? "Light" : "Dark"} Mode</span>
+      {showLabel && mounted && (
+        <span className="ml-2">{isDark ? "Dark" : "Light"} Mode</span>
       )}
       <span className="sr-only">Toggle theme</span>
     </Button>

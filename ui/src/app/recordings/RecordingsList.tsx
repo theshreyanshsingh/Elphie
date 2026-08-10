@@ -15,10 +15,13 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { useOrganizationTimezone } from "@/hooks/useOrganizationTimezone";
+import { detailFromError } from "@/lib/apiError";
+import { useAuth } from "@/lib/auth";
 import { formatDateTime } from "@/lib/dateTime";
 import logger from "@/lib/logger";
 
 export default function RecordingsList({ refreshKey }: { refreshKey?: number }) {
+    const { user, loading: authLoading, redirectToLogin } = useAuth();
     const organizationTimezone = useOrganizationTimezone();
     const [recordings, setRecordings] = useState<RecordingResponseSchema[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -33,6 +36,7 @@ export default function RecordingsList({ refreshKey }: { refreshKey?: number }) 
     const { playingId, toggle: togglePlayback, stop: stopPlayback } = useAudioPlayback();
 
     const fetchRecordings = useCallback(async () => {
+        if (authLoading || !user) return;
         try {
             setIsLoading(true);
             setError(null);
@@ -41,7 +45,16 @@ export default function RecordingsList({ refreshKey }: { refreshKey?: number }) 
                 query: {},
             });
 
-            if (response.error || !response.data) {
+            if (response.error) {
+                const message = detailFromError(response.error, "Failed to fetch recordings");
+                if (message.toLowerCase().includes("invalid or expired token")
+                    || message.toLowerCase().includes("not authenticated")) {
+                    redirectToLogin();
+                    return;
+                }
+                throw new Error(message);
+            }
+            if (!response.data) {
                 throw new Error("Failed to fetch recordings");
             }
 
@@ -52,7 +65,7 @@ export default function RecordingsList({ refreshKey }: { refreshKey?: number }) 
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [authLoading, user, redirectToLogin]);
 
     useEffect(() => {
         fetchRecordings();

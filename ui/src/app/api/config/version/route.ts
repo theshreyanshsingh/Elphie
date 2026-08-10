@@ -3,9 +3,6 @@ import { NextResponse } from "next/server";
 import type { HealthResponse } from "@/client/types.gen";
 import { getServerBackendUrl } from "@/lib/apiClient";
 
-// Import version from package.json at build time
-import packageJson from "../../../../../package.json";
-
 const HEALTHCHECK_TIMEOUT_MS = 3000;
 
 function trimTrailingSlash(url: string) {
@@ -26,12 +23,10 @@ function getHealthcheckFailureMessage(error: unknown, backendUrl: string) {
 }
 
 export async function GET() {
-  const uiVersion = packageJson.version || "dev";
   const backendUrl = trimTrailingSlash(getServerBackendUrl());
   const healthcheckUrl = `${backendUrl}/api/v1/health`;
 
-  let apiVersion = "unknown";
-  let deploymentMode = "oss";
+  let deploymentMode = "selfhosted";
   let authProvider = "local";
   let turnEnabled = false;
   let forceTurnRelay = false;
@@ -50,7 +45,6 @@ export async function GET() {
       backendMessage = `Backend health check at ${healthcheckUrl} returned HTTP ${response.status}.`;
     } else {
       const data = (await response.json()) as HealthResponse;
-      apiVersion = data.version;
       deploymentMode = data.deployment_mode;
       authProvider = data.auth_provider;
       turnEnabled = Boolean(data.turn_enabled);
@@ -65,13 +59,10 @@ export async function GET() {
       backendMessage = null;
     }
   } catch (error) {
-    apiVersion = "unavailable";
     backendMessage = getHealthcheckFailureMessage(error, backendUrl);
   }
 
   return NextResponse.json({
-    ui: uiVersion,
-    api: apiVersion,
     deploymentMode,
     authProvider,
     turnEnabled,

@@ -198,7 +198,7 @@ async def test_authorize_workflow_run_v2_insufficient_credits_prompts_billing(
 
 
 @pytest.mark.asyncio
-async def test_authorize_workflow_run_oss_exhausted_key_blocks_run(
+async def test_authorize_workflow_run_selfhosted_exhausted_key_blocks_run(
     monkeypatch,
 ):
     api_key = "mps_sk_12345678"
@@ -207,7 +207,7 @@ async def test_authorize_workflow_run_oss_exhausted_key_blocks_run(
         return_value={"total_credits_used": 500.0, "remaining_credits": 0.0}
     )
 
-    monkeypatch.setattr(quota_service, "DEPLOYMENT_MODE", "oss")
+    monkeypatch.setattr(quota_service, "DEPLOYMENT_MODE", "selfhosted")
     _patch_workflow_context(monkeypatch)
     monkeypatch.setattr(
         quota_service,
@@ -382,7 +382,7 @@ async def test_authorize_workflow_run_service_token_from_wrong_org_prompts_new_t
 
 
 @pytest.mark.asyncio
-async def test_authorize_workflow_run_oss_uses_key_paths_not_workflow_org(
+async def test_authorize_workflow_run_selfhosted_uses_key_paths_not_workflow_org(
     monkeypatch,
 ):
     api_key = "mps_sk_12345678"
@@ -397,7 +397,7 @@ async def test_authorize_workflow_run_oss_uses_key_paths_not_workflow_org(
     create_correlation = AsyncMock(return_value={"correlation_id": "oss-corr-123"})
     update_workflow_run = AsyncMock()
 
-    monkeypatch.setattr(quota_service, "DEPLOYMENT_MODE", "oss")
+    monkeypatch.setattr(quota_service, "DEPLOYMENT_MODE", "selfhosted")
     _patch_workflow_context(monkeypatch)
     monkeypatch.setattr(
         quota_service.db_client,
@@ -909,7 +909,7 @@ async def test_authorize_workflow_run_fails_closed_on_invalid_mps_url(monkeypatc
 
 
 @pytest.mark.asyncio
-async def test_authorize_workflow_run_opens_when_oss_quota_mps_is_unreachable(
+async def test_authorize_workflow_run_fails_when_selfhosted_quota_mps_is_unreachable(
     monkeypatch,
 ):
     request = httpx.Request(
@@ -917,7 +917,7 @@ async def test_authorize_workflow_run_opens_when_oss_quota_mps_is_unreachable(
         "https://services.elphie.com/api/v1/service-keys/usage/self",
     )
 
-    monkeypatch.setattr(quota_service, "DEPLOYMENT_MODE", "oss")
+    monkeypatch.setattr(quota_service, "DEPLOYMENT_MODE", "selfhosted")
     _patch_workflow_context(monkeypatch)
     monkeypatch.setattr(
         quota_service,
@@ -935,11 +935,13 @@ async def test_authorize_workflow_run_opens_when_oss_quota_mps_is_unreachable(
         organization_id=42,
     )
 
-    assert result.has_quota is True
+    assert result.has_quota is False
+    assert result.error_code == "mps_unreachable"
+    assert "BYOK" in result.error_message
 
 
 @pytest.mark.asyncio
-async def test_authorize_workflow_run_fails_closed_on_oss_quota_mps_http_error(
+async def test_authorize_workflow_run_fails_closed_on_selfhosted_quota_mps_http_error(
     monkeypatch,
 ):
     request = httpx.Request(
@@ -948,7 +950,7 @@ async def test_authorize_workflow_run_fails_closed_on_oss_quota_mps_http_error(
     )
     response = httpx.Response(503, request=request)
 
-    monkeypatch.setattr(quota_service, "DEPLOYMENT_MODE", "oss")
+    monkeypatch.setattr(quota_service, "DEPLOYMENT_MODE", "selfhosted")
     _patch_workflow_context(monkeypatch)
     monkeypatch.setattr(
         quota_service,
@@ -977,7 +979,7 @@ async def test_authorize_workflow_run_fails_closed_on_oss_quota_mps_http_error(
 
 
 @pytest.mark.asyncio
-async def test_authorize_workflow_run_opens_when_oss_correlation_mps_is_unreachable(
+async def test_authorize_workflow_run_fails_when_selfhosted_correlation_mps_is_unreachable(
     monkeypatch,
 ):
     request = httpx.Request(
@@ -985,7 +987,7 @@ async def test_authorize_workflow_run_opens_when_oss_correlation_mps_is_unreacha
         "https://services.elphie.com/api/v1/service-keys/correlation-id/self",
     )
 
-    monkeypatch.setattr(quota_service, "DEPLOYMENT_MODE", "oss")
+    monkeypatch.setattr(quota_service, "DEPLOYMENT_MODE", "selfhosted")
     _patch_workflow_context(monkeypatch)
     monkeypatch.setattr(
         quota_service.db_client,
@@ -1016,14 +1018,16 @@ async def test_authorize_workflow_run_opens_when_oss_correlation_mps_is_unreacha
         workflow_run_id=88,
     )
 
-    assert result.has_quota is True
+    assert result.has_quota is False
+    assert result.error_code == "mps_unreachable"
+    assert "BYOK" in result.error_message
 
 
 @pytest.mark.asyncio
-async def test_authorize_workflow_run_fails_closed_when_storing_oss_correlation(
+async def test_authorize_workflow_run_fails_closed_when_storing_selfhosted_correlation(
     monkeypatch,
 ):
-    monkeypatch.setattr(quota_service, "DEPLOYMENT_MODE", "oss")
+    monkeypatch.setattr(quota_service, "DEPLOYMENT_MODE", "selfhosted")
     _patch_workflow_context(monkeypatch)
     monkeypatch.setattr(
         quota_service.db_client,

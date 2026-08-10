@@ -25,6 +25,7 @@ from api.services.configuration.check_validity import (
     APIKeyStatusResponse,
     UserConfigurationValidator,
 )
+from api.schemas.ai_model_configuration import ELPHIE_DEFAULT_VOICE
 from api.services.configuration.defaults import DEFAULT_SERVICE_PROVIDERS
 from api.services.configuration.masking import check_for_masked_keys, mask_user_config
 from api.services.configuration.merge import merge_user_configurations
@@ -447,6 +448,26 @@ class VoicesResponse(BaseModel):
     facets: Optional[VoiceFacets] = None
 
 
+def _fallback_voices(provider: TTSProvider) -> VoicesResponse:
+    """Local fallback when managed voice proxy (MPS) is unreachable.
+
+    Self-hosted installs may not reach ``MPS_API_URL``, so the Models UI must
+    not hard-fail with HTTP 500 when listing voices.
+    """
+    if provider == "elphie":
+        return VoicesResponse(
+            provider=provider,
+            voices=[
+                VoiceInfo(
+                    voice_id=ELPHIE_DEFAULT_VOICE,
+                    name="Default",
+                    description="Built-in Elphie voice (managed catalog unavailable)",
+                )
+            ],
+        )
+    return VoicesResponse(provider=provider, voices=[])
+
+
 @router.get("/configurations/voices/{provider}")
 async def get_voices(
     provider: TTSProvider,
@@ -475,8 +496,10 @@ async def get_voices(
             facets=result.get("facets"),
         )
     except Exception as e:
-        logger.error(f"Failed to fetch voices for {provider}: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to fetch voices for {provider}",
+        # DNS / connection failures to MPS (common on self-hosted) → empty/default catalog
+        logger.warning(
+            "Voice catalog unavailable for {}: {}. Returning local fallback.",
+            provider,
+            e,
         )
+        return _fallback_voices(provider)

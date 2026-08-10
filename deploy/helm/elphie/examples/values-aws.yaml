@@ -5,7 +5,7 @@
 #   - IRSA configured for the elphie ServiceAccount when using S3
 #
 # REQUIRED OVERRIDES:
-#   --set secrets.ossJwtSecret=$(openssl rand -hex 32)
+#   --set secrets.selfhostedJwtSecret=$(openssl rand -hex 32)
 #   --set secrets.turnSecret=$(openssl rand -hex 32)
 #   --set exposure.gatewayApi.listenerHostname=elphie.example.com
 #   --set storage.s3.bucket=...

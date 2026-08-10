@@ -149,6 +149,16 @@
     @apply cursor-pointer;
   }
 
+  /* Elphie Paper compact controls. Button padding lives in button.tsx
+     (icon sizes need p-1 / size-7); only reinforce radius + type here. */
+  [data-slot="button"] {
+    @apply rounded-md text-xs;
+  }
+
+  [data-slot="sidebar-menu-button"] {
+    @apply rounded-md px-2 py-1 text-xs;
+  }
+
   [data-slot="input"],
   [data-slot="textarea"],
   [data-slot="select-trigger"] {
@@ -167,6 +177,12 @@
     color: var(--foreground);
   }
 
+  /* Paper compact type scale for dashboard pages */
+  .app-page-content,
+  .app-content-area {
+    @apply text-xs;
+  }
+
   .app-content-area--scroll {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -176,17 +192,35 @@
     display: none;
   }
 
-  /* Paper-flat dashboard pages — no elevation shadows on content surfaces */
-  .app-content-area:not(.app-content-area--full-bleed) .card-weave,
-  .app-content-area:not(.app-content-area--full-bleed) .shadow-sm,
-  .app-content-area:not(.app-content-area--full-bleed) .shadow-md,
-  .app-content-area:not(.app-content-area--full-bleed) .shadow-lg,
-  .app-content-area:not(.app-content-area--full-bleed) .shadow-xl,
-  .app-content-area:not(.app-content-area--full-bleed) .shadow-2xl,
-  .app-content-area:not(.app-content-area--full-bleed) .hover\:shadow-md:hover,
-  .app-content-area:not(.app-content-area--full-bleed) .hover\:shadow-lg:hover,
-  .app-content-area:not(.app-content-area--full-bleed) .hover\:shadow-xl:hover {
-    box-shadow: none;
+  /* Flat UI — no elevation shadows anywhere in the app */
+  .shadow-xs,
+  .shadow-sm,
+  .shadow,
+  .shadow-md,
+  .shadow-lg,
+  .shadow-xl,
+  .shadow-2xl,
+  .hover\:shadow-sm:hover,
+  .hover\:shadow-md:hover,
+  .hover\:shadow-lg:hover,
+  .hover\:shadow-xl:hover,
+  .hover\:shadow-2xl:hover,
+  [class*="shadow-["],
+  [class*="shadow-xs"],
+  [class*="shadow-sm"],
+  [class*="shadow-md"],
+  [class*="shadow-lg"],
+  [class*="shadow-xl"],
+  [class*="shadow-2xl"],
+  .card-weave {
+    --tw-shadow: 0 0 #0000;
+    --tw-shadow-colored: 0 0 #0000;
+    box-shadow: none !important;
+  }
+
+  [class*="drop-shadow"] {
+    --tw-drop-shadow: ;
+    filter: none !important;
   }
 
   .auth-imprint {

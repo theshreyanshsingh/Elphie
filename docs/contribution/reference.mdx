@@ -9,7 +9,7 @@ Everything on this page is optional reading — [Setup](/contribution/setup) cov
 
 Run everything directly on your host instead of inside the devcontainer. You need Git, Node.js 24, Python 3.13, and Docker (for Postgres, Redis, and MinIO).
 
-1. Run the contributor bootstrap. It configures `origin` as your fork and `upstream` as `theshreyanshsingh/Elphie`, initializes the pipecat submodule, creates the Python venv, and copies the `.env` templates:
+1. Run the contributor bootstrap. It configures git remotes, initializes the pipecat submodule, creates the Python venv, and copies the `.env` templates:
 
 <CodeGroup>
 ```bash macOS/Linux
@@ -73,7 +73,7 @@ cd ui && npm run dev
 
 ## Devcontainer internals
 
-The checked-in `.devcontainer/` follows the Dev Containers specification, so it should also work in Cursor, JetBrains IDEs, and other compatible editors. Only the VS Code path is actively tested — if something breaks elsewhere, please open a [GitHub issue](https://github.com/theshreyanshsingh/Elphie/issues).
+The checked-in `.devcontainer/` follows the Dev Containers specification, so it should also work in Cursor, JetBrains IDEs, and other compatible editors. Only the VS Code path is actively tested — if something breaks elsewhere, please ask in the [Elphie Community Slack](https://join.slack.com/t/elphie-community/shared_invite/zt-3zjb5vwvl-j7hRz3_F1SOn5cH~jm5f5g).
 
 ### What the bootstrap does
 
@@ -100,7 +100,7 @@ The workspace bind mount and the `venv` / `node_modules` named volumes persist a
 - `api/requirements.txt` or `api/requirements.dev.txt`
 - The `pipecat/` submodule
 
-Plain source edits, `ui/package.json`, and the `.env.example` templates do **not** require a rebuild. After a `git pull`, a quick check:
+Plain source edits, `ui/package.json`, and the `.env.example` templates do **not** require a rebuild. After refreshing your local source, a quick check:
 
 ```bash
 git diff HEAD@{1} HEAD -- .devcontainer api/requirements.txt api/requirements.dev.txt pipecat
@@ -155,10 +155,10 @@ devcontainer exec --workspace-folder . bash -lc 'cd ui && npm run dev -- --hostn
 
 The contributor bootstrap (`scripts/setup_fork.sh`) configures two remotes:
 
-- `origin`: your fork, where you push
-- `upstream`: `theshreyanshsingh/Elphie`, where new commits land
+- `origin`: your contribution remote, where you push
+- `upstream`: the canonical Elphie remote, where new commits land
 
-If you cloned `theshreyanshsingh/Elphie` directly instead of your fork, run it once (inside the devcontainer is fine):
+If your remotes are not set up yet, run it once (inside the devcontainer is fine):
 
 ```bash
 bash scripts/setup_fork.sh
@@ -173,13 +173,8 @@ git merge upstream/main
 git push origin main
 ```
 
-Check your remotes any time with `git remote -v`. You should see:
-
-```bash
-origin    https://github.com/<YOUR_HANDLE>/elphie.git (fetch/push)
-upstream  https://github.com/theshreyanshsingh/Elphie.git    (fetch/push)
-```
+Check your remotes any time with `git remote -v`.
 
 <Note>
-Always push feature branches to **`origin`** (your fork), then open a pull request against `theshreyanshsingh/Elphie:main`. Never push directly to `upstream`.
+Always push feature branches to **`origin`** (your contribution remote), then share the change with maintainers for review. Never push directly to `upstream`.
 </Note>

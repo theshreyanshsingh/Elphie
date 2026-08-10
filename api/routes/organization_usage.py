@@ -155,9 +155,25 @@ async def get_current_period_usage(user: UserModel = Depends(get_user)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-async def _oss_mps_credits_response(user: UserModel) -> MPSBillingCreditsResponse:
-    """Aggregate per-key MPS credits for OSS deployments (no billing account)."""
-    usage = await mps_service_key_client.get_usage_by_created_by(str(user.provider_id))
+async def _selfhosted_mps_credits_response(user: UserModel) -> MPSBillingCreditsResponse:
+    """Aggregate per-key MPS credits for self-hosted deployments (no billing account)."""
+    try:
+        usage = await mps_service_key_client.get_usage_by_created_by(
+            str(user.provider_id)
+        )
+    except Exception as exc:
+        # Self-hosted often has no reachable MPS — return zeros so Billing
+        # widgets do not hard-fail with HTTP 500.
+        logger.warning(
+            "self-hosted MPS credits unavailable for {}: {}. Returning zero balances.",
+            user.provider_id,
+            exc,
+        )
+        return MPSBillingCreditsResponse(
+            total_credits_used=0.0,
+            remaining_credits=0.0,
+            total_quota=0.0,
+        )
 
     total_used = float(usage.get("total_credits_used", 0.0))
     total_remaining = float(usage.get("remaining_credits", 0.0))
@@ -174,10 +190,10 @@ async def get_billing_credits(
     limit: int = Query(50, ge=1, le=100),
     user: UserModel = Depends(get_user),
 ):
-    """Return per-key MPS credits (OSS) or the org's paginated billing ledger."""
+    """Return per-key MPS credits (self-hosted) or the org's paginated billing ledger."""
     try:
-        if DEPLOYMENT_MODE == "oss":
-            return await _oss_mps_credits_response(user)
+        if DEPLOYMENT_MODE == "selfhosted":
+            return await _selfhosted_mps_credits_response(user)
 
         if not user.selected_organization_id:
             raise HTTPException(status_code=400, detail="No organization selected")
@@ -286,10 +302,10 @@ async def create_mps_credit_purchase_url(
     user: UserModel = Depends(get_user_with_selected_organization),
 ):
     """Create a checkout URL for purchasing organization credits."""
-    if DEPLOYMENT_MODE == "oss":
+    if DEPLOYMENT_MODE == "selfhosted":
         raise HTTPException(
             status_code=404,
-            detail="Credit purchases are not available in OSS mode",
+            detail="Credit purchases are not available in self-hosted mode",
         )
 
     organization_id = user.selected_organization_id

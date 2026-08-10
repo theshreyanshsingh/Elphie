@@ -71,24 +71,24 @@ netstat -ano | findstr :3010
 
 Elphie images are available from two registries:
 
-- **GitHub Container Registry (Default)**: `ghcr.io/theshreyanshsingh` - Recommended for most users
-- **Docker Hub**: `elphieai` - Alternative registry
+- **Container registry (default)**: `ghcr.io/theshreyanshsingh` — recommended for most users
+- **Docker Hub**: `elphieai` — alternative registry
 
-To use a specific registry, set the `REGISTRY` environment variable when running the startup script:
+To use a specific registry, set the `REGISTRY` environment variable when running the startup script from a local checkout:
 
 <CodeGroup>
 ```bash
-# Using GitHub Container Registry (recommended)
-REGISTRY=ghcr.io/theshreyanshsingh ./start_docker.sh
+# Using the default container registry (recommended)
+REGISTRY=ghcr.io/theshreyanshsingh ./scripts/start_docker.sh
 
 # Using Docker Hub
-REGISTRY=elphieai ./start_docker.sh
+REGISTRY=elphieai ./scripts/start_docker.sh
 ```
 ```powershell Windows
-# Using GitHub Container Registry (recommended)
-$env:REGISTRY = 'ghcr.io/theshreyanshsingh'; .\start_docker.ps1
+# Using the default container registry (recommended)
+$env:REGISTRY = 'ghcr.io/theshreyanshsingh'; .\scripts\start_docker.ps1
 
 # Using Docker Hub
-$env:REGISTRY = 'elphieai'; .\start_docker.ps1
+$env:REGISTRY = 'elphieai'; .\scripts\start_docker.ps1
 ```
 </CodeGroup>

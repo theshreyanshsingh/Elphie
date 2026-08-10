@@ -289,7 +289,7 @@
     "links": [
       {
         "label": "Support",
-        "href": "https://github.com/theshreyanshsingh/Elphie/issues/new/choose"
+        "href": "https://join.slack.com/t/elphie-community/shared_invite/zt-3zjb5vwvl-j7hRz3_F1SOn5cH~jm5f5g"
       }
     ],
     "primary": {
@@ -320,7 +320,6 @@
   },
   "footer": {
     "socials": {
-      "github": "https://github.com/theshreyanshsingh",
       "linkedin": "https://linkedin.com/company/elphie"
     }
   },

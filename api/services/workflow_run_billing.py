@@ -41,7 +41,7 @@ def _is_usage_not_ready_error(exc: Exception) -> bool:
 
 async def report_workflow_run_platform_usage(workflow_run) -> None:
     """Report hosted platform usage for a completed workflow run to MPS."""
-    if DEPLOYMENT_MODE == "oss":
+    if DEPLOYMENT_MODE == "selfhosted":
         return
 
     if not getattr(workflow_run, "is_completed", False):

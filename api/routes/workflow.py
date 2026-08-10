@@ -52,6 +52,7 @@ from api.services.workflow.configuration_policy import (
 from api.services.workflow.dto import ReactFlowDTO, sanitize_workflow_definition
 from api.services.workflow.duplicate import duplicate_workflow
 from api.services.workflow.errors import ItemKind, WorkflowError
+from api.services.workflow.selfhosted_template import build_selfhosted_workflow_from_template
 from api.services.workflow.run_creation import prepare_workflow_run_inputs
 from api.services.workflow.run_usage_response import (
     format_public_cost_info,
@@ -537,7 +538,7 @@ async def create_workflow_from_template(
 
     This endpoint:
     1. Uses mps_service_key_client to call MPS workflow API
-    2. Passes organization ID (authenticated mode) or created_by (OSS mode)
+    2. Passes organization ID (authenticated mode) or created_by (self-hosted mode)
     3. Creates the workflow in the database
 
     Args:
@@ -551,23 +552,43 @@ async def create_workflow_from_template(
         HTTPException: If MPS API call fails
     """
     try:
-        # Call MPS API to generate workflow using the client
-        if DEPLOYMENT_MODE == "oss":
-            workflow_data = await mps_service_key_client.call_workflow_api(
-                call_type=request.call_type.upper(),
-                use_case=request.use_case,
-                activity_description=request.activity_description,
-                created_by=str(user.provider_id),
-            )
-        else:
-            if not user.selected_organization_id:
-                raise HTTPException(status_code=400, detail="No organization selected")
+        # Prefer managed MPS template generation; self-hosted falls back locally when
+        # MPS_API_URL is unreachable.
+        workflow_data = None
+        try:
+            if DEPLOYMENT_MODE == "selfhosted":
+                workflow_data = await mps_service_key_client.call_workflow_api(
+                    call_type=request.call_type.upper(),
+                    use_case=request.use_case,
+                    activity_description=request.activity_description,
+                    created_by=str(user.provider_id),
+                )
+            else:
+                if not user.selected_organization_id:
+                    raise HTTPException(
+                        status_code=400, detail="No organization selected"
+                    )
 
-            workflow_data = await mps_service_key_client.call_workflow_api(
-                call_type=request.call_type.upper(),
+                workflow_data = await mps_service_key_client.call_workflow_api(
+                    call_type=request.call_type.upper(),
+                    use_case=request.use_case,
+                    activity_description=request.activity_description,
+                    organization_id=user.selected_organization_id,
+                )
+        except HTTPException:
+            raise
+        except Exception as mps_error:
+            if DEPLOYMENT_MODE != "selfhosted":
+                raise
+            logger.warning(
+                "MPS template generation unavailable ({}). "
+                "Creating local starter workflow.",
+                mps_error,
+            )
+            workflow_data = build_selfhosted_workflow_from_template(
+                call_type=request.call_type,
                 use_case=request.use_case,
                 activity_description=request.activity_description,
-                organization_id=user.selected_organization_id,
             )
 
         # Create the workflow in our database

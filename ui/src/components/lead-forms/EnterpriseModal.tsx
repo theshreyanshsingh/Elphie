@@ -30,8 +30,8 @@ interface EnterpriseModalProps {
 
 export function EnterpriseModal({ open, onOpenChange, source, prefill }: EnterpriseModalProps) {
   const { config } = useAppConfig();
-  // Deployment provenance (analytics only); OSS submits via the public contact-sales path.
-  const origin = config?.deploymentMode === "cloud" ? "cloud_app" : "oss_app";
+  // Deployment provenance (analytics only); self-hosted submits via the public contact-sales path.
+  const origin = config?.deploymentMode === "cloud" ? "cloud_app" : "selfhosted_app";
   const [value, setValue] = useState<EnterpriseFieldsValue>(EMPTY_ENTERPRISE_FIELDS);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [captchaActive, setCaptchaActive] = useState(false);

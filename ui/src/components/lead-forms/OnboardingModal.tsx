@@ -47,7 +47,7 @@ export function OnboardingModal({ open, onComplete }: OnboardingModalProps) {
   const { user } = useAuth(); // logged-in identity → onboarding email (sent silently)
   const { config } = useAppConfig();
   // Deployment provenance (analytics only).
-  const origin = config?.deploymentMode === "cloud" ? "cloud_app" : "oss_app";
+  const origin = config?.deploymentMode === "cloud" ? "cloud_app" : "selfhosted_app";
   // The logged-in user's email (Stack uses primaryEmail; local uses email). Sent in the
   // body — there is no visible email field on the onboarding form.
   const userEmail = user ? ("primaryEmail" in user ? user.primaryEmail ?? "" : user.email ?? "") : "";

@@ -107,7 +107,7 @@ FORCE_TURN_RELAY="${FORCE_TURN_RELAY:-false}"
 # Telemetry opt-out (default: true)
 ENABLE_TELEMETRY="${ENABLE_TELEMETRY:-true}"
 
-# Container registry (defaults to the public OSS registry)
+# Container registry (defaults to the public public registry)
 REGISTRY="${REGISTRY:-ghcr.io/elphie-hq}"
 
 echo ""
@@ -149,7 +149,7 @@ fi
 # Generate .env
 ENV_STEP=$TOTAL_STEPS
 echo -e "${BLUE}[$ENV_STEP/$TOTAL_STEPS] Creating environment file...${NC}"
-OSS_JWT_SECRET=$(openssl rand -hex 32)
+SELFHOSTED_JWT_SECRET=$(openssl rand -hex 32)
 POSTGRES_PASSWORD=$(openssl rand -hex 32)
 REDIS_PASSWORD=$(openssl rand -hex 32)
 MINIO_ROOT_USER="elphie$(openssl rand -hex 6)"
@@ -159,8 +159,8 @@ cat > .env << ENV_EOF
 # Container registry for Elphie images
 REGISTRY=$REGISTRY
 
-# JWT secret for OSS authentication
-OSS_JWT_SECRET=$OSS_JWT_SECRET
+# JWT secret for self-hosted authentication
+SELFHOSTED_JWT_SECRET=$SELFHOSTED_JWT_SECRET
 
 # PostgreSQL password. Used by the postgres container on first init and by the
 # API's DATABASE_URL. Do not change after the first start — the password is
