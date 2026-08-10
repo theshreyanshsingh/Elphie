@@ -33,9 +33,14 @@ jobs:
       short_sha: ${{ steps.tags.outputs.short_sha }}
       version: ${{ steps.tags.outputs.version }}
       push_latest: ${{ steps.tags.outputs.push_latest }}
+      push_dockerhub: ${{ steps.tags.outputs.push_dockerhub }}
+      ghcr_namespace: ${{ steps.tags.outputs.ghcr_namespace }}
     steps:
       - name: Compute tags
         id: tags
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
           SHORT_SHA="${GITHUB_SHA::8}"
 
@@ -52,9 +57,16 @@ jobs:
             PUSH_LATEST="${{ inputs.push_latest }}"
           fi
 
+          PUSH_DOCKERHUB="false"
+          if [ -n "$DOCKERHUB_USERNAME" ] && [ -n "$DOCKERHUB_TOKEN" ]; then
+            PUSH_DOCKERHUB="true"
+          fi
+
           echo "short_sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "push_latest=${PUSH_LATEST}" >> "$GITHUB_OUTPUT"
+          echo "push_dockerhub=${PUSH_DOCKERHUB}" >> "$GITHUB_OUTPUT"
+          echo "ghcr_namespace=${REGISTRY_GHCR}/${{ github.repository_owner }}" >> "$GITHUB_OUTPUT"
 
   build:
     needs: prepare
@@ -97,6 +109,7 @@ jobs:
         uses: docker/setup-buildx-action@v4
 
       - name: Log in to DockerHub
+        if: needs.prepare.outputs.push_dockerhub == 'true'
         uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -106,8 +119,22 @@ jobs:
         uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY_GHCR }}
-          username: ${{ secrets.GHCR_USERNAME }}
-          password: ${{ secrets.GHCR_TOKEN }}
+          username: ${{ github.repository_owner }}
+          password: ${{ github.token }}
+
+      - name: Resolve image names
+        id: images
+        env:
+          PUSH_DOCKERHUB: ${{ needs.prepare.outputs.push_dockerhub }}
+          DH_NAMESPACE: ${{ secrets.DOCKERHUB_USERNAME }}
+          GH_NAMESPACE: ${{ needs.prepare.outputs.ghcr_namespace }}
+          SERVICE: ${{ matrix.service.name }}
+        run: |
+          names="${GH_NAMESPACE}/${SERVICE}"
+          if [ "$PUSH_DOCKERHUB" = "true" ] && [ -n "$DH_NAMESPACE" ]; then
+            names="${DH_NAMESPACE}/${SERVICE},${names}"
+          fi
+          echo "outputs=type=image,\"name=${names}\",push-by-digest=true,name-canonical=true,push=true" >> "$GITHUB_OUTPUT"
 
       - name: Build and push by digest
         id: build
@@ -116,7 +143,7 @@ jobs:
           context: ${{ matrix.service.context }}
           file: ${{ matrix.service.dockerfile }}
           platforms: ${{ matrix.platform.name }}
-          outputs: 'type=image,"name=${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.service.name }},${{ env.REGISTRY_GHCR }}/${{ secrets.GHCR_USERNAME }}/${{ matrix.service.name }}",push-by-digest=true,name-canonical=true,push=true'
+          outputs: ${{ steps.images.outputs.outputs }}
           cache-from: type=gha,scope=${{ matrix.service.name }}-${{ matrix.platform.short }}
           cache-to: type=gha,mode=max,scope=${{ matrix.service.name }}-${{ matrix.platform.short }}
 
@@ -156,6 +183,7 @@ jobs:
         uses: docker/setup-buildx-action@v4
 
       - name: Log in to DockerHub
+        if: needs.prepare.outputs.push_dockerhub == 'true'
         uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -165,26 +193,28 @@ jobs:
         uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY_GHCR }}
-          username: ${{ secrets.GHCR_USERNAME }}
-          password: ${{ secrets.GHCR_TOKEN }}
+          username: ${{ github.repository_owner }}
+          password: ${{ github.token }}
 
       - name: Create manifest lists
         env:
           DH_NAMESPACE: ${{ secrets.DOCKERHUB_USERNAME }}
-          GH_NAMESPACE: ${{ env.REGISTRY_GHCR }}/${{ secrets.GHCR_USERNAME }}
+          GH_NAMESPACE: ${{ needs.prepare.outputs.ghcr_namespace }}
           VERSION: ${{ needs.prepare.outputs.version }}
           SHORT_SHA: ${{ needs.prepare.outputs.short_sha }}
           PUSH_LATEST: ${{ needs.prepare.outputs.push_latest }}
+          PUSH_DOCKERHUB: ${{ needs.prepare.outputs.push_dockerhub }}
         run: |
           inspect_digests() {
             service="$1"
             digest_dir="/tmp/digests/$service"
-            dh_image="$DH_NAMESPACE/$service"
             gh_image="$GH_NAMESPACE/$service"
 
             for digest_file in "$digest_dir"/*; do
               digest="$(cat "$digest_file")"
-              docker buildx imagetools inspect "$dh_image@sha256:$digest" >/dev/null
+              if [ "$PUSH_DOCKERHUB" = "true" ]; then
+                docker buildx imagetools inspect "$DH_NAMESPACE/$service@sha256:$digest" >/dev/null
+              fi
               docker buildx imagetools inspect "$gh_image@sha256:$digest" >/dev/null
             done
           }
@@ -192,22 +222,24 @@ jobs:
           create_manifests() {
             service="$1"
             digest_dir="/tmp/digests/$service"
-            dh_image="$DH_NAMESPACE/$service"
             gh_image="$GH_NAMESPACE/$service"
 
-            dh_refs=$(printf "${dh_image}@sha256:%s " $(cat "$digest_dir"/*))
             gh_refs=$(printf "${gh_image}@sha256:%s " $(cat "$digest_dir"/*))
-
-            dh_tags=(-t "$dh_image:$VERSION" -t "$dh_image:$SHORT_SHA")
             gh_tags=(-t "$gh_image:$VERSION" -t "$gh_image:$SHORT_SHA")
-
             if [ "$PUSH_LATEST" = "true" ]; then
-              dh_tags+=(-t "$dh_image:latest")
               gh_tags+=(-t "$gh_image:latest")
             fi
-
-            docker buildx imagetools create "${dh_tags[@]}" $dh_refs
             docker buildx imagetools create "${gh_tags[@]}" $gh_refs
+
+            if [ "$PUSH_DOCKERHUB" = "true" ]; then
+              dh_image="$DH_NAMESPACE/$service"
+              dh_refs=$(printf "${dh_image}@sha256:%s " $(cat "$digest_dir"/*))
+              dh_tags=(-t "$dh_image:$VERSION" -t "$dh_image:$SHORT_SHA")
+              if [ "$PUSH_LATEST" = "true" ]; then
+                dh_tags+=(-t "$dh_image:latest")
+              fi
+              docker buildx imagetools create "${dh_tags[@]}" $dh_refs
+            fi
           }
 
           inspect_digests elphie-api
@@ -219,7 +251,7 @@ jobs:
     needs:
       - prepare
       - merge
-    if: always()
+    if: always() && secrets.SLACK_WEBHOOK_URL != ''
     runs-on: ubuntu-latest
     steps:
       - name: Slack success

@@ -136,7 +136,7 @@ services:
       - app-network
 
   api:
-    image: ${REGISTRY:-elphieai}/elphie-api:${ELPHIE_VERSION:-latest}
+    image: ${REGISTRY:-ghcr.io/theshreyanshsingh}/elphie-api:${ELPHIE_VERSION:-latest}
     restart: unless-stopped
     volumes:
       - shared-tmp:/tmp
@@ -228,7 +228,7 @@ services:
       - traefik
 
   ui:
-    image: ${REGISTRY:-elphieai}/elphie-ui:${ELPHIE_VERSION:-latest}
+    image: ${REGISTRY:-ghcr.io/theshreyanshsingh}/elphie-ui:${ELPHIE_VERSION:-latest}
     restart: unless-stopped
     environment:
       HOSTNAME: "0.0.0.0"

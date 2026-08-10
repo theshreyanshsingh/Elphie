@@ -108,7 +108,7 @@ FORCE_TURN_RELAY="${FORCE_TURN_RELAY:-false}"
 ENABLE_TELEMETRY="${ENABLE_TELEMETRY:-true}"
 
 # Container registry (defaults to the public public registry)
-REGISTRY="${REGISTRY:-ghcr.io/elphie-hq}"
+REGISTRY="${REGISTRY:-ghcr.io/theshreyanshsingh}"
 
 echo ""
 echo -e "${GREEN}Configuration:${NC}"

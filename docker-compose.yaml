@@ -130,7 +130,7 @@ services:
       - app-network
 
   api:
-    image: ${REGISTRY:-elphie-local}/elphie-api:${IMAGE_TAG:-latest}
+    image: ${REGISTRY:-ghcr.io/theshreyanshsingh}/elphie-api:${IMAGE_TAG:-latest}
     volumes:
       - shared-tmp:/tmp
     environment:
@@ -228,7 +228,7 @@ services:
       - app-network
 
   ui:
-    image: ${REGISTRY:-elphie-local}/elphie-ui:${IMAGE_TAG:-latest}
+    image: ${REGISTRY:-ghcr.io/theshreyanshsingh}/elphie-ui:${IMAGE_TAG:-latest}
     environment:
       # Bind the Next.js standalone server to all interfaces
       HOSTNAME: "0.0.0.0"
