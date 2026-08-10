@@ -50,6 +50,9 @@ async def signup(request: SignupRequest):
     # Link user to organization
     await db_client.add_user_to_organization(user.id, organization.id)
     await db_client.update_user_selected_organization(user.id, organization.id)
+    # Keep the in-memory model in sync — ensure_* reads selected_organization_id
+    # from this object, not from a fresh DB fetch.
+    user.selected_organization_id = organization.id
 
     # Create default managed LLM/TTS/STT configuration (MPS trial key)
     await ensure_default_mps_model_configuration(user)
