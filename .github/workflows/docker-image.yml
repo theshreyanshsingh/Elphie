@@ -119,8 +119,8 @@ jobs:
         uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY_GHCR }}
-          username: ${{ github.repository_owner }}
-          password: ${{ github.token }}
+          username: ${{ secrets.GHCR_USERNAME || github.repository_owner }}
+          password: ${{ secrets.GHCR_TOKEN || github.token }}
 
       - name: Resolve image names
         id: images
@@ -193,8 +193,8 @@ jobs:
         uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY_GHCR }}
-          username: ${{ github.repository_owner }}
-          password: ${{ github.token }}
+          username: ${{ secrets.GHCR_USERNAME || github.repository_owner }}
+          password: ${{ secrets.GHCR_TOKEN || github.token }}
 
       - name: Create manifest lists
         env:
