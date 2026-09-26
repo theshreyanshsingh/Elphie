@@ -1,7 +1,7 @@
 'use client';
 
-import { arrow, autoUpdate, flip, offset, shift, useFloating } from '@floating-ui/react-dom';
 import type { Placement } from '@floating-ui/react-dom';
+import { arrow, autoUpdate, flip, offset, shift, useFloating } from '@floating-ui/react-dom';
 import { X } from 'lucide-react';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';

@@ -3,7 +3,7 @@ import type { HTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Elphie Paper page title — compact `text-sm` (not Dograh-scale text-2xl/3xl).
+ * Elphie Paper page title. Uses compact `text-sm`.
  * Trailing `text-sm` wins over any larger size passed via className.
  */
 export function PageHeading({
