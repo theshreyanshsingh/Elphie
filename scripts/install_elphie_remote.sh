@@ -35,29 +35,13 @@ fi
 
 echo -e "${BLUE}==> Installing Elphie on ${SERVER_IP}${NC}"
 
-# 0) Ensure pipecat sources are present (required for API Docker build bind-mount)
-if [[ ! -f "$ROOT_DIR/pipecat/pyproject.toml" ]]; then
-  echo -e "${BLUE}==> Initializing git submodules (pipecat)${NC}"
-  git -C "$ROOT_DIR" submodule sync --recursive || true
-  git -C "$ROOT_DIR" submodule update --init --recursive || true
-fi
-if [[ ! -f "$ROOT_DIR/pipecat/pyproject.toml" ]]; then
-  PIPECAT_SHA="$(git -C "$ROOT_DIR" ls-tree HEAD pipecat | awk '{print $3}')"
-  echo -e "${BLUE}==> Fallback: cloning dograh-hq/pipecat @ ${PIPECAT_SHA:-latest}${NC}"
-  rm -rf "$ROOT_DIR/pipecat"
-  git clone https://github.com/dograh-hq/pipecat.git "$ROOT_DIR/pipecat"
-  if [[ -n "${PIPECAT_SHA:-}" ]]; then
-    git -C "$ROOT_DIR/pipecat" fetch --depth 1 origin "$PIPECAT_SHA"
-    git -C "$ROOT_DIR/pipecat" checkout --force "$PIPECAT_SHA"
-  fi
-fi
+# 0) Pipecat ships inside this repo (required for the API Docker build).
 if [[ ! -f "$ROOT_DIR/pipecat/pyproject.toml" ]]; then
   echo -e "${RED}pipecat/pyproject.toml missing — cannot build API image${NC}"
-  echo -e "${RED}Manual fix:${NC}"
-  echo "  cd $ROOT_DIR && rm -rf pipecat && git clone https://github.com/dograh-hq/pipecat.git pipecat"
+  echo -e "${RED}Pipecat is part of the Elphie repo. Re-clone Elphie instead of fetching it from another remote.${NC}"
   exit 1
 fi
-echo -e "${GREEN}✓ pipecat ready ($(git -C "$ROOT_DIR/pipecat" rev-parse --short HEAD 2>/dev/null || echo ok))${NC}"
+echo -e "${GREEN}✓ pipecat ready${NC}"
 
 # 1) .env
 if [[ ! -f .env ]]; then
