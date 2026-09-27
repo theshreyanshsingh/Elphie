@@ -131,17 +131,12 @@ cd elphie
 # Refresh local source to the desired release tag (format: elphie-vX.Y.Z), e.g.:
 git checkout elphie-v1.28.0
 
-# Pick up pipecat and other submodule bumps
-git submodule update --init --recursive
+# Pipecat is included in the Elphie tree. A git checkout is enough.
 
 # Rebuild and restart
 sudo docker compose --profile remote build
 sudo docker compose --profile remote up -d
 ```
-
-<Warning>
-If you update the `pipecat` submodule, you **must** run `git submodule update --init --recursive` before rebuilding, or the Docker build will not pick up `pipecat` changes.
-</Warning>
 
 If you maintain a customized tree on top of upstream, resolving conflicts in `docker-compose.yaml`, `remote_up.sh`, `scripts/run_elphie_init.sh`, `deploy/templates/*`, or `setup_remote.sh` is up to you — resolve them as you would any other merge. Leave `SELFHOSTED_JWT_SECRET`, `TURN_SECRET`, `POSTGRES_PASSWORD`, `REDIS_PASSWORD`, `MINIO_ROOT_USER`, and `MINIO_ROOT_PASSWORD` in `.env` unchanged across updates to preserve sessions, WebRTC auth, and service credentials.
 

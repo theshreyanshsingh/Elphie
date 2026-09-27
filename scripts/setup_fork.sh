@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Contributor bootstrap. Run this once after cloning your fork.
 # Configures git remotes (origin = your fork, upstream = elphie-hq/elphie),
-# initializes the pipecat submodule, creates the Python venv, and copies
+# checks that Pipecat is present in the tree, creates the Python venv, and copies
 # the .env templates.
 
 set -e
@@ -90,9 +90,12 @@ echo ""
 ### 2) Initialize submodules
 ###############################################################################
 
-echo -e "${BLUE}[2/4] Initializing pipecat submodule${NC}"
-git submodule update --init --recursive
-echo -e "${GREEN}✓ submodules initialized${NC}"
+echo -e "${BLUE}[2/4] Checking pipecat sources${NC}"
+if [[ ! -f "$BASE_DIR/pipecat/pyproject.toml" ]]; then
+    echo -e "${RED}pipecat/pyproject.toml is missing. Pipecat ships in the Elphie repo; re-clone Elphie.${NC}"
+    exit 1
+fi
+echo -e "${GREEN}✓ pipecat present${NC}"
 echo ""
 
 ###############################################################################

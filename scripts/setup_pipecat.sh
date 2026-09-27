@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Setup script for using pipecat as a git submodule
+# Install Pipecat from the copy shipped in this Elphie repo.
 
 # Get the project root directory (parent of scripts)
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -8,13 +8,14 @@ ELPHIE_DIR="$(dirname "$SCRIPT_DIR")"
 
 cd "$ELPHIE_DIR"
 
-echo "Setting up pipecat as a git submodule..."
+echo "Setting up pipecat from the Elphie repo..."
 
-# Initialize and update submodules
-echo "Initializing git submodules..."
-git submodule update --init --recursive
+if [[ ! -f "$ELPHIE_DIR/pipecat/pyproject.toml" ]]; then
+  echo "pipecat/pyproject.toml is missing. Re-clone Elphie; Pipecat is included in the repo."
+  exit 1
+fi
 
-# Install other requirements first so pipecat submodule wins any version conflicts
+# Install other requirements first so the in-repo pipecat wins any version conflicts
 echo "Installing elphie API requirements..."
 pip install -r api/requirements.txt
 
@@ -22,4 +23,4 @@ pip install -r api/requirements.txt
 echo "Installing pipecat dependencies..."
 pip install -e ./pipecat[cartesia,deepgram,openai,elevenlabs,groq,google,azure,sarvam,soundfile,silero,webrtc,speechmatics,openrouter,camb,mcp,inworld,smallest]
 
-echo "Setup complete! Pipecat is now available as a git submodule."
+echo "Setup complete. Pipecat is installed from this Elphie checkout."

@@ -231,8 +231,8 @@ sudo docker compose --profile remote up -d --build
 ```bash
 cd elphie
 
-# 1. Refresh local source / submodules as needed.
-git submodule update --init --recursive   # picks up pipecat submodule bumps
+# 1. Refresh local source. Pipecat is part of this repo.
+git pull
 
 # 2. Rebuild both images.
 sudo docker compose --profile remote build api ui
@@ -240,8 +240,6 @@ sudo docker compose --profile remote build api ui
 # 3. Recreate the running containers so they use the new images.
 sudo docker compose --profile remote up -d
 ```
-
-<Warning>If you update `pipecat` submodule, you must do `git submodule update --init --recursive`, or the Docker build step will not pick up `pipecat` changes</Warning>
 
 **Rebuild a single service** — faster when you only changed one side:
 

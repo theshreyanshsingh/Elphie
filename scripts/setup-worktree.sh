@@ -46,8 +46,11 @@ mkdir -p "$ROOT/logs"
 exec > >(tee "$LOG") 2>&1
 echo "=== setup-worktree $(date '+%Y-%m-%d %H:%M:%S')  [$(basename "$ROOT")] ==="
 
-echo "==> [1/4] pipecat submodule (init/update for this worktree)..."
-git submodule update --init --recursive
+echo "==> [1/4] pipecat (included in this repo)..."
+if [[ ! -f pipecat/pyproject.toml ]]; then
+  echo "pipecat/pyproject.toml is missing. Pipecat ships in the Elphie repo; re-clone Elphie."
+  exit 1
+fi
 
 echo "==> [2/4] isolated venv (python $PYVER)..."
 if [ -x venv/bin/python ]; then

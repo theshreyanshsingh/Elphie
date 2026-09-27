@@ -63,7 +63,7 @@ else
   git clone --depth 1 --branch main "$REPO_URL" "$INSTALL_DIR"
 fi
 
-# pipecat is a git submodule; Docker build bind-mounts it. Ensure sources exist.
+# Pipecat ships inside this repo. A clone of Elphie already contains it.
 ensure_pipecat() {
   local root="$1"
   if [[ -f "$root/pipecat/pyproject.toml" ]]; then
@@ -71,41 +71,9 @@ ensure_pipecat() {
     return 0
   fi
 
-  echo -e "${BLUE}==> Initializing git submodules (pipecat)${NC}"
-  git -C "$root" submodule sync --recursive || true
-  git -C "$root" submodule update --init --recursive || true
-
-  if [[ -f "$root/pipecat/pyproject.toml" ]]; then
-    echo -e "${GREEN}✓ pipecat submodule checked out${NC}"
-    return 0
-  fi
-
-  # Fallback: some hosts fail shallow/submodule fetch. Clone pinned SHA directly.
-  local sha
-  sha="$(git -C "$root" ls-tree HEAD pipecat | awk '{print $3}')"
-  if [[ -z "$sha" ]]; then
-    echo -e "${RED}Could not resolve pipecat submodule SHA from git tree${NC}"
-    return 1
-  fi
-
-  local pipecat_url
-  pipecat_url="${ELPHIE_PIPECAT_REPO_URL:-$(git -C "$root" config -f .gitmodules --get submodule.pipecat.url || true)}"
-  if [[ -z "$pipecat_url" ]]; then
-    echo -e "${RED}Could not resolve the pipecat repository URL${NC}"
-    return 1
-  fi
-
-  echo -e "${BLUE}==> Fallback: cloning pipecat @ ${sha}${NC}"
-  rm -rf "$root/pipecat"
-  git clone "$pipecat_url" "$root/pipecat"
-  git -C "$root/pipecat" fetch --depth 1 origin "$sha"
-  git -C "$root/pipecat" checkout --force "$sha"
-
-  if [[ ! -f "$root/pipecat/pyproject.toml" ]]; then
-    echo -e "${RED}pipecat/pyproject.toml still missing after fallback clone${NC}"
-    return 1
-  fi
-  echo -e "${GREEN}✓ pipecat cloned via fallback${NC}"
+  echo -e "${RED}pipecat/pyproject.toml is missing from this Elphie checkout.${NC}"
+  echo -e "${RED}Pipecat is part of the Elphie repo. Re-clone Elphie; do not fetch it from another remote.${NC}"
+  return 1
 }
 
 ensure_pipecat "$INSTALL_DIR"

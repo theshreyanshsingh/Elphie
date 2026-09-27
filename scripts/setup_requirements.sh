@@ -52,9 +52,9 @@ case "$PY_MAJ_MIN" in
         ;;
 esac
 
-echo "Setting up pipecat as a git submodule..."
+echo "Pipecat is included in this Elphie checkout."
 
-if [ "$DEV_MODE" -eq 0 ]; then
+if [[ -f .gitmodules ]] && [ "$DEV_MODE" -eq 0 ]; then
     echo "Initializing git submodules..."
     git submodule update --init --recursive
 fi
