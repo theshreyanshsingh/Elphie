@@ -8,7 +8,7 @@ BOOTSTRAP_LIB=""
 
 if [[ ! -f "$LIB_PATH" ]]; then
     BOOTSTRAP_LIB="$(mktemp)"
-    curl -fsSL -o "$BOOTSTRAP_LIB" "https://raw.githubusercontent.com/dograh-hq/dograh/main/scripts/lib/setup_common.sh"
+    curl -fsSL -o "$BOOTSTRAP_LIB" "https://raw.githubusercontent.com/theshreyanshsingh/Elphie/main/scripts/lib/setup_common.sh"
     LIB_PATH="$BOOTSTRAP_LIB"
 fi
 
@@ -50,10 +50,10 @@ done
 
 cd "$SCRIPT_DIR"
 
-dograh_info "Running Dograh remote preflight..."
+dograh_info "Running Elphie remote preflight..."
 dograh_prepare_remote_install "$SCRIPT_DIR"
 docker compose config -q
-dograh_success "✓ dograh-init preflight validated"
+dograh_success "✓ elphie-init preflight validated"
 
 if [[ "$VALIDATE_ONLY" == "1" ]]; then
     exit 0

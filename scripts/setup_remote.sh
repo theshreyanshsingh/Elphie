@@ -14,7 +14,7 @@ BOOTSTRAP_LIB=""
 
 if [[ ! -f "$LIB_PATH" ]]; then
     BOOTSTRAP_LIB="$(mktemp)"
-    curl -fsSL -o "$BOOTSTRAP_LIB" "https://raw.githubusercontent.com/dograh-hq/dograh/main/scripts/lib/setup_common.sh"
+    curl -fsSL -o "$BOOTSTRAP_LIB" "https://raw.githubusercontent.com/theshreyanshsingh/Elphie/main/scripts/lib/setup_common.sh"
     LIB_PATH="$BOOTSTRAP_LIB"
 fi
 
@@ -30,7 +30,7 @@ trap cleanup EXIT
 
 echo -e "${BLUE}"
 echo "╔══════════════════════════════════════════════════════════════╗"
-echo "║                   Dograh Remote Setup                        ║"
+echo "║                   Elphie Remote Setup                        ║"
 echo "║      Automated HTTPS deployment with TURN server             ║"
 echo "╚══════════════════════════════════════════════════════════════╝"
 echo -e "${NC}"
@@ -69,7 +69,7 @@ if [[ -z "${DEPLOY_MODE:-}" ]]; then
     if [[ -t 0 ]]; then
         echo ""
         echo -e "${YELLOW}Deployment mode:${NC}"
-        echo "  1) prebuilt - pull official dograh images (recommended, fastest)"
+        echo "  1) prebuilt - pull published images (recommended, fastest)"
         echo "  2) build    - build images from source (for forks or local customizations)"
         read -p "Choose [1]: " mode_choice
         mode_choice="${mode_choice:-1}"
@@ -109,10 +109,10 @@ if [[ "$DEPLOY_MODE" == "build" ]]; then
             if [[ -t 0 ]]; then
                 echo ""
                 echo -e "${YELLOW}GitHub repo to clone (format: owner/name):${NC}"
-                read -p "[dograh-hq/dograh]: " FORK_REPO
-                FORK_REPO="${FORK_REPO:-dograh-hq/dograh}"
+                read -p "[theshreyanshsingh/Elphie]: " FORK_REPO
+                FORK_REPO="${FORK_REPO:-theshreyanshsingh/Elphie}"
             else
-                FORK_REPO="dograh-hq/dograh"
+                FORK_REPO="theshreyanshsingh/Elphie"
             fi
         fi
 
@@ -147,10 +147,10 @@ fi
 if [[ "$DEPLOY_MODE" == "build" && "${REPO_SOURCE:-}" == "existing" ]]; then
     TARGET_DIR="."
 else
-    TARGET_DIR="dograh"
+    TARGET_DIR="elphie"
 fi
 
-if [[ "${DOGRAH_FORCE_OVERWRITE:-}" != "1" && "${DOGRAH_SKIP_DOWNLOAD:-}" != "1" ]]; then
+if [[ "${ELPHIE_FORCE_OVERWRITE:-${DOGRAH_FORCE_OVERWRITE:-}}" != "1" && "${ELPHIE_SKIP_DOWNLOAD:-${DOGRAH_SKIP_DOWNLOAD:-}}" != "1" ]]; then
     if [[ -f "$TARGET_DIR/.env" ]]; then
         if [[ "$TARGET_DIR" == "." ]]; then
             existing_path="$(pwd)/.env"
@@ -158,7 +158,7 @@ if [[ "${DOGRAH_FORCE_OVERWRITE:-}" != "1" && "${DOGRAH_SKIP_DOWNLOAD:-}" != "1"
             existing_path="$(pwd)/$TARGET_DIR/.env"
         fi
         echo ""
-        echo -e "${YELLOW}Detected an existing Dograh install:${NC}"
+        echo -e "${YELLOW}Detected an existing Elphie install:${NC}"
         echo -e "  ${YELLOW}$existing_path${NC}"
         echo ""
         echo -e "${RED}Refusing to continue - re-running setup would:${NC}"
@@ -167,10 +167,10 @@ if [[ "${DOGRAH_FORCE_OVERWRITE:-}" != "1" && "${DOGRAH_SKIP_DOWNLOAD:-}" != "1"
         echo -e "${RED}  - replace the validated remote deployment bundle${NC}"
         echo ""
         echo -e "${BLUE}To upgrade an existing install, follow:${NC}"
-        echo -e "  ${BLUE}https://docs.dograh.com/deployment/update${NC}"
+        echo -e "  ${BLUE}https://elphie.willowave.in/deployment/update${NC}"
         echo ""
         echo -e "${BLUE}To wipe state and reinstall from scratch, re-run with:${NC}"
-        echo -e "  ${BLUE}DOGRAH_FORCE_OVERWRITE=1 <same command>${NC}"
+        echo -e "  ${BLUE}ELPHIE_FORCE_OVERWRITE=1 <same command>${NC}"
         echo ""
         exit 1
     fi
@@ -199,26 +199,26 @@ fi
 echo ""
 
 if [[ "$DEPLOY_MODE" == "build" ]]; then
-    if [[ "${DOGRAH_SKIP_DOWNLOAD:-}" == "1" ]]; then
+    if [[ "${ELPHIE_SKIP_DOWNLOAD:-${DOGRAH_SKIP_DOWNLOAD:-}}" == "1" ]]; then
         echo -e "${BLUE}[1/$TOTAL] Using existing repo in current directory${NC}"
     elif [[ "${REPO_SOURCE:-}" == "clone" ]]; then
-        if [[ -e "dograh" ]]; then
-            dograh_fail "'dograh' directory already exists. Remove it or re-run with REPO_SOURCE=existing from inside it."
+        if [[ -e "elphie" ]]; then
+            dograh_fail "'elphie' directory already exists. Remove it or re-run with REPO_SOURCE=existing from inside it."
         fi
         echo -e "${BLUE}[1/$TOTAL] Cloning $FORK_REPO (branch: $BRANCH)...${NC}"
-        git clone --branch "$BRANCH" "https://github.com/$FORK_REPO.git" dograh
-        cd dograh
+        git clone --branch "$BRANCH" "https://github.com/$FORK_REPO.git" elphie
+        cd elphie
         echo -e "${GREEN}✓ Repo cloned${NC}"
     else
         echo -e "${BLUE}[1/$TOTAL] Using existing repo at $(pwd)${NC}"
     fi
 else
-    if [[ "${DOGRAH_SKIP_DOWNLOAD:-}" != "1" ]]; then
-        mkdir -p dograh 2>/dev/null || true
-        cd dograh
+    if [[ "${ELPHIE_SKIP_DOWNLOAD:-${DOGRAH_SKIP_DOWNLOAD:-}}" != "1" ]]; then
+        mkdir -p elphie 2>/dev/null || true
+        cd elphie
 
         echo -e "${BLUE}[1/$TOTAL] Downloading deployment bundle...${NC}"
-        curl -fsSL -o docker-compose.yaml "https://raw.githubusercontent.com/dograh-hq/dograh/main/docker-compose.yaml"
+        curl -fsSL -o docker-compose.yaml "https://raw.githubusercontent.com/theshreyanshsingh/Elphie/main/docker-compose.yaml"
         dograh_download_remote_support_bundle "$(pwd)" "main"
         echo -e "${GREEN}✓ Deployment bundle downloaded${NC}"
     else
@@ -253,7 +253,7 @@ echo -e "${BLUE}[4/$TOTAL] Creating environment file...${NC}"
 OSS_JWT_SECRET=$(openssl rand -hex 32)
 POSTGRES_PASSWORD=$(openssl rand -hex 32)
 REDIS_PASSWORD=$(openssl rand -hex 32)
-MINIO_ROOT_USER="dograh$(openssl rand -hex 6)"
+MINIO_ROOT_USER="elphie$(openssl rand -hex 6)"
 MINIO_ROOT_PASSWORD=$(openssl rand -hex 32)
 
 cat > .env << ENV_EOF
@@ -319,14 +319,14 @@ services:
     build:
       context: .
       dockerfile: api/Dockerfile
-    image: dograh-local/dograh-api:local
+    image: elphie-local/elphie-api:local
     pull_policy: never
 
   ui:
     build:
       context: .
       dockerfile: ui/Dockerfile
-    image: dograh-local/dograh-ui:local
+    image: elphie-local/elphie-ui:local
     pull_policy: never
 OVERRIDE_EOF
     echo -e "${GREEN}✓ docker-compose.override.yaml created${NC}"
@@ -350,7 +350,7 @@ echo "  - certs/local.crt"
 echo "  - certs/local.key"
 echo "  - .env"
 echo ""
-echo -e "${YELLOW}To start Dograh, run:${NC}"
+echo -e "${YELLOW}To start Elphie, run:${NC}"
 echo ""
 if [[ "$DEPLOY_MODE" != "build" || "${REPO_SOURCE:-}" != "existing" ]]; then
     echo -e "  ${BLUE}cd $(pwd)${NC}"
